@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>net.vleo.timel</groupId>
+    <artifactId>pom</artifactId>
+    <version>0.2.0-rc13-SNAPSHOT</version>
+    <packaging>pom</packaging>
+
+    <name>TimEL pom</name>
+
+    <description>TimEL is a Java library to parse and evaluate discreet time mathematical expressions</description>
+
+    <url>http://timel.vleo.net</url>
+
+    <licenses>
+        <license>
+            <name>GNU Lesser General Public License, Version 3.0</name>
+            <url>http://www.gnu.org/licenses/lgpl-3.0.txt</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
+
+    <developers>
+        <developer>
+            <name>Andrea Leofreddi</name>
+            <email>a.leofreddi@vleo.net</email>
+            <roles>
+                <role>owner</role>
+                <role>architect</role>
+                <role>developer</role>
+            </roles>
+        </developer>
+    </developers>
+
+    <scm>
+        <connection>scm:git:https://scm.vleo.net/repo/timel/pub/main</connection>
+        <developerConnection>scm:git:https://scm.vleo.net/repo/timel/auth/main</developerConnection>
+        <url>https://scm.vleo.net/repo/timel/pub/main</url>
+    </scm>
+
+    <properties>
+        <!-- Software version -->
+        <junit.version>4.12</junit.version>
+        <commons-csv.version>1.1</commons-csv.version>
+
+        <!-- Project build -->
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    </properties>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.3</version>
+
+                <!-- Set the Java source and target version to 1.6 -->
+                <configuration>
+                    <source>1.6</source>
+                    <target>1.6</target>
+                </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-source-plugin</artifactId>
+                <version>2.4</version>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <version>2.10.3</version>
+            </plugin>
+        </plugins>
+    </build>
+
+    <modules>
+        <module>timel</module>
+        <module>timel-mapdb</module>
+    </modules>
+
+
+    <profiles>
+        <profile>
+            <id>release-vleo</id>
+
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+
+            <distributionManagement>
+                <repository>
+                    <id>vleo-release</id>
+                    <name>repo-release</name>
+                    <url>https://repo.vleo.net/artifactory/release</url>
+                </repository>
+                <snapshotRepository>
+                    <id>vleo-snapshot</id>
+                    <name>repo-snapshot</name>
+                    <url>https://repo.vleo.net/artifactory/snapshot</url>
+                </snapshotRepository>
+            </distributionManagement>
+        </profile>
+
+        <profile>
+            <id>release-ossrh</id>
+
+            <activation>
+                <property>
+                    <name>performRelease</name>
+                    <value>true</value>
+                </property>
+            </activation>
+
+            <distributionManagement>
+                <snapshotRepository>
+                    <id>ossrh</id>
+                    <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+                </snapshotRepository>
+            </distributionManagement>
+
+            <build>
+                <plugins>
+                    <plugin>
+                        <!-- Nexus staging -->
+                        <groupId>org.sonatype.plugins</groupId>
+                        <artifactId>nexus-staging-maven-plugin</artifactId>
+                        <extensions>true</extensions>
+                        <configuration>
+                            <serverId>ossrh</serverId>
+                            <nexusUrl>https://oss.sonatype.org/</nexusUrl>
+                            <autoReleaseAfterClose>true</autoReleaseAfterClose>
+                        </configuration>
+                    </plugin>
+
+                    <plugin>
+                        <!-- GPG plugin -->
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-gpg-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>sign-artifacts</id>
+                                <phase>verify</phase>
+                                <goals>
+                                    <goal>sign</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
+</project>

@@ -1,0 +1,20 @@
+"program=
+R =
+    Integral[
+        If[
+            Extract[EvalStart, ""HOUR_OF_DAY"", ""Europe/Rome""] < 12
+            &&
+            Start >= EvalStart
+            &&
+            Stop <= EvalStop,
+            Integral[1, Every[1, ""HOUR_OF_DAY"", ""Europe/Rome""]],
+            Integral[0]
+        ],
+        Every[1, ""DAY_OF_MONTH"", ""Europe/Rome""]
+    ]
+";;;
+timeZone=Europe/Rome;;;
+data;;;
+R*;01/01/2015 21:00;02/01/2015 00:00;0
+AR;02/01/2015 00:00;03/01/2015 00:00;12
+AR;03/01/2015 00:00;04/01/2015 00:00;12
