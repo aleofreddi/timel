@@ -5,7 +5,7 @@
     <parent>
         <groupId>net.vleo.timel</groupId>
         <artifactId>pom</artifactId>
-        <version>0.2.0-rc13-SNAPSHOT</version>
+        <version>0.3-SNAPSHOT</version>
     </parent>
 
     <artifactId>timel-mapdb</artifactId>
@@ -40,7 +40,8 @@
         <connection>scm:git:https://scm.vleo.net/repo/timel/pub/main</connection>
         <developerConnection>scm:git:https://scm.vleo.net/repo/timel/auth/main</developerConnection>
         <url>https://scm.vleo.net/repo/timel/pub/main</url>
-    </scm>
+      <tag>HEAD</tag>
+  </scm>
 
     <properties>
         <!-- Software version -->
@@ -94,7 +95,7 @@
         <dependency>
             <groupId>net.vleo.timel</groupId>
             <artifactId>timel</artifactId>
-            <version>0.2.0-rc13-SNAPSHOT</version>
+            <version>0.3-SNAPSHOT</version>
         </dependency>
 
         <!-- MapDB -->
@@ -108,7 +109,7 @@
         <dependency>
             <groupId>net.vleo.timel</groupId>
             <artifactId>timel</artifactId>
-            <version>0.2.0-rc13-SNAPSHOT</version>
+            <version>0.3-SNAPSHOT</version>
             <type>test-jar</type>
             <scope>test</scope>
         </dependency>
