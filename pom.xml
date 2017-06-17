@@ -37,17 +37,28 @@
         <connection>scm:git:https://scm.vleo.net/repo/timel/pub/main</connection>
         <developerConnection>scm:git:https://scm.vleo.net/repo/timel/auth/main</developerConnection>
         <url>https://scm.vleo.net/repo/timel/pub/main</url>
-      <tag>HEAD</tag>
-  </scm>
+        <tag>HEAD</tag>
+    </scm>
 
     <properties>
         <!-- Software version -->
         <junit.version>4.12</junit.version>
         <commons-csv.version>1.1</commons-csv.version>
+        <lombok.version>1.16.16</lombok.version>
 
         <!-- Project build -->
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
+
+    <dependencies>
+        <!-- Lombok -->
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <version>${lombok.version}</version>
+            <scope>provided</scope>
+        </dependency>
+    </dependencies>
 
     <build>
         <plugins>
@@ -56,10 +67,15 @@
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>3.3</version>
 
-                <!-- Set the Java source and target version to 1.6 -->
                 <configuration>
-                    <source>1.6</source>
-                    <target>1.6</target>
+                    <source>1.8</source>
+                    <target>1.8</target>
+
+                    <annotationProcessors>
+                        <annotationProcessor>
+                            lombok.launch.AnnotationProcessorHider$AnnotationProcessor
+                        </annotationProcessor>
+                    </annotationProcessors>
                 </configuration>
             </plugin>
 
@@ -80,8 +96,8 @@
     <modules>
         <module>timel</module>
         <module>timel-mapdb</module>
+        <module>timel-parser</module>
     </modules>
-
 
     <profiles>
         <profile>
