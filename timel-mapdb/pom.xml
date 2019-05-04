@@ -1,18 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
         <groupId>net.vleo.timel</groupId>
         <artifactId>pom</artifactId>
-        <version>0.3-SNAPSHOT</version>
+        <version>0.9-SNAPSHOT</version>
     </parent>
 
     <artifactId>timel-mapdb</artifactId>
 
     <name>TimEL MapDB backend</name>
 
-    <description>TimEL is a Java library to parse and evaluate discreet time mathematical expressions</description>
+    <description>MapDB backend for TimEL variables</description>
 
     <url>http://timel.vleo.net</url>
 
@@ -37,15 +38,15 @@
     </developers>
 
     <scm>
-        <connection>scm:git:https://scm.vleo.net/repo/timel/pub/main</connection>
-        <developerConnection>scm:git:https://scm.vleo.net/repo/timel/auth/main</developerConnection>
-        <url>https://scm.vleo.net/repo/timel/pub/main</url>
-      <tag>HEAD</tag>
-  </scm>
+        <connection>scm:git:https://github.com/aleofreddi/timel</connection>
+        <developerConnection>scm:git:https://github.com/aleofreddi/timel</developerConnection>
+        <url>https://github.com/aleofreddi/timel</url>
+        <tag>HEAD</tag>
+    </scm>
 
     <properties>
         <!-- Software version -->
-        <mapdb.version>2.0-beta12</mapdb.version>
+        <mapdb.version>2.0-beta13</mapdb.version>
     </properties>
 
     <build>
@@ -94,8 +95,8 @@
         <!-- TimEL -->
         <dependency>
             <groupId>net.vleo.timel</groupId>
-            <artifactId>timel</artifactId>
-            <version>0.3-SNAPSHOT</version>
+            <artifactId>timel-core</artifactId>
+            <version>${project.version}</version>
         </dependency>
 
         <!-- MapDB -->
@@ -105,28 +106,21 @@
             <version>${mapdb.version}</version>
         </dependency>
 
-        <!-- TimEL (tests) -->
-        <dependency>
-            <groupId>net.vleo.timel</groupId>
-            <artifactId>timel</artifactId>
-            <version>0.3-SNAPSHOT</version>
-            <type>test-jar</type>
-            <scope>test</scope>
-        </dependency>
-
-        <!-- JUnit -->
-        <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <version>${junit.version}</version>
-            <scope>test</scope>
-        </dependency>
-
         <!-- Commons CSV -->
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-csv</artifactId>
-            <version>1.1</version><!--${commons-csv.version}</version -->
+            <version>${commons-csv.version}</version>
+            <scope>test</scope>
+        </dependency>
+
+        <!-- TimEL (tests) -->
+        <dependency>
+            <groupId>net.vleo.timel</groupId>
+            <artifactId>timel-core</artifactId>
+            <version>${project.version}</version>
+            <classifier>tests</classifier>
+            <type>test-jar</type>
             <scope>test</scope>
         </dependency>
     </dependencies>
