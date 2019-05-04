@@ -1,15 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>net.vleo.timel</groupId>
     <artifactId>pom</artifactId>
-    <version>0.3-SNAPSHOT</version>
+    <version>0.9-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <name>TimEL pom</name>
 
-    <description>TimEL is a Java library to parse and evaluate discreet time mathematical expressions</description>
+    <description>TimEL is a Java library to parse and evaluate time-series expressions</description>
 
     <url>http://timel.vleo.net</url>
 
@@ -34,20 +35,32 @@
     </developers>
 
     <scm>
-        <connection>scm:git:https://scm.vleo.net/repo/timel/pub/main</connection>
-        <developerConnection>scm:git:https://scm.vleo.net/repo/timel/auth/main</developerConnection>
-        <url>https://scm.vleo.net/repo/timel/pub/main</url>
+        <connection>scm:git:https://github.com/aleofreddi/timel</connection>
+        <developerConnection>scm:git:https://github.com/aleofreddi/timel</developerConnection>
+        <url>https://github.com/aleofreddi/timel</url>
         <tag>HEAD</tag>
     </scm>
 
     <properties>
-        <!-- Software version -->
-        <junit.version>4.12</junit.version>
+        <!-- Dependency versions -->
         <commons-csv.version>1.1</commons-csv.version>
-        <lombok.version>1.16.16</lombok.version>
+        <hamcrest.version>2.1</hamcrest.version>
+        <junit.version>5.4.2</junit.version>
+        <lombok.version>1.18.6</lombok.version>
+        <maven-compiler-plugin.version>3.8.1</maven-compiler-plugin.version>
+        <maven-jar-plugin.version>3.1.1</maven-jar-plugin.version>
+        <maven-jacoco-plugin.version>0.8.3</maven-jacoco-plugin.version>
+        <maven-javadoc-plugin.version>3.1.0</maven-javadoc-plugin.version>
+        <maven-license-plugin.version>1.20</maven-license-plugin.version>
+        <maven-source-plugin.version>3.0.1</maven-source-plugin.version>
+        <maven-surefire-plugin.version>3.0.0-M3</maven-surefire-plugin.version>
+        <mockito.version>2.27.0</mockito.version>
 
         <!-- Project build -->
+        <license.licenseName>lgpl_v3</license.licenseName>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.inceptionYear>2015</project.inceptionYear>
+        <project.organization.name>Andrea Leofreddi</project.organization.name>
     </properties>
 
     <dependencies>
@@ -58,6 +71,51 @@
             <version>${lombok.version}</version>
             <scope>provided</scope>
         </dependency>
+
+        <!-- JUnit -->
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-api</artifactId>
+            <version>${junit.version}</version>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-engine</artifactId>
+            <version>${junit.version}</version>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-params</artifactId>
+            <version>${junit.version}</version>
+            <scope>test</scope>
+        </dependency>
+
+        <!-- Hamcrest -->
+        <dependency>
+            <groupId>org.hamcrest</groupId>
+            <artifactId>hamcrest-library</artifactId>
+            <version>${hamcrest.version}</version>
+            <scope>test</scope>
+        </dependency>
+
+        <!-- Mockito -->
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-core</artifactId>
+            <version>${mockito.version}</version>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-junit-jupiter</artifactId>
+            <version>${mockito.version}</version>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
     <build>
@@ -65,7 +123,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.3</version>
+                <version>${maven-compiler-plugin.version}</version>
 
                 <configuration>
                     <source>1.8</source>
@@ -82,45 +140,78 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-source-plugin</artifactId>
-                <version>2.4</version>
+                <version>${maven-source-plugin.version}</version>
             </plugin>
 
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
-                <version>2.10.3</version>
+                <version>${maven-javadoc-plugin.version}</version>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>${maven-surefire-plugin.version}</version>
+
+                <configuration>
+                    <argLine>-Xmx256m @{argLine}</argLine>
+                </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <version>${maven-jar-plugin.version}</version>
+            </plugin>
+
+            <plugin>
+                <groupId>org.jacoco</groupId>
+                <artifactId>jacoco-maven-plugin</artifactId>
+                <version>${maven-jacoco-plugin.version}</version>
+                <executions>
+                    <execution>
+                        <id>prepare-agent</id>
+                        <goals>
+                            <goal>prepare-agent</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>report</id>
+                        <phase>prepare-package</phase>
+                        <goals>
+                            <goal>report</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>license-maven-plugin</artifactId>
+                <version>${maven-license-plugin.version}</version>
+                <configuration>
+                    <verbose>true</verbose>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>first</id>
+                        <goals>
+                            <goal>update-file-header</goal>
+                        </goals>
+                        <phase>process-sources</phase>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>
 
     <modules>
-        <module>timel</module>
+        <module>timel-core</module>
         <module>timel-mapdb</module>
-        <module>timel-parser</module>
     </modules>
 
     <profiles>
-        <profile>
-            <id>release-vleo</id>
-
-            <activation>
-                <activeByDefault>true</activeByDefault>
-            </activation>
-
-            <distributionManagement>
-                <repository>
-                    <id>vleo-release</id>
-                    <name>repo-release</name>
-                    <url>https://repo.vleo.net/artifactory/release</url>
-                </repository>
-                <snapshotRepository>
-                    <id>vleo-snapshot</id>
-                    <name>repo-snapshot</name>
-                    <url>https://repo.vleo.net/artifactory/snapshot</url>
-                </snapshotRepository>
-            </distributionManagement>
-        </profile>
-
         <profile>
             <id>release-ossrh</id>
 
