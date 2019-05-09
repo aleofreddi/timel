@@ -1,0 +1,15 @@
+variable;from;to;value
+
+### boolean_V1 (monthly)
+boolean_V1;01/01/2015 00:00;01/02/2015 00:00;0
+boolean_V1;01/02/2015 00:00;01/03/2015 00:00;1
+# Undef
+
+### EXPECTED RESULTS ###
+
+# ! false => true
+boolean_R*;01/01/2015 00:00;01/02/2015 00:00;1
+# ! true => false
+boolean_R*;01/02/2015 00:00;01/03/2015 00:00;0
+# ! undef => undef
+#boolean_R*;01/03/2015 00:00;01/04/2015 00:00;undef

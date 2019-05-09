@@ -1,26 +1,29 @@
-/*
- * Copyright 2014-2016 Andrea Leofreddi
- *
- * This file is part of TimEL.
- *
- * TimEL is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Lesser General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * TimEL is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public License
- * along with TimEL.  If not, see <http://www.gnu.org/licenses/>.
- */
 package net.vleo.timel.variable;
 
+/*-
+ * #%L
+ * TimEL MapDB backend
+ * %%
+ * Copyright (C) 2015 - 2019 Andrea Leofreddi
+ * %%
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Lesser Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Lesser Public
+ * License along with this program.  If not, see
+ * <http://www.gnu.org/licenses/lgpl-3.0.html>.
+ * #L%
+ */
+
 import net.vleo.timel.executor.ExecutorContext;
-import net.vleo.timel.executor.Sample;
-import net.vleo.timel.executor.variable.Variable;
+import net.vleo.timel.time.Sample;
 import net.vleo.timel.iterator.AdapterTimeIterator;
 import net.vleo.timel.iterator.TimeIterator;
 import net.vleo.timel.time.Interval;
