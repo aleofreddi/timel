@@ -10,23 +10,25 @@ package net.vleo.timel.type;
  * it under the terms of the GNU Lesser General Public License as
  * published by the Free Software Foundation, either version 3 of the
  * License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Lesser Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Lesser Public
  * License along with this program.  If not, see
  * <http://www.gnu.org/licenses/lgpl-3.0.html>.
  * #L%
  */
 
+import net.vleo.timel.ConfigurationException;
 import net.vleo.timel.impl.downscaler.Downscaler;
 import net.vleo.timel.impl.downscaler.SameDownscaler;
 import net.vleo.timel.impl.upscaler.SameUpscaler;
 import net.vleo.timel.impl.upscaler.Upscaler;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -49,24 +51,34 @@ public abstract class Type<T> {
     }
 
     /**
-     * @return True iff this type is a template.
+     * @return True iff this type is a non-specialized template
      */
-    public boolean isTemplate() {
+    public boolean isUnboundTemplate() {
         return false;
     }
 
     /**
-     * @return
+     * @return True iff this type is a specialized template
      */
-    public boolean isSpecialized() {
+    public boolean isSpecializedTemplate() {
         return false;
     }
 
-    public Type template() {
+    /**
+     * @return True if template is a concrete type, that is either not a template  or it is a specialized template
+     */
+    public boolean isConcrete() {
+        return !isUnboundTemplate() || isSpecializedTemplate();
+    }
+
+    /**
+     * @return The unbound template type for a specialized template, or itself for a non-template type.
+     */
+    public Type<T> template() {
         return this;
     }
 
-    public Type specialize(Object... parameters) {
+    public Type<T> specialize(Object... parameters) {
         throw new UnsupportedOperationException();
     }
 
@@ -115,4 +127,5 @@ public abstract class Type<T> {
     public int hashCode() {
         return getClass().hashCode();
     }
+
 }

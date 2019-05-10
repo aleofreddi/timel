@@ -55,11 +55,11 @@ public abstract class TemplateType<T> extends Type<T> {
         this(Collections.emptyList());
     }
 
-    public boolean isSpecialized() {
+    public boolean isSpecializedTemplate() {
         return !parameters.isEmpty();
     }
 
-    public boolean isTemplate() {
+    public boolean isUnboundTemplate() {
         return true;
     }
 
@@ -71,7 +71,7 @@ public abstract class TemplateType<T> extends Type<T> {
         }
     }
 
-    public TemplateType specialize(Object... parameters) {
+    public TemplateType<T> specialize(Object... parameters) {
         Class[] parameterTypes = Arrays.stream(parameters)
                 .map(Object::getClass)
                 .toArray(Class[]::new);
@@ -84,7 +84,7 @@ public abstract class TemplateType<T> extends Type<T> {
         }
 
         try {
-            return (TemplateType) constructor.newInstance(parameters);
+            return (TemplateType<T>) constructor.newInstance(parameters);
         } catch(InstantiationException | IllegalAccessException | InvocationTargetException e) {
             throw new RuntimeException(e); // FIXME
         }

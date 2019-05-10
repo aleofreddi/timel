@@ -1,4 +1,4 @@
-# TimEL: a Java time-serie library [![Build Status](https://travis-ci.com/aleofreddi/timel.svg?branch=master)](https://travis-ci.com/aleofreddi/timel)
+# TimEL: a Java time-serie library [![Build Status](https://travis-ci.com/aleofreddi/timel.svg?branch=master)](https://travis-ci.com/aleofreddi/timel) [![License: LGPL v3](https://img.shields.io/badge/License-LGPL%20v3-blue.svg)](https://www.gnu.org/licenses/lgpl-3.0)
 
 TimEL is a Java library to evaluate expressions with time-series data. TimEL's aim is to provide an easy to use - yet powerful language - to model, aggregate and manipulate time-series. With TimEL you can:
 
@@ -7,9 +7,9 @@ TimEL is a Java library to evaluate expressions with time-series data. TimEL's a
   * **Autoscale** natively integral values (like consumptions);
   * **Stream** results without the need of having all the operands in memory;
   * **Support** integer, floating point and double expressions;
-  * **Extend**: you can define your own types and functions;
+  * **Extend** the functionalities with your own types and functions.
 
-TL;DR? Pick a random example in the [online console](https://timel.vleo.net/console) and try it yourself!
+**TL;DR?** Pick a random example in the [📺 online console](https://timel.vleo.net/console) and try it yourself!
 
 TimEL requires Java 8 and will run in any J2SE or J2EE container.
 

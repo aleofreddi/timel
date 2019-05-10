@@ -10,12 +10,12 @@ package net.vleo.timel.impl.poset;
  * it under the terms of the GNU Lesser General Public License as
  * published by the Free Software Foundation, either version 3 of the
  * License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Lesser Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Lesser Public
  * License along with this program.  If not, see
  * <http://www.gnu.org/licenses/lgpl-3.0.html>.
@@ -32,42 +32,40 @@ import static java.util.stream.Collectors.toMap;
 import static java.util.stream.Stream.concat;
 
 /**
- * A class to represent a weighted, partially ordered set.
+ * A class to represent a partially ordered set over N elements, eventually connected by a certain number of {@link OrderEntry} items.
  * <p>
- * This class supports leastUpperBound and getPath operations so it is suitable as a base for the intermediate system.
+ * This class supports leastUpperBound and getPath operations so it is suitable as a base for a type system.
  *
- * @param <N> Node intermediate
- * @param <E> Edge intermediate
+ * @param <N> Node type
+ * @param <E> Order entry type
  * @author Andrea Leofreddi
  */
-public class WeightedPoset<N, E extends WeightedPoset.Edge<N>> {
+public class Poset<N, E extends Poset.OrderEntry<N>> {
     private final Map<N, Integer> nodeEnumeration;
     private final Map<Integer, Path<N, E>> closure;
 
     /**
-     * A weighted poset edge.
+     * A partial order entry.
      *
-     * @param <T>
+     * @param <T> Element type
      */
-    public interface Edge<T> {
+    public interface OrderEntry<T> {
         T getSource();
 
         T getTarget();
-
-        int getWeight();
     }
 
     /**
-     * Build a {@link WeightedPoset} from the given edges.
+     * Build a {@link Poset} from the given edges.
      *
      * @param edges Posted edges
      */
-    public WeightedPoset(Set<E> edges) {
+    public Poset(Set<E> edges) {
         List<N> types = concat(
                 edges.stream()
-                        .map(Edge::getSource),
+                        .map(OrderEntry::getSource),
                 edges.stream()
-                        .map(Edge::getTarget)
+                        .map(OrderEntry::getTarget)
         )
                 .distinct()
                 .collect(toList());

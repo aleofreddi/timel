@@ -10,12 +10,12 @@ package net.vleo.timel.console;
  * it under the terms of the GNU Lesser General Public License as
  * published by the Free Software Foundation, either version 3 of the
  * License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Lesser Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Lesser Public
  * License along with this program.  If not, see
  * <http://www.gnu.org/licenses/lgpl-3.0.html>.
@@ -23,7 +23,7 @@ package net.vleo.timel.console;
  */
 
 import lombok.val;
-import net.vleo.timel.cast.StandardConversions;
+import net.vleo.timel.conversion.StandardConversions;
 import net.vleo.timel.function.FunctionRegistry;
 import net.vleo.timel.function.StandardFunctions;
 import net.vleo.timel.impl.function.interval.EveryFunction;
@@ -59,7 +59,7 @@ public class Console {
         DateTime start = new DateTime(2015, 1, 15, 0, 0, 0, 0, timeZone);
         DateTime stop = new DateTime(2016, 2, 14, 0, 0, 0, 0, timeZone);
 
-        final TypeSystem TYPE_SYSTEM = new TypeSystem(StandardConversions.STANDARD_COERCIONS, StandardConversions.STANDARD_CASTS);
+        final TypeSystem TYPE_SYSTEM = new TypeSystem(StandardConversions.STANDARD_CONVERSIONS);
 
         while(true) {
             try {

@@ -29,12 +29,13 @@ import java.util.stream.Stream;
 /**
  * This class represents a chain between two paths.
  *
- * @param <T>
+ * @param <N> Node type
+ * @param <E> Order entry type
  * @author Andrea Leofreddi
  */
 @Value
-class ChainedPath<T, C> implements Path<T, C> {
-    private final Path<T, C> first, second;
+class ChainedPath<N, E> implements Path<N, E> {
+    private final Path<N, E> first, second;
 
     @Override
     public String toString() {
@@ -42,12 +43,12 @@ class ChainedPath<T, C> implements Path<T, C> {
     }
 
     @Override
-    public T getTargetNode() {
+    public N getTargetNode() {
         return second.getTargetNode();
     }
 
     @Override
-    public Stream<C> getPath() {
+    public Stream<E> getPath() {
         return Stream.concat(
                 first.getPath(),
                 second.getPath()

@@ -1,4 +1,4 @@
-package net.vleo.timel.cast;
+package net.vleo.timel.conversion;
 
 /*-
  * #%L
@@ -22,23 +22,15 @@ package net.vleo.timel.cast;
  * #L%
  */
 
-import net.vleo.timel.type.IntegerType;
-import net.vleo.timel.type.ZeroType;
+import net.vleo.timel.annotation.CastPrototype;
+import net.vleo.timel.type.IntegralDoubleType;
+import net.vleo.timel.type.IntegralFloatType;
 
 /**
- * Zero to integer conversion.
+ * Integral double to integral float conversion.
  *
  * @author Andrea Leofreddi
  */
-public class ZeroToIntegerConversion extends AbstractTypeConversion {
-    public ZeroToIntegerConversion() {
-        super(new ZeroType(), new IntegerType());
-    }
-
-    @Override
-    public Object apply(Object value) {
-        if(value == null)
-            return null;
-        return 0;
-    }
+@CastPrototype(source = IntegralDoubleType.class, target = IntegralFloatType.class)
+public class IntegralDoubleToIntegralFloatConversion extends DoubleToFloatConversion {
 }
