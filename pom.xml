@@ -192,6 +192,7 @@
                 <version>${maven-license-plugin.version}</version>
                 <configuration>
                     <verbose>true</verbose>
+                    <trimHeaderLine>true</trimHeaderLine>
                 </configuration>
                 <executions>
                     <execution>
