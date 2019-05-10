@@ -1,4 +1,4 @@
-package net.vleo.timel.cast;
+package net.vleo.timel.conversion;
 
 /*-
  * #%L
@@ -10,20 +10,20 @@ package net.vleo.timel.cast;
  * it under the terms of the GNU Lesser General Public License as
  * published by the Free Software Foundation, either version 3 of the
  * License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Lesser Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Lesser Public
  * License along with this program.  If not, see
  * <http://www.gnu.org/licenses/lgpl-3.0.html>.
  * #L%
  */
 
-import net.vleo.timel.impl.poset.WeightedPoset;
-import net.vleo.timel.impl.poset.WeightedPoset.Edge;
+import net.vleo.timel.impl.poset.Poset;
+import net.vleo.timel.impl.poset.Poset.OrderEntry;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
@@ -37,13 +37,12 @@ import static java.util.function.Function.identity;
 import static java.util.stream.Collectors.*;
 import static org.hamcrest.MatcherAssert.*;
 import static org.hamcrest.Matchers.*;
-import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 /**
  * @author Andrea Leofreddi
  */
-class WeightedPosetTest {
+class PosetTest {
     private static Object NODE_A = build("A"),
             NODE_B = build("B"),
             NODE_C = build("C"),
@@ -67,8 +66,8 @@ class WeightedPosetTest {
         return Arrays.stream(items).collect(toSet());
     }
 
-    private static Edge<Object> edge(Object from, Object to, int weight) {
-        return new Edge<Object>() {
+    private static OrderEntry<Object> edge(Object from, Object to) {
+        return new OrderEntry<Object>() {
             @Override
             public Object getSource() {
                 return from;
@@ -77,11 +76,6 @@ class WeightedPosetTest {
             @Override
             public Object getTarget() {
                 return to;
-            }
-
-            @Override
-            public int getWeight() {
-                return weight;
             }
 
             @Override
@@ -95,14 +89,14 @@ class WeightedPosetTest {
             .collect(toMap(Object::toString, identity()));
 
     @SuppressWarnings("unchecked")
-    private static List<Set<Edge<Object>>> TYPE_CONVERSION_GRAPH = asList(
+    private static List<Set<OrderEntry<Object>>> TYPE_CONVERSION_GRAPH = asList(
             /*
              *  B
              *  |
              *  A
              */
             asSet(
-                    edge(NODE_A, NODE_B, 1)
+                    edge(NODE_A, NODE_B)
             ),
 
             /*
@@ -113,10 +107,10 @@ class WeightedPosetTest {
              *    A
              */
             asSet(
-                    edge(NODE_A, NODE_B, 1),
-                    edge(NODE_A, NODE_C, 1),
-                    edge(NODE_B, NODE_D, 1),
-                    edge(NODE_C, NODE_D, 1)
+                    edge(NODE_A, NODE_B),
+                    edge(NODE_A, NODE_C),
+                    edge(NODE_B, NODE_D),
+                    edge(NODE_C, NODE_D)
             ),
 
             /*
@@ -129,98 +123,99 @@ class WeightedPosetTest {
              *    A
              */
             asSet(
-                    edge(NODE_A, NODE_B, 1),
-                    edge(NODE_A, NODE_C, 1),
-                    edge(NODE_B, NODE_D, 1),
-                    edge(NODE_C, NODE_E, 1),
-                    edge(NODE_C, NODE_F, 1),
-                    edge(NODE_D, NODE_E, 1)
+                    edge(NODE_A, NODE_B),
+                    edge(NODE_A, NODE_C),
+                    edge(NODE_B, NODE_D),
+                    edge(NODE_C, NODE_E),
+                    edge(NODE_C, NODE_F),
+                    edge(NODE_D, NODE_E)
             ),
 
             /*
-             *      E
-             *     / \
-             *    D   | F
-             * 2=>|   |/
-             *    B   C
-             *     \ /<=2
-             *      A
+             *    E
+             *   / \
+             *  D   | F
+             *  |   |/
+             *  B   C
+             *   \ /
+             *    A
              */
             asSet(
-                    edge(NODE_A, NODE_B, 1),
-                    edge(NODE_A, NODE_C, 2),
-                    edge(NODE_B, NODE_D, 2),
-                    edge(NODE_C, NODE_E, 1),
-                    edge(NODE_C, NODE_F, 1),
-                    edge(NODE_D, NODE_E, 1)
+                    edge(NODE_A, NODE_B),
+                    edge(NODE_A, NODE_C),
+                    edge(NODE_B, NODE_D),
+                    edge(NODE_C, NODE_E),
+                    edge(NODE_C, NODE_F),
+                    edge(NODE_D, NODE_E)
             ),
 
             /*
-             *      E
-             *     / \
-             *    D   | F  H   I
-             * 2=>|   |/    \ /<=3
-             *    B   C      G
-             *     \ /<=2
-             *      A
+             *    E
+             *   / \
+             *  D   | F  H   I
+             *  |   |/    \ /
+             *  B   C      G
+             *   \ /
+             *    A
              */
             asSet(
-                    edge(NODE_A, NODE_B, 1),
-                    edge(NODE_A, NODE_C, 2),
-                    edge(NODE_B, NODE_D, 2),
-                    edge(NODE_C, NODE_E, 1),
-                    edge(NODE_C, NODE_F, 1),
-                    edge(NODE_D, NODE_E, 1),
-                    edge(NODE_G, NODE_H, 1),
-                    edge(NODE_G, NODE_I, 3)
+                    edge(NODE_A, NODE_B),
+                    edge(NODE_A, NODE_C),
+                    edge(NODE_B, NODE_D),
+                    edge(NODE_C, NODE_E),
+                    edge(NODE_C, NODE_F),
+                    edge(NODE_D, NODE_E),
+                    edge(NODE_G, NODE_H),
+                    edge(NODE_G, NODE_I)
             )
     );
 
-    private static List<Set<Edge<Object>>> INVALID_GRAPHS = asList(
+    private static List<Set<OrderEntry<Object>>> INVALID_GRAPHS = asList(
             /*
              * A->B->D is ambiguous to A->C->D
              *
-             *      D
-             *  2=>/ \
-             *    B   C
-             *     \ /<=2
-             *      A
+             *    D
+             *   / \
+             *  B   C
+             *   \ /
+             *    A
              */
             asSet(
-                    edge(NODE_A, NODE_B, 1),
-                    edge(NODE_A, NODE_C, 2),
-                    edge(NODE_B, NODE_D, 2),
-                    edge(NODE_C, NODE_D, 1)
+                    edge(NODE_A, NODE_B),
+                    edge(NODE_A, NODE_C),
+                    edge(NODE_B, NODE_D),
+                    edge(NODE_C, NODE_D)
             ),
 
             /*
-             * A->B->D->E is ambiguous to A->C->E
+             * A->B->D->G is ambiguous to A->C->E->G
              *
-             *      E
-             *     / \
-             *    D   | F
-             * 2=>|   |/
-             *    B   C
-             *     \ /<=3
-             *      A
+             *    G
+             *   / \
+             *  D   E F
+             *  |   |/
+             *  B   C
+             *   \ /
+             *    A
              */
             asSet(
-                    edge(NODE_A, NODE_B, 1),
-                    edge(NODE_A, NODE_C, 3),
-                    edge(NODE_B, NODE_D, 2),
-                    edge(NODE_C, NODE_E, 1),
-                    edge(NODE_C, NODE_F, 1),
-                    edge(NODE_D, NODE_E, 1)
+                    edge(NODE_A, NODE_B),
+                    edge(NODE_A, NODE_C),
+                    edge(NODE_B, NODE_D),
+                    edge(NODE_C, NODE_E),
+                    edge(NODE_C, NODE_F),
+                    edge(NODE_D, NODE_G),
+                    edge(NODE_E, NODE_G)
             )
     );
 
     @ParameterizedTest(name = "graph=#{0} expectedWeight={1}")
     @CsvSource({
-            "0,3",
-            "1,4"
+            "0,2",
+            "1,3"
     })
     void ambiguousGraphShouldThrowIllegalArgumentException(int graph, int expectedWeight) {
-        IllegalArgumentException actual = assertThrows(IllegalArgumentException.class, () -> new WeightedPoset<>(INVALID_GRAPHS.get(graph)));
+        IllegalArgumentException actual = assertThrows(IllegalArgumentException.class, () -> new Poset<>(INVALID_GRAPHS.get(graph)));
 
         assertThat(actual.getMessage(), containsString("Ambiguous path"));
         assertThat(actual.getMessage(), containsString("weight " + expectedWeight));
@@ -236,7 +231,7 @@ class WeightedPosetTest {
             "4,A;H,null"
     })
     void leastUpperBoundShouldWork(int graph, String typeNames, String expectedLubName) {
-        WeightedPoset<Object, Edge<Object>> conversionClosure = new WeightedPoset<>(TYPE_CONVERSION_GRAPH.get(graph));
+        Poset<Object, OrderEntry<Object>> conversionClosure = new Poset<>(TYPE_CONVERSION_GRAPH.get(graph));
         Set<Object> types = Arrays.stream(typeNames.split(";"))
                 .map(typeName -> KNOWN_NODES.get(typeName))
                 .collect(toSet());
@@ -257,10 +252,10 @@ class WeightedPosetTest {
             "4,G,I,G->I,3"
     })
     void conversionPathShouldWork(int graph, String fromName, String toName, String expectedPath, int expectedWeight) {
-        WeightedPoset<Object, Edge<Object>> conversionClosure = new WeightedPoset<>(TYPE_CONVERSION_GRAPH.get(graph));
+        Poset<Object, Poset.OrderEntry<Object>> conversionClosure = new Poset<>(TYPE_CONVERSION_GRAPH.get(graph));
         Object from = KNOWN_NODES.get(fromName), to = KNOWN_NODES.get(toName);
 
-        List<Edge<Object>> conversions = conversionClosure.getPath(from, to);
+        List<OrderEntry<Object>> conversions = conversionClosure.getPath(from, to);
 
         String actualPath = conversions.stream()
                 .map(Object::toString)
@@ -274,17 +269,17 @@ class WeightedPosetTest {
             "4,F,E"
     })
     void shouldReturnNullWhenNoPath(int graph, String fromName, String toName) {
-        WeightedPoset<Object, Edge<Object>> conversionClosure = new WeightedPoset<>(TYPE_CONVERSION_GRAPH.get(graph));
+        Poset<Object, OrderEntry<Object>> conversionClosure = new Poset<>(TYPE_CONVERSION_GRAPH.get(graph));
         Object from = KNOWN_NODES.get(fromName), to = KNOWN_NODES.get(toName);
 
-        List<Edge<Object>> conversions = conversionClosure.getPath(from, to);
+        List<Poset.OrderEntry<Object>> conversions = conversionClosure.getPath(from, to);
 
         assertThat(conversions, nullValue());
     }
 
     @Test
     void conversionPathShouldReturnEmptyListForUnknownTypesIdentity() {
-        WeightedPoset<Object, Edge<Object>> conversionClosure = new WeightedPoset<>(TYPE_CONVERSION_GRAPH.get(0));
+        Poset<Object, OrderEntry<Object>> conversionClosure = new Poset<>(TYPE_CONVERSION_GRAPH.get(0));
         Object newType = new Object() {
         };
 

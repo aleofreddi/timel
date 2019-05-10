@@ -1,4 +1,4 @@
-package net.vleo.timel.cast;
+package net.vleo.timel.conversion;
 
 /*-
  * #%L
@@ -22,23 +22,19 @@ package net.vleo.timel.cast;
  * #L%
  */
 
-import net.vleo.timel.type.DoubleType;
+import net.vleo.timel.annotation.CastPrototype;
 import net.vleo.timel.type.FloatType;
+import net.vleo.timel.type.IntegerType;
 
 /**
- * Float to double conversion.
+ * Float to integer conversion.
  *
  * @author Andrea Leofreddi
  */
-public class FloatToDoubleConversion extends AbstractTypeConversion {
-    public FloatToDoubleConversion() {
-        super(new FloatType(), new DoubleType());
-    }
-
+@CastPrototype(source = FloatType.class, target = IntegerType.class)
+public class FloatToIntegerConversion implements Conversion<Float, Integer> {
     @Override
-    public Object apply(Object value) {
-        if(value == null)
-            return null;
-        return ((Float) value).doubleValue();
+    public Integer apply(Float value) {
+        return value.intValue();
     }
 }

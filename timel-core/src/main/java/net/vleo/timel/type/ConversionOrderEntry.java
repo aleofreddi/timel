@@ -1,4 +1,4 @@
-package net.vleo.timel.impl.poset;
+package net.vleo.timel.type;
 
 /*-
  * #%L
@@ -23,38 +23,17 @@ package net.vleo.timel.impl.poset;
  */
 
 import lombok.Value;
-import net.vleo.timel.impl.poset.Poset.OrderEntry;
-
-import java.util.stream.Stream;
+import net.vleo.timel.conversion.Conversion;
+import net.vleo.timel.impl.poset.Poset;
 
 /**
- * Represent a weighted edge between to nodes. There is a {@link DirectPath} for each edge provided when initializing the {@link Poset}.
+ * A conversion edge to be used for {@link Poset}.
+ * <p>
  *
- * @param <N> Element type
- * @param <E> Partial order entry
  * @author Andrea Leofreddi
  */
 @Value
-class DirectPath<N, E extends OrderEntry<N>> implements Path<N, E> {
-    private final E edge;
-
-    @Override
-    public String toString() {
-        return "(" + edge.getSource().toString() + " -> " + edge.getTarget().toString() + ")";
-    }
-
-    @Override
-    public N getTargetNode() {
-        return edge.getTarget();
-    }
-
-    @Override
-    public Stream<E> getPath() {
-        return Stream.of(edge);
-    }
-
-    @Override
-    public int getWeight() {
-        return 1; //edge.getWeight();
-    }
+public class ConversionOrderEntry implements Poset.OrderEntry<Type<?>> {
+    private final Type<?> source, target;
+    private final Conversion<?, ?> conversion;
 }

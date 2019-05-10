@@ -10,12 +10,12 @@ package net.vleo.timel.function;
  * it under the terms of the GNU Lesser General Public License as
  * published by the Free Software Foundation, either version 3 of the
  * License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Lesser Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Lesser Public
  * License along with this program.  If not, see
  * <http://www.gnu.org/licenses/lgpl-3.0.html>.
@@ -26,20 +26,19 @@ import lombok.Data;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.val;
+import net.vleo.timel.ConfigurationException;
 import net.vleo.timel.ParseException;
 import net.vleo.timel.annotation.Constraint;
 import net.vleo.timel.annotation.Parameter;
 import net.vleo.timel.annotation.Prototype;
 import net.vleo.timel.annotation.Prototypes;
-import net.vleo.timel.cast.AbstractTypeConversion;
+import net.vleo.timel.conversion.Conversion;
 import net.vleo.timel.impl.intermediate.tree.AbstractSyntaxTree;
 import net.vleo.timel.impl.intermediate.tree.Cast;
 import net.vleo.timel.impl.intermediate.tree.FunctionCall;
 import net.vleo.timel.tuple.Pair;
 import net.vleo.timel.tuple.Tuple4;
-import net.vleo.timel.type.TemplateType;
-import net.vleo.timel.type.Type;
-import net.vleo.timel.type.TypeSystem;
+import net.vleo.timel.type.*;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.*;
@@ -64,7 +63,7 @@ public class FunctionRegistry {
         private final Parameter parameter;
 
         private AbstractSyntaxTree output;
-        private List<AbstractTypeConversion> outputConversion;
+        private List<Conversion<Object, Object>> outputConversion;
         private int weight;
 
         BoundedArgument(AbstractSyntaxTree input, Parameter parameter) {
@@ -148,7 +147,7 @@ public class FunctionRegistry {
         );
     }
 
-    private Tuple4<Integer, Function, Type, List<AbstractSyntaxTree>> functionMatches(Prototype prototype, Function<?> function, List<AbstractSyntaxTree> arguments) {
+    private Tuple4<Integer, Function, Type, List<AbstractSyntaxTree>> functionMatches(Prototype prototype, Function<?> function, List<AbstractSyntaxTree> arguments) throws ConfigurationException {
         val functionClass = function.getClass();
         val metaReturns = prototype.returns();
         val metaParameters = prototype.parameters();
@@ -238,39 +237,34 @@ public class FunctionRegistry {
 
         // Convert arguments into AbstractSyntaxTree nodes
         for(val functionArgument : functionArguments) {
-            Type sourceType, targetType;
+            Type<?> sourceType = functionArgument.getInput().getType(), targetType;
 
-            if(functionArgument.getParameter().variable().equals(NULL_VARIABLE)) {
-                try {
-                    sourceType = functionArgument.getInput().getType().template();
-                    targetType = functionArgument.getParameter().type().newInstance();
-                } catch(IllegalAccessException | InstantiationException e) {
-                    throw new RuntimeException(e);
-                }
-            } else {
-                sourceType = functionArgument.getInput().getType().template();
-                targetType = typeVariables.get(functionArgument.parameter.variable()).template();
-            }
+            if(functionArgument.getParameter().variable().equals(NULL_VARIABLE))
+                targetType = Types.instance((Class<? extends Type<Object>>) functionArgument.getParameter().type());
+            else
+                targetType = typeVariables.get(functionArgument.parameter.variable());
 
             // Convert the source type into target type
             if(!sourceType.equals(targetType)) {
-                List<AbstractTypeConversion> conversions = typeSystem.getPath(sourceType.template(), targetType.template());
+                ConversionResult result = typeSystem.getConcretePath(true, sourceType, targetType);
 
-                if(conversions == null)
+                if(result == null)
                     return null;
 
-                functionArgument.setOutputConversion(conversions);
+                if(targetType.isSpecializedTemplate()) {
+                    if(!targetType.equals(result.getResultType()))
+                        return null;
+                } else if(targetType.isUnboundTemplate())
+                    targetType = result.getResultType();
+
+                functionArgument.setOutputConversion(result.getConversions());
                 functionArgument.setOutput(new Cast(
                         functionArgument.getInput().getReference(),
                         functionArgument.getInput(),
                         targetType,
-                        conversions
+                        result.getConversions()
                 ));
-                functionArgument.setWeight(
-                        conversions.stream()
-                                .mapToInt(AbstractTypeConversion::getWeight)
-                                .sum()
-                );
+                functionArgument.setWeight(result.getConversions().size());
             } else {
                 functionArgument.setOutput(functionArgument.getInput());
                 functionArgument.setWeight(0);
@@ -283,21 +277,16 @@ public class FunctionRegistry {
                 .sum();
 
         // Get the return intermediate
-        Type returnType = null;
+        Type<?> returnType = null;
 
-        if(!NULL_VARIABLE.equals(metaReturns.variable())) {
+        if(!NULL_VARIABLE.equals(metaReturns.variable()))
             // If return intermediate is a variable, get it
             returnType = typeVariables.get(metaReturns.variable());
-        } else if(metaReturns.type() != Prototype.NilType.class) {
-            try {
-                returnType = metaReturns.type().getDeclaredConstructor().newInstance();
-            } catch(InstantiationException | InvocationTargetException | NoSuchMethodException | IllegalAccessException e) {
-                throw new RuntimeException("Failed to instance intermediate " + metaReturns.type(), e);
-            }
-        }
+        else if(metaReturns.type() != Prototype.NilType.class)
+            returnType = newInstance(metaReturns.type());
 
         // If the return intermediate is a non-specialized template, rely on Function's resolveReturnType
-        if(returnType == null || returnType.isTemplate() && !returnType.isSpecialized()) {
+        if(returnType == null || !returnType.isConcrete()) {
             Optional<Type> deductedReturnType = function.resolveReturnType(
                     returnType,
                     typeVariables,
@@ -362,7 +351,8 @@ public class FunctionRegistry {
 
     private Optional<Type> resolveVariableType(Function function, String variable, List<BoundedArgument> arguments) {
         // Use type system to see if all the variables are convertible to a single type
-        Optional<Type> resolvedType = typeSystem.leastUpperBound(
+        Optional<Type> resolvedType = typeSystem.leastUpperBound__FIXME(
+                true,
                 arguments.stream()
                         .map(boundArgument -> boundArgument.input.getType().template())
                         .collect(toSet())

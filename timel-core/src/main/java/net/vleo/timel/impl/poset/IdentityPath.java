@@ -31,8 +31,8 @@ import static java.util.stream.Stream.empty;
 /**
  * Represent an empty identity path.
  *
- * @param <N> Node intermediate
- * @param <E> Edge intermediate
+ * @param <N> Node type
+ * @param <E> Order entry type
  * @author Andrea Leofreddi
  */
 @Value

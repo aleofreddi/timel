@@ -1,4 +1,4 @@
-package net.vleo.timel.cast;
+package net.vleo.timel.type;
 
 /*-
  * #%L
@@ -22,32 +22,33 @@ package net.vleo.timel.cast;
  * #L%
  */
 
-import java.util.HashSet;
-import java.util.Set;
+import lombok.val;
+import net.vleo.timel.ConfigurationException;
+import org.junit.jupiter.api.Test;
 
-import static java.util.Arrays.asList;
+import static org.hamcrest.MatcherAssert.*;
+import static org.hamcrest.Matchers.*;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 /**
- * Standard conversions.
- *
  * @author Andrea Leofreddi
  */
-public class StandardConversions {
-    public static final Set<AbstractTypeConversion> STANDARD_COERCIONS = new HashSet<>(asList(
-            // Numeric
-            new IntegerToFloatConversion(),
-            new FloatToDoubleConversion(),
+class TypesTest {
+    public static class TestType extends Type<Void> {
+    }
 
-            // Integral
-            new IntegralIntegerToIntegralFloatConversion(),
-            new IntegralFloatToIntegralDoubleConversion(),
+    private static class ErrorTestType extends Type<Void> {
+    }
 
-            // Zero
-            new ZeroToIntegerConversion()
-    ));
+    @Test
+    void shouldInstantiateType() {
+        val actual = Types.instance(TestType.class);
 
-    public static final Set<AbstractTypeConversion> STANDARD_CASTS = new HashSet<>(asList(
-            new DoubleToFloatConversion(),
-            new FloatToIntegerConversion()
-    ));
+        assertThat(actual, is(instanceOf(TestType.class)));
+    }
+
+    @Test
+    void shouldThrowConfigurationErrorOnFailure() {
+        ConfigurationException actual = assertThrows(ConfigurationException.class, () -> Types.instance(ErrorTestType.class));
+    }
 }

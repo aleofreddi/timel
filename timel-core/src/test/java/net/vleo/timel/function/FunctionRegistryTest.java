@@ -10,12 +10,12 @@ package net.vleo.timel.function;
  * it under the terms of the GNU Lesser General Public License as
  * published by the Free Software Foundation, either version 3 of the
  * License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Lesser Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Lesser Public
  * License along with this program.  If not, see
  * <http://www.gnu.org/licenses/lgpl-3.0.html>.
@@ -26,18 +26,19 @@ import lombok.NoArgsConstructor;
 import lombok.val;
 import net.vleo.timel.ParseException;
 import net.vleo.timel.annotation.*;
-import net.vleo.timel.cast.AbstractTypeConversion;
+import net.vleo.timel.conversion.Conversion;
 import net.vleo.timel.executor.ExecutorContext;
+import net.vleo.timel.impl.downscaler.Downscaler;
 import net.vleo.timel.impl.intermediate.tree.AbstractSyntaxTree;
 import net.vleo.timel.impl.intermediate.tree.Cast;
 import net.vleo.timel.impl.target.Evaluable;
-import net.vleo.timel.impl.downscaler.Downscaler;
 import net.vleo.timel.impl.upscaler.Upscaler;
 import net.vleo.timel.iterator.UpscalableIterator;
 import net.vleo.timel.time.Interval;
 import net.vleo.timel.type.TemplateType;
 import net.vleo.timel.type.Type;
 import net.vleo.timel.type.TypeSystem;
+import net.vleo.timel.type.Types;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -58,6 +59,7 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static java.util.Arrays.sort;
 import static java.util.Arrays.stream;
 import static java.util.stream.Collectors.toList;
 import static org.hamcrest.MatcherAssert.*;
@@ -71,7 +73,7 @@ import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
 class FunctionRegistryTest {
     @Spy
-    private TypeSystem typeSystem = new TypeSystem(TestTypes.CONVERSIONS, new HashSet<>());
+    private TypeSystem typeSystem = new TypeSystem(TestTypes.CONVERSIONS);
 
     private FunctionRegistry functionRegistry;
 
@@ -102,7 +104,7 @@ class FunctionRegistryTest {
     void shouldThrowParseExceptionWhenTooManyArguments() {
         functionRegistry.add(new TestFunctions.Fun_A2A());
 
-        ParseException actual = assertThrows(ParseException.class, () -> functionRegistry.lookup("a->a", mockArguments(new TestTypes.Line(), new TestTypes.Line())));
+        ParseException actual = assertThrows(ParseException.class, () -> functionRegistry.lookup("a->a", mockArguments(new TestTypes.Polygon(), new TestTypes.Polygon())));
 
         assertCannotResolve(actual);
     }
@@ -112,7 +114,7 @@ class FunctionRegistryTest {
         functionRegistry.add(new TestFunctions.Fun_A2A());
         functionRegistry.add(new TestFunctions.Fun_A2A());
 
-        ParseException actual = assertThrows(ParseException.class, () -> functionRegistry.lookup("a->a", mockArguments(new TestTypes.Line(), new TestTypes.Line())));
+        ParseException actual = assertThrows(ParseException.class, () -> functionRegistry.lookup("a->a", mockArguments(new TestTypes.Polygon(), new TestTypes.Polygon())));
 
         assertCannotResolve(actual);
     }
@@ -121,9 +123,9 @@ class FunctionRegistryTest {
     void shouldMatchAndResolveReturnTypeFromVariable() throws ParseException {
         functionRegistry.add(new TestFunctions.Fun_A2A());
 
-        val actual = functionRegistry.lookup("a->a", mockArguments(new TestTypes.Line()));
+        val actual = functionRegistry.lookup("a->a", mockArguments(new TestTypes.Polygon()));
 
-        assertThat(actual.getType(), equalTo(new TestTypes.Line()));
+        assertThat(actual.getType(), equalTo(new TestTypes.Polygon()));
     }
 
     @Test
@@ -131,11 +133,11 @@ class FunctionRegistryTest {
         functionRegistry.add(new TestFunctions.Fun_AA2A());
 
         val actual = functionRegistry.lookup("aa->a", mockArguments(
-                new TestTypes.Line(),
-                new TestTypes.Line()
+                new TestTypes.Polygon(),
+                new TestTypes.Polygon()
         ));
 
-        assertThat(actual.getType(), equalTo(new TestTypes.Line()));
+        assertThat(actual.getType(), equalTo(new TestTypes.Polygon()));
     }
 
     @Test
@@ -155,8 +157,8 @@ class FunctionRegistryTest {
         functionRegistry.add(new TestFunctions.Fun_CC2One());
 
         ParseException actual = assertThrows(ParseException.class, () -> functionRegistry.lookup("cc->1", mockArguments(
-                new TestTypes.Line(),
-                new TestTypes.Line()
+                new TestTypes.Polygon(),
+                new TestTypes.Polygon()
         )));
 
         assertCannotResolve(actual);
@@ -164,8 +166,8 @@ class FunctionRegistryTest {
 
     @ParameterizedTest
     @CsvSource({
-            "Line,Square,Line",
-            "Line,Line,Line",
+            "Polygon,Square,Polygon",
+            "Polygon,Polygon,Polygon",
             "Square,Square,Square",
     })
     void shouldMatchAndResolveVariablesWhenConvertibleTypes(
@@ -182,9 +184,9 @@ class FunctionRegistryTest {
 
     @ParameterizedTest
     @CsvSource({
-            "Square,Line,Line,",
-            "Line,Square,,Line",
-            "Line,Line,,",
+            "Square,Polygon,Polygon,",
+            "Polygon,Square,,Polygon",
+            "Polygon,Polygon,,",
             "Square,Square,,",
     })
     void shouldMatchAndAddCastNodesWhenVariablesHaveConvertibleTypes(
@@ -204,7 +206,16 @@ class FunctionRegistryTest {
         else {
             assertThat(actual.getArguments().get(0), instanceOf(Cast.class));
             val conversions = ((Cast) actual.getArguments().get(0)).getConversions();
-            assertThat(conversions.get(conversions.size() - 1).getTarget(), is(tExpectedCast));
+            assertThat(
+                    Types.instance(
+                            (Class<? extends Type<Object>>) conversions
+                                    .get(conversions.size() - 1)
+                                    .getClass()
+                                    .getDeclaredAnnotation(CastPrototype.class)
+                                    .target()
+                    ),
+                    is(tExpectedCast)
+            );
         }
 
         if(uExpectedCast == null)
@@ -212,7 +223,16 @@ class FunctionRegistryTest {
         else {
             assertThat(actual.getArguments().get(1), instanceOf(Cast.class));
             val conversions = ((Cast) actual.getArguments().get(1)).getConversions();
-            assertThat(conversions.get(conversions.size() - 1).getTarget(), is(uExpectedCast));
+            assertThat(
+                    Types.instance(
+                            (Class<? extends Type<Object>>) conversions
+                                    .get(conversions.size() - 1)
+                                    .getClass()
+                                    .getDeclaredAnnotation(CastPrototype.class)
+                                    .target()
+                    ),
+                    is(uExpectedCast)
+            );
         }
     }
 
@@ -483,7 +503,7 @@ class FunctionRegistryTest {
 
     @ParameterizedTest
     @CsvSource({
-            "Line,One,l->1",
+            "Polygon,One,l->1",
             "Color,One,c->1"
     })
     void shouldMatchMultiPrototypes(
@@ -516,22 +536,22 @@ class FunctionRegistryTest {
      * Dummy types to support the tests above.
      */
     private static class TestTypes {
-        static class Line extends Type {
+        public static class Polygon extends Type {
         }
 
-        static class Triangle extends Type {
+        public static class Triangle extends Type {
         }
 
-        static class Rectangle extends Type {
+        public static class Rectangle extends Type {
         }
 
-        static class Square extends Type {
+        public static class Square extends Type {
         }
 
-        static class One extends Type {
+        public static class One extends Type {
         }
 
-        static class Two extends Type {
+        public static class Two extends Type {
         }
 
         @NoArgsConstructor
@@ -541,22 +561,26 @@ class FunctionRegistryTest {
             }
         }
 
-        private static class MockedConversion extends AbstractTypeConversion {
-            MockedConversion(Type source, Type target, int weight) {
-                super(source, target, weight);
-            }
-
+        public static class MockedConversion implements Conversion<Object, Object> {
             @Override
             public Object apply(Object value) {
                 return null;
             }
         }
 
-        private static final Set<AbstractTypeConversion> CONVERSIONS = new HashSet<>(Arrays.asList(
-                new MockedConversion(new TestTypes.Square(), new TestTypes.Rectangle(), 1),
-                new MockedConversion(new TestTypes.Rectangle(), new TestTypes.Line(), 1),
-                new MockedConversion(new TestTypes.Triangle(), new TestTypes.Line(), 1)
-        ));
+        @CastPrototype(source = TestTypes.Square.class, target = TestTypes.Rectangle.class, implicit = true)
+        static class SquareToRectangle extends MockedConversion {
+        }
+
+        @CastPrototype(source = TestTypes.Rectangle.class, target = Polygon.class, implicit = true)
+        static class RectangleToPolygon extends MockedConversion {
+        }
+
+        @CastPrototype(source = TestTypes.Triangle.class, target = Polygon.class, implicit = true)
+        static class TriangleToPolygon extends MockedConversion {
+        }
+
+        private static final Set<Conversion<?, ?>> CONVERSIONS = new HashSet<>(Arrays.asList(new SquareToRectangle(), new RectangleToPolygon(), new TriangleToPolygon()));
 
         private static class TypeConverter implements ArgumentConverter {
             private final Pattern TEMPLATE_PATTERN = Pattern.compile("(\\w+)<(\\w+)?>");
@@ -721,7 +745,7 @@ class FunctionRegistryTest {
                         returns = @Returns(type = TestTypes.One.class),
                         name = "l->1",
                         parameters = {
-                                @Parameter(type = TestTypes.Line.class)
+                                @Parameter(type = TestTypes.Polygon.class)
                         }
                 )
         })
