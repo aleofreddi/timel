@@ -20,7 +20,7 @@ To use TimEL you need to import the following dependecy:
 ```xml
 <dependency>
     <groupId>net.vleo.timel</groupId>
-    <artifactId>timel</artifactId>
+    <artifactId>timel-core</artifactId>
     <version>0.9.0</version>
 </dependency>
 ```
