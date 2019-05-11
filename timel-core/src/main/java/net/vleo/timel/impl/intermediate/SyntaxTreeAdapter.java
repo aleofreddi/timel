@@ -11,12 +11,12 @@ package net.vleo.timel.impl.intermediate;
  * it under the terms of the GNU Lesser General Public License as
  * published by the Free Software Foundation, either version 3 of the
  * License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Lesser Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Lesser Public
  * License along with this program.  If not, see
  * <http://www.gnu.org/licenses/lgpl-3.0.html>.
@@ -26,7 +26,7 @@ package net.vleo.timel.impl.intermediate;
 import lombok.RequiredArgsConstructor;
 import lombok.val;
 import net.vleo.timel.ParseException;
-import net.vleo.timel.cast.AbstractTypeConversion;
+import net.vleo.timel.conversion.Conversion;
 import net.vleo.timel.function.FunctionRegistry;
 import net.vleo.timel.impl.intermediate.tree.*;
 import net.vleo.timel.impl.parser.ParserTreeVisitor;
@@ -142,10 +142,12 @@ public class SyntaxTreeAdapter implements ParserTreeVisitor<AbstractSyntaxTree> 
 
         AbstractSyntaxTree value = explicitCast.getChildren().get(0).accept(this);
         Type sourceType = value.getType();
-        List<AbstractTypeConversion> conversions = functionRegistry.getTypeSystem().getExplicitPath(sourceType, targetType);
+        val conversionResult = functionRegistry.getTypeSystem().getConcretePath(false, sourceType, targetType);
 
-        if(conversions == null)
-            throw new RuntimeException(new ParseException("Cannot cast " + sourceType + " to " + targetType));
+        if(!targetType.equals(conversionResult.getResultType()))
+            throw new RuntimeException(new ParseException("Cannot conversion " + sourceType + " to " + targetType));
+
+        List<Conversion<Object, Object>> conversions = conversionResult.getConversions();
 
         return new Cast(
                 explicitCast,

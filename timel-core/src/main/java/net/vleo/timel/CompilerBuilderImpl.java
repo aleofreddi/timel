@@ -23,7 +23,7 @@ package net.vleo.timel;
  */
 
 import lombok.val;
-import net.vleo.timel.cast.StandardConversions;
+import net.vleo.timel.conversion.StandardConversions;
 import net.vleo.timel.function.Function;
 import net.vleo.timel.function.FunctionRegistry;
 import net.vleo.timel.function.StandardFunctions;
@@ -130,7 +130,7 @@ class CompilerBuilderImpl implements CompilerBuilder {
     }
 
     private FunctionRegistry setupFunctionRegistry() {
-        final TypeSystem TYPE_SYSTEM = new TypeSystem(StandardConversions.STANDARD_COERCIONS, StandardConversions.STANDARD_CASTS);
+        final TypeSystem TYPE_SYSTEM = new TypeSystem(StandardConversions.STANDARD_CONVERSIONS);
         FunctionRegistry functionRegistry = new FunctionRegistry(TYPE_SYSTEM);
         functionRegistry.addAll(StandardFunctions.STANDARD_FUNCTIONS);
 

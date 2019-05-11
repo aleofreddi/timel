@@ -1,4 +1,4 @@
-package net.vleo.timel.cast;
+package net.vleo.timel;
 
 /*-
  * #%L
@@ -22,23 +22,17 @@ package net.vleo.timel.cast;
  * #L%
  */
 
-import net.vleo.timel.type.IntegerType;
-import net.vleo.timel.type.ZeroType;
-
 /**
- * Zero to integer conversion.
+ * An exception thrown to signal a configuration error.
  *
  * @author Andrea Leofreddi
  */
-public class ZeroToIntegerConversion extends AbstractTypeConversion {
-    public ZeroToIntegerConversion() {
-        super(new ZeroType(), new IntegerType());
+public class ConfigurationException extends RuntimeException {
+    public ConfigurationException(String message) {
+        super(message);
     }
 
-    @Override
-    public Object apply(Object value) {
-        if(value == null)
-            return null;
-        return 0;
+    public ConfigurationException(String message, Throwable cause) {
+        super(message, cause);
     }
 }
