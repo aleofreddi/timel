@@ -27,9 +27,9 @@ import lombok.Value;
 /**
  * Tuple3 implementation.
  *
- * @param <T>
- * @param <U>
- * @param <V>
+ * @param <T> First type
+ * @param <U> Second type
+ * @param <V> Third type
  * @author Andrea Leofreddi
  */
 @Value
