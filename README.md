@@ -11,7 +11,7 @@ TimEL is a Java library to evaluate expressions with time-series data. TimEL's a
 
 **TL;DR?** Pick a random example in the [📺 online console](https://timel.vleo.net/console) and try it yourself!
 
-TimEL requires Java 8 and will run in any J2SE or J2EE container.
+TimEL requires Java 8 and will run in any J2SE or J2EE container.  For complete project information, see [TimEL's website](https://timel.vleo.net).
 
 ## Quickstart
 
