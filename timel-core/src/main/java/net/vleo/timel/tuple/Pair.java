@@ -27,8 +27,8 @@ import lombok.Value;
 /**
  * Pair of values.
  *
- * @param <T>
- * @param <U>
+ * @param <T> First type
+ * @param <U> Second type
  * @author Andrea Leofreddi
  */
 @Value

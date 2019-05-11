@@ -33,24 +33,28 @@ import java.util.Optional;
  */
 public interface Conversion<S, T> {
     /**
-     * Helps the compiler to resolve the return type for a possible conversion candidate. Note that this method is always called with a concrete source type (either
-     * a non-template, or a specialised one) and a target template type which can be either a non-template, or a unbounded one.
+     * Helps the compiler to resolve the return type for a possible conversion. Note that this method is always called with a concrete source type (either
+     * a non-template, or a specialised one) and a target template type which can be either a non-template or an unbounded template.
      * <p>
      * This method is invoked by the compiler due to one of the following conditions:
      *
      * <ul>
-     * <li>The source type is a specialized template, so to ensure that it can be effectively casted</ul>
-     * <li>The target type is a unbounded template, so that it is required to resolve a specialisation for it</ul>
+     * <li>The source type is a specialized template, so the compiler needs to ensure that it can be effectively casted</li>
+     * <li>The target type is a unbounded template, so the compiler needs to resolve a specialisation for it</li>
+     * </ul>
+     *
      * <p>
-     * The default implementation will handle the following cases:
+     * The default implementation will handle the aforementioned cases as follows:
+     *
      * <ul>
      * <li>When the source is a specialised template and the target is an unbounded template, specialise the target using the same parameters as the source</li>
      * <li>When the source is a non-template, and the target is an unbounded template, fail (return empty)</li>
+     * <li>No match in any other case</li>
      * </ul>
      *
-     * @param source The source type. It is ensured to be a concrete type.
-     * @param target The target type
-     * @return The specialized return type if any
+     * @param source The source type. It is ensured to be a concrete type
+     * @param target The target type. Could be either a non-template or an unbounced template
+     * @return The specialized return type, or empty when no match
      */
     default Optional<Type<? extends T>> resolveReturnType(Type<? extends S> source, Type<? extends T> target) {
         assert source.isConcrete();

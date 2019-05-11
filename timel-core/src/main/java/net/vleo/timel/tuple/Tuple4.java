@@ -27,10 +27,10 @@ import lombok.Value;
 /**
  * Tuple4 implementation.
  *
- * @param <T>
- * @param <U>
- * @param <V>
- * @param <W>
+ * @param <T> First type
+ * @param <U> Second type
+ * @param <V> Third type
+ * @param <W> Fourth type
  * @author Andrea Leofreddi
  */
 @Value
