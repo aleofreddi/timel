@@ -7,7 +7,7 @@ TimEL is a Java library to evaluate expressions with time-series data. TimEL's a
   * **Autoscale** natively integral values (like consumptions);
   * **Stream** results without the need of having all the operands in memory;
   * **Support** integer, floating point and double expressions;
-  * **Extend** the functionalities with your own types and functions.
+  * **Extend** with your own types and functions.
 
 **TL;DR?** Pick a random example in the [📺 online console](https://timel.vleo.net/console) and try it yourself!
 
