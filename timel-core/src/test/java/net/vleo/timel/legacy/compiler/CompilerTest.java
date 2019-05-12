@@ -47,6 +47,19 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  */
 class CompilerTest {
     @Test
+    void shouldCompileAndEvaluateBasicTest() throws ParseException {
+        Expression<?> expression = TimEL
+                .parse("scale(scale(uniform(1), every(1, \"DAY_OF_YEAR\", \"UTC\")))")
+                .compile();
+
+        Interval interval = Interval.of(Instant.ofEpochMilli(0), Instant.ofEpochMilli(0).plus(1000, ChronoUnit.DAYS));
+
+        Object value = TimEL.evaluate(expression, interval).next().getValue();
+
+        assertThat(value, is(1000));
+    }
+
+    @Test
     void shouldCompileAndEvaluateSimpleTest() throws ParseException {
         // Assemble the evaluation interval as [now, now + 1 second)
         Instant now = Instant.now();
