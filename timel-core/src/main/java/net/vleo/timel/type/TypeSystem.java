@@ -25,7 +25,7 @@ package net.vleo.timel.type;
 import lombok.val;
 import net.vleo.timel.ConfigurationException;
 import net.vleo.timel.ParseException;
-import net.vleo.timel.annotation.CastPrototype;
+import net.vleo.timel.annotation.ConversionPrototype;
 import net.vleo.timel.conversion.Conversion;
 import net.vleo.timel.impl.poset.Poset;
 import net.vleo.timel.tuple.Pair;
@@ -143,10 +143,10 @@ public class TypeSystem {
     private Map<Boolean, Set<ConversionOrderEntry>> parse(Set<Conversion<?, ?>> conversions) {
         return conversions.stream()
                 .map(conversion -> {
-                    CastPrototype prototype = conversion.getClass().getDeclaredAnnotation(CastPrototype.class);
+                    ConversionPrototype prototype = conversion.getClass().getDeclaredAnnotation(ConversionPrototype.class);
 
                     if(prototype == null)
-                        throw new ConfigurationException("Cast class " + conversion.getClass() + " should be annotated via @CastPrototype");
+                        throw new ConfigurationException("Cast class " + conversion.getClass() + " should be annotated via " + ConversionPrototype.class.getName());
 
                     return new Pair<>(conversion, prototype);
                 })

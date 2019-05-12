@@ -22,7 +22,7 @@ package net.vleo.timel.conversion;
  * #L%
  */
 
-import net.vleo.timel.annotation.CastPrototype;
+import net.vleo.timel.annotation.ConversionPrototype;
 import net.vleo.timel.type.DoubleType;
 import net.vleo.timel.type.FloatType;
 
@@ -31,7 +31,7 @@ import net.vleo.timel.type.FloatType;
  *
  * @author Andrea Leofreddi
  */
-@CastPrototype(source = FloatType.class, target = DoubleType.class, implicit = true)
+@ConversionPrototype(source = FloatType.class, target = DoubleType.class, implicit = true)
 public class FloatToDoubleConversion implements Conversion<Float, Double> {
     @Override
     public Double apply(Float value) {

@@ -22,7 +22,7 @@ package net.vleo.timel.conversion;
  * #L%
  */
 
-import net.vleo.timel.annotation.CastPrototype;
+import net.vleo.timel.annotation.ConversionPrototype;
 import net.vleo.timel.type.DoubleType;
 import net.vleo.timel.type.IntegerType;
 
@@ -31,7 +31,7 @@ import net.vleo.timel.type.IntegerType;
  *
  * @author Andrea Leofreddi
  */
-@CastPrototype(source = DoubleType.class, target = IntegerType.class)
+@ConversionPrototype(source = DoubleType.class, target = IntegerType.class)
 public class DoubleToIntegerConversion implements Conversion<Double, Integer> {
     @Override
     public Integer apply(Double value) {

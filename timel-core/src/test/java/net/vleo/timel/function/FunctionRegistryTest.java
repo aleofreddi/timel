@@ -211,7 +211,7 @@ class FunctionRegistryTest {
                             (Class<? extends Type<Object>>) conversions
                                     .get(conversions.size() - 1)
                                     .getClass()
-                                    .getDeclaredAnnotation(CastPrototype.class)
+                                    .getDeclaredAnnotation(ConversionPrototype.class)
                                     .target()
                     ),
                     is(tExpectedCast)
@@ -228,7 +228,7 @@ class FunctionRegistryTest {
                             (Class<? extends Type<Object>>) conversions
                                     .get(conversions.size() - 1)
                                     .getClass()
-                                    .getDeclaredAnnotation(CastPrototype.class)
+                                    .getDeclaredAnnotation(ConversionPrototype.class)
                                     .target()
                     ),
                     is(uExpectedCast)
@@ -568,15 +568,15 @@ class FunctionRegistryTest {
             }
         }
 
-        @CastPrototype(source = TestTypes.Square.class, target = TestTypes.Rectangle.class, implicit = true)
+        @ConversionPrototype(source = TestTypes.Square.class, target = TestTypes.Rectangle.class, implicit = true)
         static class SquareToRectangle extends MockedConversion {
         }
 
-        @CastPrototype(source = TestTypes.Rectangle.class, target = Polygon.class, implicit = true)
+        @ConversionPrototype(source = TestTypes.Rectangle.class, target = Polygon.class, implicit = true)
         static class RectangleToPolygon extends MockedConversion {
         }
 
-        @CastPrototype(source = TestTypes.Triangle.class, target = Polygon.class, implicit = true)
+        @ConversionPrototype(source = TestTypes.Triangle.class, target = Polygon.class, implicit = true)
         static class TriangleToPolygon extends MockedConversion {
         }
 

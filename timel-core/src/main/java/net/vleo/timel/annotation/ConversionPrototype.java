@@ -36,7 +36,7 @@ import java.lang.annotation.Target;
  */
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface CastPrototype {
+public @interface ConversionPrototype {
     Class<? extends Type> source();
 
     Class<? extends Type> target();

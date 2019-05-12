@@ -22,7 +22,7 @@ package net.vleo.timel.conversion;
  * #L%
  */
 
-import net.vleo.timel.annotation.CastPrototype;
+import net.vleo.timel.annotation.ConversionPrototype;
 import net.vleo.timel.type.FloatType;
 import net.vleo.timel.type.IntegerType;
 
@@ -31,7 +31,7 @@ import net.vleo.timel.type.IntegerType;
  *
  * @author Andrea Leofreddi
  */
-@CastPrototype(source = IntegerType.class, target = FloatType.class, implicit = true)
+@ConversionPrototype(source = IntegerType.class, target = FloatType.class, implicit = true)
 public class IntegerToFloatConversion implements Conversion<Integer, Float> {
     @Override
     public Float apply(Integer value) {
