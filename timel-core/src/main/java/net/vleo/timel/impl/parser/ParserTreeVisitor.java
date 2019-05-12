@@ -50,6 +50,8 @@ public interface ParserTreeVisitor<T> {
 
     T visit(TypeOf typeOf);
 
+    T visit(TypeSpecifier typeSpecifier);
+
     T visit(Variable variable);
 
     T visit(ZeroConstant node);

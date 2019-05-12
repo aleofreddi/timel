@@ -26,7 +26,7 @@ import lombok.EqualsAndHashCode;
 import lombok.Value;
 import net.vleo.timel.impl.parser.ParserTreeVisitor;
 
-import java.util.List;
+import java.util.Arrays;
 
 /**
  * An explicit conversion.
@@ -36,11 +36,16 @@ import java.util.List;
 @Value
 @EqualsAndHashCode(callSuper = true)
 public class ExplicitCast extends AbstractParseTree {
-    private final String type;
+    public ExplicitCast(AbstractParseTree type, AbstractParseTree rhs) {
+        super(Arrays.asList(type, rhs));
+    }
 
-    public ExplicitCast(String type, List<AbstractParseTree> arguments) {
-        super(arguments);
-        this.type = type;
+    public TypeSpecifier getType() {
+        return (TypeSpecifier) getChildren().get(0);
+    }
+
+    public AbstractParseTree getValue() {
+        return getChildren().get(1);
     }
 
     @Override

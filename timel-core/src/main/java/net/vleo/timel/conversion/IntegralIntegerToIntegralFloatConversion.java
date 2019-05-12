@@ -22,7 +22,7 @@ package net.vleo.timel.conversion;
  * #L%
  */
 
-import net.vleo.timel.annotation.CastPrototype;
+import net.vleo.timel.annotation.ConversionPrototype;
 import net.vleo.timel.type.IntegralFloatType;
 import net.vleo.timel.type.IntegralIntegerType;
 
@@ -31,6 +31,6 @@ import net.vleo.timel.type.IntegralIntegerType;
  *
  * @author Andrea Leofreddi
  */
-@CastPrototype(source = IntegralIntegerType.class, target = IntegralFloatType.class, implicit = true)
+@ConversionPrototype(source = IntegralIntegerType.class, target = IntegralFloatType.class, implicit = true)
 public class IntegralIntegerToIntegralFloatConversion extends IntegerToFloatConversion {
 }

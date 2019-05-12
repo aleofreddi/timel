@@ -25,7 +25,7 @@ package net.vleo.timel.type;
 import lombok.val;
 import net.vleo.timel.ConfigurationException;
 import net.vleo.timel.ParseException;
-import net.vleo.timel.annotation.CastPrototype;
+import net.vleo.timel.annotation.ConversionPrototype;
 import net.vleo.timel.conversion.Conversion;
 import net.vleo.timel.impl.poset.Poset;
 import net.vleo.timel.tuple.Pair;
@@ -94,22 +94,30 @@ public class TypeSystem {
                 .leastUpperBound(types);
     }
 
-    public Type parse(String type) throws ParseException {
-        int separator = type.indexOf('<');
-
-        if(separator != -1) {
-            if(!type.endsWith(">"))
-                throw new ParseException("Invalid type " + type);
-
-            throw new AssertionError(); // FIXME - IMPLEMENT ME! A TYPE SHOULD SOMEHOW KNOW ITS PARAMETER LIST TYPES
-        }
-
-        Type result = idToType.get(type);
+    /**
+     * Parse a type given its id, and a list of specialization
+     *
+     * @param id        Type id
+     * @param arguments Template arguments (if any)
+     * @return Parsed type
+     * @throws ParseException When the type declaration is not consistent
+     */
+    public Type parse(String id, List<Object> arguments) throws ParseException {
+        Type result = idToType.get(id);
 
         if(result == null)
-            throw new ParseException("Unknown type " + type);
+            throw new ParseException("Unknown type " + id);
 
-        return result;
+        if(result.isUnboundTemplate() && arguments.isEmpty())
+            throw new ParseException("Cannot instance template type " + id);
+
+        if(result.isConcrete() && !arguments.isEmpty())
+            throw new ParseException("Type " + id + " is not a template");
+
+        if(arguments.isEmpty())
+            return result;
+
+        return result.specialize(arguments.toArray());
     }
 
     /**
@@ -143,10 +151,10 @@ public class TypeSystem {
     private Map<Boolean, Set<ConversionOrderEntry>> parse(Set<Conversion<?, ?>> conversions) {
         return conversions.stream()
                 .map(conversion -> {
-                    CastPrototype prototype = conversion.getClass().getDeclaredAnnotation(CastPrototype.class);
+                    ConversionPrototype prototype = conversion.getClass().getDeclaredAnnotation(ConversionPrototype.class);
 
                     if(prototype == null)
-                        throw new ConfigurationException("Cast class " + conversion.getClass() + " should be annotated via @CastPrototype");
+                        throw new ConfigurationException("Cast class " + conversion.getClass() + " should be annotated via " + ConversionPrototype.class.getName());
 
                     return new Pair<>(conversion, prototype);
                 })

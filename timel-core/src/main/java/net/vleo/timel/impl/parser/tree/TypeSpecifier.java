@@ -1,4 +1,4 @@
-package net.vleo.timel.annotation;
+package net.vleo.timel.impl.parser.tree;
 
 /*-
  * #%L
@@ -22,24 +22,33 @@ package net.vleo.timel.annotation;
  * #L%
  */
 
-import net.vleo.timel.type.Type;
+import lombok.EqualsAndHashCode;
+import lombok.Value;
+import net.vleo.timel.impl.parser.ParserTreeVisitor;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import java.util.List;
 
 /**
- * An annotation to declare a TimEL conversion.
+ * Type specifier
  *
  * @author Andrea Leofreddi
  */
-@Target(ElementType.TYPE)
-@Retention(RetentionPolicy.RUNTIME)
-public @interface CastPrototype {
-    Class<? extends Type> source();
+@Value
+@EqualsAndHashCode(callSuper = true)
+public class TypeSpecifier extends AbstractParseTree {
+    private final String type;
 
-    Class<? extends Type> target();
+    public TypeSpecifier(String type, List<AbstractParseTree> templateArguments) {
+        super(templateArguments);
+        this.type = type;
+    }
 
-    boolean implicit() default false;
+    public List<AbstractParseTree> getTemplateArguments() {
+        return getChildren();
+    }
+
+    @Override
+    public <T> T accept(ParserTreeVisitor<T> visitor) {
+        return visitor.visit(this);
+    }
 }

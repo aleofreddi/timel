@@ -133,14 +133,9 @@ public class SyntaxTreeAdapter implements ParserTreeVisitor<AbstractSyntaxTree> 
 
     @Override
     public AbstractSyntaxTree visit(ExplicitCast explicitCast) {
-        Type targetType;
-        try {
-            targetType = functionRegistry.getTypeSystem().parse(explicitCast.getType());
-        } catch(ParseException e) {
-            throw new RuntimeException(e);
-        }
+        Type targetType = explicitCast.getType().accept(this).getType();
 
-        AbstractSyntaxTree value = explicitCast.getChildren().get(0).accept(this);
+        AbstractSyntaxTree value = explicitCast.getValue().accept(this);
         Type sourceType = value.getType();
         val conversionResult = functionRegistry.getTypeSystem().getConcretePath(false, sourceType, targetType);
 
@@ -167,6 +162,19 @@ public class SyntaxTreeAdapter implements ParserTreeVisitor<AbstractSyntaxTree> 
         Type type = typeOf.getChildren().get(0).accept(this).getType();
 
         return new Constant(typeOf, new StringType(), type.toString());
+    }
+
+    @Override
+    public AbstractSyntaxTree visit(TypeSpecifier typeSpecifier) {
+        Type<?> type = (Type<?>) new TypeSpecifierAdapter(functionRegistry.getTypeSystem()).visit(typeSpecifier);
+
+        // We return an anonymous AbstractSyntaxTree to carry the type. It will be unwrapped by the parent call
+        return new AbstractSyntaxTree(typeSpecifier, type, Collections.emptyList()) {
+            @Override
+            public <T> T accept(SyntaxTreeVisitor<T> visitor) {
+                return null;
+            }
+        };
     }
 
     @Override

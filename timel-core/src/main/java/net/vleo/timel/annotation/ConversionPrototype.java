@@ -1,4 +1,4 @@
-package net.vleo.timel.conversion;
+package net.vleo.timel.annotation;
 
 /*-
  * #%L
@@ -22,19 +22,24 @@ package net.vleo.timel.conversion;
  * #L%
  */
 
-import net.vleo.timel.annotation.ConversionPrototype;
-import net.vleo.timel.type.DoubleType;
-import net.vleo.timel.type.IntegerType;
+import net.vleo.timel.type.Type;
+
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
 /**
- * Double to integer conversion.
+ * An annotation to declare a TimEL conversion.
  *
  * @author Andrea Leofreddi
  */
-@ConversionPrototype(source = DoubleType.class, target = IntegerType.class)
-public class DoubleToIntegerConversion implements Conversion<Double, Integer> {
-    @Override
-    public Integer apply(Double value) {
-        return value.intValue();
-    }
+@Target(ElementType.TYPE)
+@Retention(RetentionPolicy.RUNTIME)
+public @interface ConversionPrototype {
+    Class<? extends Type> source();
+
+    Class<? extends Type> target();
+
+    boolean implicit() default false;
 }

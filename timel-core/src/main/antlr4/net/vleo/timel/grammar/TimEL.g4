@@ -46,7 +46,17 @@ statement
     ;
 
 typeSpecifier
-    : Identifier ('<' templateExpressionList? '>')?
+    : Identifier ('<' templateExpressionList '>')?
+    | Identifier ('<' templateExpressionListOpen '>>')?
+    ;
+
+templateExpressionListOpen
+    : typeSpecifierOpen
+    | templateExpressionList ',' typeSpecifierOpen
+    ;
+
+typeSpecifierOpen
+    : Identifier '<' templateExpressionList
     ;
 
 templateExpressionList
@@ -215,10 +225,6 @@ Comma : ',';
 
 Equal : '==';
 NotEqual : '!=';
-
-Arrow : '->';
-Dot : '.';
-Ellipsis : '...';
 
 TypeOf : 'typeOf';
 
