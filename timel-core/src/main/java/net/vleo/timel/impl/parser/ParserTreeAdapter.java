@@ -57,7 +57,7 @@ class ParserTreeAdapter implements TimELVisitor<AbstractParseTree> {
     @Override
     public AbstractParseTree visitArray(TimELParser.ArrayContext ctx) {
         assertChildCount(ctx, 3, Integer.MAX_VALUE);
-        List<AbstractParseTree> arguments = parseFunctionCallArguments((TimELParser.ArgumentExpressionListContext) ctx.getChild(1));
+        List<AbstractParseTree> arguments = parseList(ctx.getChild(1));
         return new FunctionCall("Array", arguments);
     }
 
@@ -71,7 +71,7 @@ class ParserTreeAdapter implements TimELVisitor<AbstractParseTree> {
         assertChildCount(ctx, 3, 4);
         String function = ctx.getChild(0).getText();
         List<AbstractParseTree> arguments = ctx.getChildCount() == 3 ?
-                emptyList() : parseFunctionCallArguments((TimELParser.ArgumentExpressionListContext) ctx.getChild(2));
+                emptyList() : parseList(ctx.getChild(2));
         return new FunctionCall(function, arguments);
     }
 
@@ -110,7 +110,7 @@ class ParserTreeAdapter implements TimELVisitor<AbstractParseTree> {
         if(ctx.getChildCount() == 1)
             return passthroughFirst(ctx);
         assertChildCount(ctx, 4);
-        return new ExplicitCast(ctx.getChild(1).getText(), singletonList(ctx.getChild(3).accept(this)));
+        return new ExplicitCast(ctx.getChild(1).accept(this), ctx.getChild(3).accept(this));
     }
 
     @Override
@@ -201,7 +201,23 @@ class ParserTreeAdapter implements TimELVisitor<AbstractParseTree> {
 
     @Override
     public AbstractParseTree visitTypeSpecifier(TimELParser.TypeSpecifierContext ctx) {
-        return passthroughFirst(ctx);
+        assertChildCount(ctx, 1, 4);
+        String type = ctx.getChild(0).getText();
+        List<AbstractParseTree> arguments = ctx.getChildCount() == 1 ? emptyList() : parseList(ctx.getChild(2));
+        return new TypeSpecifier(type, arguments);
+    }
+
+    @Override
+    public AbstractParseTree visitTemplateExpressionListOpen(TimELParser.TemplateExpressionListOpenContext ctx) {
+        throw new AssertionError();
+    }
+
+    @Override
+    public AbstractParseTree visitTypeSpecifierOpen(TimELParser.TypeSpecifierOpenContext ctx) {
+        assertChildCount(ctx, 1, 4);
+        String type = ctx.getChild(0).getText();
+        List<AbstractParseTree> arguments = ctx.getChildCount() == 1 ? emptyList() : parseList(ctx.getChild(2));
+        return new TypeSpecifier(type, arguments);
     }
 
     @Override
@@ -211,7 +227,7 @@ class ParserTreeAdapter implements TimELVisitor<AbstractParseTree> {
 
     @Override
     public AbstractParseTree visitTemplateArgument(TimELParser.TemplateArgumentContext ctx) {
-        throw new UnsupportedOperationException();
+        return passthroughFirst(ctx);
     }
 
     @Override
@@ -305,11 +321,11 @@ class ParserTreeAdapter implements TimELVisitor<AbstractParseTree> {
         return ctx.getChild(0).accept(this);
     }
 
-    private List<AbstractParseTree> parseFunctionCallArguments(TimELParser.ArgumentExpressionListContext argumentList) {
+    private List<AbstractParseTree> parseList(ParseTree argumentList) {
         LinkedList<AbstractParseTree> arguments = new LinkedList<>();
         while(argumentList.getChildCount() == 3) {
             arguments.addFirst(argumentList.getChild(2).accept(this));
-            argumentList = (TimELParser.ArgumentExpressionListContext) argumentList.getChild(0);
+            argumentList = argumentList.getChild(0);
         }
         arguments.addFirst(passthroughFirst(argumentList));
         return arguments;

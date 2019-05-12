@@ -1,4 +1,4 @@
-package net.vleo.timel.impl.parser;
+package net.vleo.timel.impl.parser.tree;
 
 /*-
  * #%L
@@ -22,37 +22,33 @@ package net.vleo.timel.impl.parser;
  * #L%
  */
 
-import net.vleo.timel.impl.parser.tree.*;
+import lombok.EqualsAndHashCode;
+import lombok.Value;
+import net.vleo.timel.impl.parser.ParserTreeVisitor;
+
+import java.util.List;
 
 /**
- * A {@link AbstractParseTree} visitor.
+ * Type specifier
  *
  * @author Andrea Leofreddi
  */
-public interface ParserTreeVisitor<T> {
-    T visit(Assignment assignment);
+@Value
+@EqualsAndHashCode(callSuper = true)
+public class TypeSpecifier extends AbstractParseTree {
+    private final String type;
 
-    T visit(CompilationUnit compilationUnit);
+    public TypeSpecifier(String type, List<AbstractParseTree> templateArguments) {
+        super(templateArguments);
+        this.type = type;
+    }
 
-    T visit(Declaration node);
+    public List<AbstractParseTree> getTemplateArguments() {
+        return getChildren();
+    }
 
-    T visit(DoubleConstant node);
-
-    T visit(ExplicitCast explicitCast);
-
-    T visit(FloatConstant node);
-
-    T visit(FunctionCall node);
-
-    T visit(IntegerConstant node);
-
-    T visit(StringConstant node);
-
-    T visit(TypeOf typeOf);
-
-    T visit(TypeSpecifier typeSpecifier);
-
-    T visit(Variable variable);
-
-    T visit(ZeroConstant node);
+    @Override
+    public <T> T accept(ParserTreeVisitor<T> visitor) {
+        return visitor.visit(this);
+    }
 }

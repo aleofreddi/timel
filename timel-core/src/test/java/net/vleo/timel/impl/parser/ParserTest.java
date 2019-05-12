@@ -22,11 +22,17 @@ package net.vleo.timel.impl.parser;
  * #L%
  */
 
+import lombok.val;
 import net.vleo.timel.ParseException;
-import net.vleo.timel.impl.parser.tree.AbstractParseTree;
-import net.vleo.timel.impl.parser.tree.CompilationUnit;
+import net.vleo.timel.grammar.TimELLexer;
+import net.vleo.timel.grammar.TimELParser;
+import net.vleo.timel.impl.parser.tree.*;
+import org.antlr.v4.runtime.*;
+import org.antlr.v4.runtime.misc.ParseCancellationException;
+import org.antlr.v4.runtime.tree.ParseTree;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.ValueSource;
 
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
@@ -70,5 +76,30 @@ class ParserTest {
                 ))
         ));
     }
-}
 
+    @ParameterizedTest
+    @ValueSource(strings = {
+            "(T<T,T<1,T<2.0>>>)1",
+            "(T<T,T<1,T<2.0> >>)1",
+            "(T<T,T<1,T<2.0>> >)1",
+            "(T<T,T<1,T<2.0> > >)1",
+    })
+    void shouldParseNestedTypeTemplates(String source) throws ParseException {
+        val parseTree = new Parser().parse(source);
+
+        assertThat(parseTree, instanceOf(CompilationUnit.class));
+        assertThat(navigate(parseTree, 0), instanceOf(ExplicitCast.class));
+        assertThat(navigate(parseTree, 0, 0), instanceOf(TypeSpecifier.class));
+        assertThat(navigate(parseTree, 0, 0, 0), instanceOf(TypeSpecifier.class));
+        assertThat(navigate(parseTree, 0, 0, 1), instanceOf(TypeSpecifier.class));
+        assertThat(navigate(parseTree, 0, 0, 1, 0), instanceOf(IntegerConstant.class));
+        assertThat(navigate(parseTree, 0, 0, 1, 1), instanceOf(TypeSpecifier.class));
+        assertThat(navigate(parseTree, 0, 0, 1, 1, 0), instanceOf(DoubleConstant.class));
+    }
+
+    private AbstractParseTree navigate(AbstractParseTree tree, int... path) {
+        for(int i : path)
+            tree = tree.getChildren().get(i);
+        return tree;
+    }
+}

@@ -54,9 +54,9 @@ import static org.junit.jupiter.api.Assertions.fail;
  */
 public class IntegrationTest {
     private static final double EPSILON = 0.001;
-    public static final String TEST_PROPERTIES_FILE = "test.properties";
-    public static final String DATA_CSV_FILE = "data.csv";
-    public static final String INTEGRATION_DIR = "integration";
+    private static final String TEST_PROPERTIES_FILE = "test.properties";
+    private static final String DATA_CSV_FILE = "data.csv";
+    private static final String INTEGRATION_DIR = "integration";
 
     @ParameterizedTest(name = "{0}")
     @MethodSource("getSourceStream")
