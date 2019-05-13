@@ -1,4 +1,4 @@
-# TimEL: Time-serie Expression Language [![Build Status](https://travis-ci.com/aleofreddi/timel.svg?branch=master)](https://travis-ci.com/aleofreddi/timel) [![License: LGPL v3](https://img.shields.io/badge/License-LGPL%20v3-blue.svg)](https://www.gnu.org/licenses/lgpl-3.0)
+# TimEL: Time-serie Expression Language [![License: LGPL v3](https://img.shields.io/badge/License-LGPL%20v3-blue.svg)](https://www.gnu.org/licenses/lgpl-3.0) [![Build Status](https://travis-ci.com/aleofreddi/timel.svg?branch=master)](https://travis-ci.com/aleofreddi/timel) [![Test Coverage](https://codecov.io/gh/aleofreddi/timel/branch/master/graph/badge.svg)](https://codecov.io/gh/aleofreddi/timel)
 
 TimEL is a Java library to parse and evaluate expressions with time-series data:
 
