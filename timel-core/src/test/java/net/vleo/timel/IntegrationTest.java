@@ -36,6 +36,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 
 import java.io.*;
 import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
@@ -95,8 +96,6 @@ public class IntegrationTest {
                     .filter(file -> limit.length == 0 || Arrays.stream(limit).anyMatch(l -> file.getName().toLowerCase().contains(l.toLowerCase())))
                     .map(File::toPath)
                     .forEach(directory -> {
-                        FileInputStream metadata, data;
-
                         tests.put(
                                 directory.getFileName().toString(),
                                 new Pair<>(
@@ -108,7 +107,7 @@ public class IntegrationTest {
         } else if(url.getProtocol().equals("jar")) {
             JarFile jar = new JarFile(URLDecoder.decode(
                     new File(url.getFile().substring(5, url.getFile().indexOf('!'))).toString(),
-                    "UTF-8"
+                    StandardCharsets.UTF_8.name()
             ));
 
             for(Enumeration<JarEntry> entries = jar.entries(); entries.hasMoreElements(); ) {
