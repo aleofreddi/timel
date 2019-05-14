@@ -54,7 +54,7 @@ public interface Function<T> {
      * @param argumentTypes
      * @return The deduced template type if any
      */
-    default Optional<Type> specializeVariableTemplate(String variable, TemplateType template, Type<?>... argumentTypes) {
+    default Optional<Type<?>> specializeVariableTemplate(String variable, TemplateType template, Type<?>... argumentTypes) {
         Set<List<Object>> parametersSet = Arrays.stream(argumentTypes)
                 .map(Type::getParameters)
                 .collect(Collectors.toSet());

@@ -30,6 +30,7 @@ import net.vleo.timel.type.Type;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * A conversion node.
@@ -50,5 +51,10 @@ public class Cast extends AbstractSyntaxTree {
     @Override
     public <T> T accept(SyntaxTreeVisitor<T> visitor) {
         return visitor.visit(this);
+    }
+
+    @Override
+    public String toString() {
+        return "Cast [" + conversions.stream().map(Object::toString).collect(Collectors.joining("->")) + "]";
     }
 }

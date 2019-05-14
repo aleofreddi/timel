@@ -44,5 +44,5 @@ import net.vleo.timel.type.IntegralDoubleType;
                 }
         )
 })
-public class DivIntegralDoubleScaleOperator extends MulDoubleOperator {
+public class DivIntegralDoubleScaleOperator extends DivDoubleOperator {
 }

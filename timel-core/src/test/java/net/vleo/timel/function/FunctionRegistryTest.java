@@ -518,11 +518,11 @@ class FunctionRegistryTest {
         assertThat(actual.getType(), equalTo(u));
     }
 
-    private List<AbstractSyntaxTree> mockArguments(Type... types) {
+    private List<AbstractSyntaxTree> mockArguments(Type<?>... types) {
         return stream(types)
                 .map(type -> {
                     AbstractSyntaxTree node = mock(AbstractSyntaxTree.class);
-                    when(node.getType()).thenReturn(type);
+                    Mockito.<Type<?>>when(node.getType()).thenReturn(type);
                     return node;
                 })
                 .collect(toList());

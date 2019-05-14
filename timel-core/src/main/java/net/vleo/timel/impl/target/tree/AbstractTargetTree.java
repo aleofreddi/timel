@@ -39,4 +39,9 @@ import java.util.List;
 public abstract class AbstractTargetTree implements Evaluable<Object> {
     private final AbstractSyntaxTree reference;
     private final List<AbstractTargetTree> children;
+
+    @Override
+    public String toString() {
+        return getClass().getSimpleName();
+    }
 }

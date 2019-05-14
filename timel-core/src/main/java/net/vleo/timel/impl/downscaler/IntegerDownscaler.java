@@ -1,4 +1,4 @@
-package net.vleo.timel.conversion;
+package net.vleo.timel.impl.downscaler;
 
 /*-
  * #%L
@@ -22,20 +22,41 @@ package net.vleo.timel.conversion;
  * #L%
  */
 
-import net.vleo.timel.annotation.ConversionPrototype;
-import net.vleo.timel.type.FloatType;
-import net.vleo.timel.type.IntegerType;
-import net.vleo.timel.type.ZeroType;
+import net.vleo.timel.time.Sample;
 
 /**
- * Zero to integer conversion.
+ * Integer downscaler.
  *
  * @author Andrea Leofreddi
  */
-@ConversionPrototype(source = ZeroType.class, target = IntegerType.class, implicit = true)
-public class ZeroToIntegerConversion implements Conversion<Object, Integer> {
+public class IntegerDownscaler implements Downscaler<Integer> {
+    private Integer value;
+    private long length;
+
+    public IntegerDownscaler() {
+        reset();
+    }
+
     @Override
-    public Integer apply(Object value) {
-        return 0;
+    public void reset() {
+        value = 0;
+        length = 0;
+    }
+
+    @Override
+    public void add(Sample<Integer> sample) {
+        if(value != null) {
+            long duration = sample.getInterval().toDurationMillis();
+            value += (int) (sample.getValue() * duration);
+            length += duration;
+        }
+    }
+
+    @Override
+    public Integer reduce() {
+        int result = (int) (value / length);
+        value = 0;
+        length = 0;
+        return result;
     }
 }

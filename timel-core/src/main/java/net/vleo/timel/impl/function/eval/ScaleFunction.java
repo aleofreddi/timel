@@ -53,10 +53,14 @@ public class ScaleFunction<T> implements Function<T> {
         assert arguments.length == 1;
         return new UpscalerIterator<>(
                 upscaler,
-                new DownscalerIterator<>(
-                        downscaler,
-                        ((Evaluable<T>) arguments[0]).evaluate(interval, context),
-                        interval
+                context.debug(this, "Scale.outer", interval,
+                        new DownscalerIterator<>(
+                                downscaler,
+                                context.debug(this, "Scale.inner", interval,
+                                        ((Evaluable<T>) arguments[0]).evaluate(interval, context)
+                                ),
+                                interval
+                        )
                 )
         );
     }

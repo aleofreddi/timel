@@ -56,7 +56,7 @@ public class DebugContext {
         return "next".equals(method) || "hasNext".equals(method);
     }
 
-    public <T> T apply(AbstractTargetTree node, String id, Interval interval, String method, Callable<T> callable) {
+    public <T> T apply(Object node, String id, Interval interval, String method, Callable<T> callable) {
         if(dump(method))
             System.out.println(getIndent() + node.toString() + " " + id + "." + method + " for " + interval + " ?");
 

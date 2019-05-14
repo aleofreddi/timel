@@ -1,4 +1,4 @@
-package net.vleo.timel.executor;
+package net.vleo.timel.impl.executor;
 
 /*-
  * #%L
@@ -22,17 +22,34 @@ package net.vleo.timel.executor;
  * #L%
  */
 
+import lombok.Value;
+import net.vleo.timel.executor.ExecutorContext;
+import net.vleo.timel.impl.iterator.TracingTimeIterator;
+import net.vleo.timel.impl.iterator.TracingUpscalableTimeIterator;
 import net.vleo.timel.iterator.TimeIterator;
 import net.vleo.timel.iterator.UpscalableIterator;
 import net.vleo.timel.time.Interval;
 
 /**
- * A class to hold execution context.
+ * Executor context implementation.
  *
  * @author Andrea Leofreddi
  */
-public interface ExecutorContext {
-    <V> TimeIterator<V> debug(Object reference, String id, Interval interval, TimeIterator<V> delegate);
+@Value
+public class ExecutorContextImpl implements ExecutorContext {
+    private final boolean trace;
 
-    <V> UpscalableIterator<V> debug(Object reference, String id, Interval interval, UpscalableIterator<V> delegate);
+    @Override
+    public <V> TimeIterator<V> debug(Object reference, String id, Interval interval, TimeIterator<V> delegate) {
+        if(trace)
+            return new TracingTimeIterator<>(reference, id, interval, delegate);
+        return delegate;
+    }
+
+    @Override
+    public <V> UpscalableIterator<V> debug(Object reference, String id, Interval interval, UpscalableIterator<V> delegate) {
+        if(trace)
+            return new TracingUpscalableTimeIterator<>(reference, id, interval, delegate);
+        return delegate;
+    }
 }

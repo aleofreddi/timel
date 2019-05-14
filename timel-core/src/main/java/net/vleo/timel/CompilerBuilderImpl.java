@@ -24,9 +24,11 @@ package net.vleo.timel;
 
 import lombok.val;
 import net.vleo.timel.conversion.StandardConversions;
+import net.vleo.timel.executor.ExecutorContext;
 import net.vleo.timel.function.Function;
 import net.vleo.timel.function.FunctionRegistry;
 import net.vleo.timel.function.StandardFunctions;
+import net.vleo.timel.impl.executor.ExecutorContextImpl;
 import net.vleo.timel.impl.intermediate.SyntaxTreeAdapter;
 import net.vleo.timel.impl.intermediate.SyntaxTreeDumper;
 import net.vleo.timel.impl.intermediate.tree.AbstractSyntaxTree;
@@ -55,6 +57,7 @@ import java.util.Map;
 class CompilerBuilderImpl implements CompilerBuilder {
     private final String source;
     private boolean dumpTrees = false;
+    private boolean traceExecution = false;
 
     private VariableFactory variableFactory;
     private Map<String, Pair<Type, Variable<?>>> variables;
@@ -75,7 +78,18 @@ class CompilerBuilderImpl implements CompilerBuilder {
 
     @Override
     public CompilerBuilder withOption(String key, Object value) {
-        throw new IllegalArgumentException("Unknown option " + key);
+        CompilerBuilderImpl next = new CompilerBuilderImpl(this);
+        switch(key) {
+            case "compile.dump":
+                next.dumpTrees = true;
+                break;
+            case "eval.trace":
+                next.traceExecution = (Boolean) value;
+                break;
+            default:
+                throw new IllegalArgumentException("Unknown option " + key);
+        }
+        return next;
     }
 
     @Override
@@ -105,8 +119,9 @@ class CompilerBuilderImpl implements CompilerBuilder {
         val functionRegistry = setupFunctionRegistry();
 
         val targetTree = compile("(" + expected.toString() + ")(" + source + ")", variableRegistry, functionRegistry);
+        ExecutorContext executorContext = new ExecutorContextImpl(traceExecution);
 
-        return new ExpressionImpl<>(targetTree);
+        return new ExpressionImpl<>(targetTree, executorContext);
     }
 
     @Override
@@ -115,8 +130,9 @@ class CompilerBuilderImpl implements CompilerBuilder {
         val functionRegistry = setupFunctionRegistry();
 
         val targetTree = compile(source, variableRegistry, functionRegistry);
+        ExecutorContext executorContext = new ExecutorContextImpl(traceExecution);
 
-        return new ExpressionImpl(targetTree);
+        return new ExpressionImpl<>(targetTree, executorContext);
     }
 
     private VariableRegistry setupVariableRegistry(VariableFactory variableFactory, Map<String, Pair<Type, Variable<?>>> variables) {

@@ -36,13 +36,14 @@ import net.vleo.timel.conversion.Conversion;
 import net.vleo.timel.impl.intermediate.tree.AbstractSyntaxTree;
 import net.vleo.timel.impl.intermediate.tree.Cast;
 import net.vleo.timel.impl.intermediate.tree.FunctionCall;
+import net.vleo.timel.impl.parser.tree.AbstractParseTree;
 import net.vleo.timel.tuple.Pair;
-import net.vleo.timel.tuple.Tuple4;
 import net.vleo.timel.type.*;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static java.util.Collections.*;
 import static java.util.stream.Collectors.*;
@@ -56,10 +57,20 @@ import static net.vleo.timel.annotation.Prototype.NULL_VARIABLE;
 @RequiredArgsConstructor
 public class FunctionRegistry {
     @Data
+    private static class FunctionCallMatch {
+        private final Function<Object> function;
+        private final Prototype prototype;
+        private final Type<?> returnType;
+        private final List<AbstractSyntaxTree> arguments;
+
+        private final int weight;
+    }
+
+    @Data
     private static class BoundedArgument {
         private final AbstractSyntaxTree input;
-        private final Type inputType;
-        private final Type inputTemplate;
+        private final Type<?> inputType;
+        private final Type<?> inputTemplate;
         private final Parameter parameter;
 
         private AbstractSyntaxTree output;
@@ -116,38 +127,40 @@ public class FunctionRegistry {
     /**
      * Lookup a function for the given arguments.
      *
+     * @param reference Source reference node
      * @param function  Function to lookup
      * @param arguments Call arguments
      * @return A {@link FunctionCall} applying the given function to the passed arguments (casting them when needed).
      * @throws ParseException When the lookup failed
      */
-    public FunctionCall lookup(String function, List<AbstractSyntaxTree> arguments) throws ParseException {
-        List<Tuple4<Integer, Function, Type, List<AbstractSyntaxTree>>> alternatives = functions.getOrDefault(function, emptySet())
+    public FunctionCall lookup(AbstractParseTree reference, String function, List<AbstractSyntaxTree> arguments) throws ParseException {
+        List<FunctionCallMatch> alternatives = functions.getOrDefault(function, emptySet())
                 .stream()
                 .map(registryFunction -> functionMatches(registryFunction.getFirst(), registryFunction.getSecond(), arguments))
                 .filter(Objects::nonNull)
-                .sorted(Comparator.comparing(Tuple4::getFirst))
+                .sorted(Comparator.comparing(FunctionCallMatch::getWeight))
                 .collect(toList());
 
         if(alternatives.isEmpty())
             throw new ParseException("Cannot resolve function " + getSignature(function, arguments));
 
-        if(alternatives.size() > 1 && alternatives.get(0).getFirst().equals(alternatives.get(1).getFirst()))
+        if(alternatives.size() > 1 && alternatives.get(0).getWeight() == alternatives.get(1).getWeight())
             throw new ParseException("Ambiguous function call, matches: " +
                     alternatives.stream()
-                            .map(alternative -> getSignature(alternative.getSecond()))
+                            .map(alternative -> getSignature(alternative.getPrototype()))
                             .collect(Collectors.joining("; ")));
 
         val match = alternatives.get(0);
         return new FunctionCall(
-                null,
-                match.getSecond(),
-                match.getFourth(),
-                match.getThird()
+                reference,
+                match.getFunction(),
+                getSignature(match.getPrototype()),
+                match.getReturnType(),
+                match.getArguments()
         );
     }
 
-    private Tuple4<Integer, Function, Type, List<AbstractSyntaxTree>> functionMatches(Prototype prototype, Function<?> function, List<AbstractSyntaxTree> arguments) throws ConfigurationException {
+    private FunctionCallMatch functionMatches(Prototype prototype, Function<?> function, List<AbstractSyntaxTree> arguments) throws ConfigurationException {
         val functionClass = function.getClass();
         val metaReturns = prototype.returns();
         val metaParameters = prototype.parameters();
@@ -200,7 +213,7 @@ public class FunctionRegistry {
         }
 
         // Resolve the intermediate variables from all the arguments.
-        Map<String, Optional<Type>> typeVariableGuess = functionArguments.stream()
+        Map<String, Optional<Type<?>>> typeVariableGuess = functionArguments.stream()
                 .filter(functionArgument -> !NULL_VARIABLE.equals(functionArgument.getParameter().variable()))
                 .collect(Collectors.groupingBy(
                         functionArgument -> functionArgument.getParameter().variable(),
@@ -210,8 +223,10 @@ public class FunctionRegistry {
                 .stream()
                 .map(entry -> new AbstractMap.SimpleEntry<>(
                         entry.getKey(),
-                        ensureMatching(
-                                resolveVariableType(function, entry.getKey(), entry.getValue()),
+                        resolveVariableType(
+                                function,
+                                entry.getKey(),
+                                entry.getValue(),
                                 Optional.ofNullable(variableContraints.get(entry.getKey()))
                                         .map(this::newInstance)
                         )
@@ -239,7 +254,9 @@ public class FunctionRegistry {
         for(val functionArgument : functionArguments) {
             Type<?> sourceType = functionArgument.getInput().getType(), targetType;
 
-            if(functionArgument.getParameter().variable().equals(NULL_VARIABLE))
+            boolean isVariable = !functionArgument.getParameter().variable().equals(NULL_VARIABLE);
+
+            if(!isVariable)
                 targetType = Types.instance((Class<? extends Type<Object>>) functionArgument.getParameter().type());
             else
                 targetType = typeVariables.get(functionArgument.parameter.variable());
@@ -265,6 +282,10 @@ public class FunctionRegistry {
                         result.getConversions()
                 ));
                 functionArgument.setWeight(result.getConversions().size());
+
+                // If a template was resolved, upgrade the variable type accordingly
+                if(isVariable)
+                    typeVariables.put(functionArgument.parameter.variable(), targetType);
             } else {
                 functionArgument.setOutput(functionArgument.getInput());
                 functionArgument.setWeight(0);
@@ -301,13 +322,14 @@ public class FunctionRegistry {
             returnType = deductedReturnType.get();
         }
 
-        return new Tuple4<>(
-                weight,
-                function,
+        return new FunctionCallMatch(
+                (Function<Object>) function,
+                prototype,
                 returnType,
                 functionArguments.stream()
                         .map(arg -> arg.output)
-                        .collect(toList())
+                        .collect(toList()),
+                weight
         );
     }
 
@@ -320,25 +342,23 @@ public class FunctionRegistry {
                 + ")";
     }
 
-    private String getSignature(Function function) {
-        Class<? extends Function> functionClass = function.getClass();
+    private String getSignature(Prototype prototype) {
+        val parameters = prototype.parameters();
 
-        val metaFunction = functionClass.getDeclaredAnnotation(Prototype.class);
-        val metaParameters = metaFunction.parameters();
-
-        return metaFunction.name() + "(" +
-                Arrays.stream(metaParameters)
+        return prototype.name() + "(" +
+                Arrays.stream(parameters)
                         .map(parameter -> {
                             String type;
 
                             if(parameter.type() != Prototype.NilType.class) {
+                                type = Types.instance((Class<? extends Type<Object>>) parameter.type()).toString();
                                 try {
                                     type = parameter.type().getDeclaredConstructor().newInstance().toString();
                                 } catch(InstantiationException | IllegalAccessException | NoSuchMethodException | InvocationTargetException e) {
                                     type = "?unknown?";
                                 }
                             } else
-                                type = "[" + parameter.variable() + "]";
+                                type = "$" + parameter.variable();
 
                             if(parameter.varArgs())
                                 type += "*";
@@ -349,17 +369,23 @@ public class FunctionRegistry {
                 + ")";
     }
 
-    private Optional<Type> resolveVariableType(Function function, String variable, List<BoundedArgument> arguments) {
+    private Optional<Type<?>> resolveVariableType(Function<?> function, String variable, List<BoundedArgument> arguments, Optional<Type<?>> constraintType) {
         // Use type system to see if all the variables are convertible to a single type
-        Optional<Type> resolvedType = typeSystem.leastUpperBound__FIXME(
+        Optional<Type<?>> resolvedType = typeSystem.leastUpperBound(
                 true,
-                arguments.stream()
-                        .map(boundArgument -> boundArgument.input.getType().template())
+                Stream.concat(
+                        arguments.stream()
+                                .map(boundArgument -> boundArgument.input.getType().template()),
+                        constraintType.isPresent() ? Stream.of(constraintType.get()) : Stream.empty()
+                )
                         .collect(toSet())
         );
 
         if(!resolvedType.isPresent())
-            return resolvedType;
+            return Optional.empty();
+
+        if(constraintType.isPresent() && !resolvedType.get().equals(constraintType.get()))
+            return Optional.empty();
 
         Type resolved = resolvedType.get();
 
@@ -374,21 +400,6 @@ public class FunctionRegistry {
             );
 
         return resolvedType;
-    }
-
-    private Optional<Type> ensureMatching(Optional<Type> type, Optional<Type> constraint) {
-        if(!type.isPresent())
-            return Optional.empty();
-
-        if(!constraint.isPresent())
-            return type;
-
-        Type t = type.get(), u = constraint.get();
-
-        if(!t.template().equals(u))
-            return Optional.empty();
-
-        return type;
     }
 
     private <T> T newInstance(Class<? extends T> class_) {

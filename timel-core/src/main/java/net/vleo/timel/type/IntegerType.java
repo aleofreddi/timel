@@ -23,6 +23,8 @@ package net.vleo.timel.type;
  */
 
 import lombok.EqualsAndHashCode;
+import net.vleo.timel.impl.downscaler.Downscaler;
+import net.vleo.timel.impl.downscaler.IntegerDownscaler;
 
 /**
  * A type for integer values.
@@ -34,5 +36,10 @@ public class IntegerType extends Type<Integer> {
     @Override
     public String getName() {
         return "Integer";
+    }
+
+    @Override
+    public Downscaler<?> getDownscaler() {
+        return new IntegerDownscaler();
     }
 }

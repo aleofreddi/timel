@@ -94,7 +94,7 @@ public class SyntaxTreeAdapter implements ParserTreeVisitor<AbstractSyntaxTree> 
                 .collect(Collectors.toList());
 
         try {
-            return functionRegistry.lookup(function, children);
+            return functionRegistry.lookup(null, function, children);
         } catch(ParseException e) {
             throw new RuntimeException(e);
         }

@@ -37,4 +37,15 @@ public class Tuple3<T, U, V> {
     T first;
     U second;
     V third;
+
+    /**
+     * Extend the current tuple with an additional (last) value.
+     *
+     * @param value Value to append
+     * @param <W>   Type to append
+     * @return Extended tuple
+     */
+    public <W> Tuple4<T, U, V, W> append(W value) {
+        return new Tuple4<>(first, second, third, value);
+    }
 }

@@ -55,10 +55,12 @@ public class VariableReader extends AbstractTargetTree {
         return new ChopUpscalableIterator<>(
                 new UpscalerIterator<>(
                         upscaler,
-                        new FilterNullTimeIterator<>(
-                                variable.readForward(
-                                        interval,
-                                        context
+                        context.debug(this, "FilterNullTimeIterator", interval,
+                                new FilterNullTimeIterator<>(
+                                        variable.readForward(
+                                                interval,
+                                                context
+                                        )
                                 )
                         )
                 ),

@@ -40,7 +40,7 @@ public class DownscalerIterator<T> extends BufferedTimeIterator<T> implements Ti
         super();
 
         this.downscaler = downscaler;
-        this.iterator = new ChopUpscalableIterator<T>(iterator, interval);
+        this.iterator = new ChopUpscalableIterator<>(iterator, interval);
         this.interval = interval;
     }
 
