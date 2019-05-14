@@ -35,4 +35,15 @@ import lombok.Value;
 public class Pair<T, U> {
     T first;
     U second;
+
+    /**
+     * Extend the current pair with an additional (last) value.
+     *
+     * @param value Value to append
+     * @param <V>   Type to append
+     * @return Extended tuple
+     */
+    public <V> Tuple3<T, U, V> append(V value) {
+        return new Tuple3<>(first, second, value);
+    }
 }

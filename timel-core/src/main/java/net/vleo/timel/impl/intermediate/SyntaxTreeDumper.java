@@ -41,7 +41,10 @@ public class SyntaxTreeDumper {
         for(int i = 0; i < indent; i++)
             sb.append("  ");
 
-        sb.append(node.toString()).append(" (").append(node.getClass()).append(')').append('\n');
+        sb.append(node.toString())
+                .append(" (").append(node.getClass()).append(')')
+                .append(" [").append(node.getType()).append(']')
+                .append('\n');
 
         for(AbstractSyntaxTree child : node.getChildren())
             dump(sb, child, indent + 1);

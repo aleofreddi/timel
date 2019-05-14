@@ -35,13 +35,13 @@ import java.util.NoSuchElementException;
  * @author Andrea Leofreddi
  */
 public class TracingTimeIterator<V> implements TimeIterator<V> {
-    protected final AbstractTargetTree node;
+    protected final Object reference;
     protected final String id;
     protected final Interval interval;
     protected final TimeIterator<V> delegate;
 
-    public TracingTimeIterator(AbstractTargetTree node, String id, Interval interval, TimeIterator<V> delegate) {
-        this.node = node;
+    public TracingTimeIterator(Object reference, String id, Interval interval, TimeIterator<V> delegate) {
+        this.reference = reference;
         this.id = id;
         this.interval = interval;
         this.delegate = delegate;
@@ -50,33 +50,33 @@ public class TracingTimeIterator<V> implements TimeIterator<V> {
     @Override
     public Sample<V> next() throws NoSuchElementException {
         return DebugContexts.get().apply(
-                node,
+                reference,
                 id,
                 interval,
                 "next",
-                () -> delegate.next()
+                delegate::next
         );
     }
 
     @Override
     public Sample<V> peekNext() throws NoSuchElementException {
         return DebugContexts.get().apply(
-                node,
+                reference,
                 id,
                 interval,
                 "peekNext",
-                () -> delegate.peekNext()
+                delegate::peekNext
         );
     }
 
     @Override
     public boolean hasNext() {
         return DebugContexts.get().apply(
-                node,
+                reference,
                 id,
                 interval,
                 "hasNext",
-                () -> delegate.hasNext()
+                delegate::hasNext
         );
     }
 

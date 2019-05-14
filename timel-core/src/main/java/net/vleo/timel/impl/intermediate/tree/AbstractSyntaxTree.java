@@ -31,7 +31,7 @@ import net.vleo.timel.type.Type;
 import java.util.List;
 
 /**
- * An tree that maps the parsed nodes into a {@link Type}d one.
+ * A tree that maps the parsed nodes into a {@link Type}d one.
  *
  * @author Andrea Leofreddi
  */
@@ -39,7 +39,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public abstract class AbstractSyntaxTree {
     private final AbstractParseTree reference;
-    private final Type type;
+    private final Type<?> type;
     private final List<AbstractSyntaxTree> children;
 
     public abstract <T> T accept(SyntaxTreeVisitor<T> visitor);

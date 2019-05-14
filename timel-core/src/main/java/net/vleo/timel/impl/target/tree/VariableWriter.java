@@ -57,12 +57,10 @@ public class VariableWriter extends AbstractTargetTree {
         return new ChopUpscalableIterator<>(
                 new UpscalerIterator<>(
                         upscaler,
-//                        context.debug(this, "FilterNullTimeIterator", interval,
-                        (
+                        context.debug(this, "FilterNullTimeIterator", interval,
                                 new FilterNullTimeIterator<>(
                                         new AdapterTimeIterator<Optional<Object>, Object>( /* Upscalable */
-//                                                context.debug(this, "GapEvaluatorTimeIterator", interval,
-                                                (
+                                                context.debug(this, "GapEvaluatorTimeIterator", interval,
                                                         new GapEvaluatorTimeIterator<>(
                                                                 variable,
                                                                 value.evaluate(

@@ -28,6 +28,7 @@ import net.vleo.timel.impl.downscaler.Downscaler;
 import net.vleo.timel.impl.downscaler.IntegralIntegerDownscaler;
 import net.vleo.timel.impl.upscaler.IntegralIntegerUpscaler;
 import net.vleo.timel.impl.upscaler.InverseIntegralFloatUpscaler;
+import net.vleo.timel.impl.upscaler.InverseIntegralIntegerUpscaler;
 import net.vleo.timel.impl.upscaler.Upscaler;
 
 /**
@@ -45,7 +46,7 @@ public class IntegralIntegerType extends IntegralType<Integer> {
     @Override
     public Upscaler<?> getUpscaler() {
         if(getDegree() <= 0)
-            return new InverseIntegralFloatUpscaler();
+            return new InverseIntegralIntegerUpscaler();
         return new IntegralIntegerUpscaler();
     }
 

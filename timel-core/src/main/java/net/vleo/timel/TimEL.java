@@ -80,6 +80,6 @@ public final class TimEL {
     public static <V> TimeIterator<V> evaluate(Expression<V> expression, Interval interval) {
         ExpressionImpl exprImpl = (ExpressionImpl) expression;
 
-        return (TimeIterator<V>) exprImpl.getTree().evaluate(interval, null);
+        return (TimeIterator<V>) exprImpl.getTree().evaluate(interval, exprImpl.getExecutorContext());
     }
 }

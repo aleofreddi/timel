@@ -78,7 +78,9 @@ public final class StandardFunctions {
             new AddDoubleOperator(),
             new AddFloatOperator(),
             new AddIntegerOperator(),
+            new AddIntegralDoubleOperator(),
             new AddIntegralFloatOperator(),
+            new AddIntegralIntegerOperator(),
 
             new DivDoubleOperator(),
             new DivFloatOperator(),

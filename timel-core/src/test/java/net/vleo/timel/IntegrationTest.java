@@ -28,6 +28,8 @@ import net.vleo.timel.time.Interval;
 import net.vleo.timel.time.IntervalMaps;
 import net.vleo.timel.time.Sample;
 import net.vleo.timel.tuple.Pair;
+import net.vleo.timel.tuple.Tuple3;
+import net.vleo.timel.type.*;
 import net.vleo.timel.variable.TreeMapVariable;
 import net.vleo.timel.variable.Variable;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -36,6 +38,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 
 import java.io.*;
 import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
@@ -58,14 +61,14 @@ public class IntegrationTest {
     private static final String DATA_CSV_FILE = "data.csv";
     private static final String INTEGRATION_DIR = "integration";
 
-    @ParameterizedTest(name = "{0}")
+    @ParameterizedTest(name = "{0}, numeric={3}, integral={4}")
     @MethodSource("getSourceStream")
-    void testExpression(String testName, Supplier<InputStream> metaReader, Supplier<InputStream> dataReader) throws IOException, ParseException {
+    void testExpression(String testName, Properties properties, Supplier<InputStream> dataReader, Type<?> numericType, Type<?> integralNumericType)
+            throws IOException, ParseException {
         try(
-                InputStream meta = metaReader.get();
                 InputStream data = dataReader.get()
         ) {
-            IntegrationTestContext context = new IntegrationTestContext(meta, data);
+            IntegrationTestContext context = new IntegrationTestContext(properties, data, numericType, integralNumericType);
             Expression expression = compile(context.getSource(), context.getEvaluationVariables());
 
             // Execute the program
@@ -95,8 +98,6 @@ public class IntegrationTest {
                     .filter(file -> limit.length == 0 || Arrays.stream(limit).anyMatch(l -> file.getName().toLowerCase().contains(l.toLowerCase())))
                     .map(File::toPath)
                     .forEach(directory -> {
-                        FileInputStream metadata, data;
-
                         tests.put(
                                 directory.getFileName().toString(),
                                 new Pair<>(
@@ -108,7 +109,7 @@ public class IntegrationTest {
         } else if(url.getProtocol().equals("jar")) {
             JarFile jar = new JarFile(URLDecoder.decode(
                     new File(url.getFile().substring(5, url.getFile().indexOf('!'))).toString(),
-                    "UTF-8"
+                    StandardCharsets.UTF_8.name()
             ));
 
             for(Enumeration<JarEntry> entries = jar.entries(); entries.hasMoreElements(); ) {
@@ -139,9 +140,54 @@ public class IntegrationTest {
         } else
             throw new UnsupportedOperationException("Cannot load integration tests from URL " + url);
 
+        // Cross factor all the tests with the numeric types
         return tests.entrySet().stream()
                 .sorted(Comparator.comparing(Map.Entry::getKey))
-                .map(entry -> Arguments.of(entry.getKey(), entry.getValue().getFirst(), entry.getValue().getSecond()));
+                .map(entry -> new Tuple3<>(
+                        entry.getKey(),
+                        readProperties(entry.getValue().getFirst()),
+                        entry.getValue().getSecond()
+                ))
+                .flatMap(entry -> getNumericTypes(entry.getSecond()).map(entry::append))
+                .map(entry -> Arguments.of(
+                        entry.getFirst(),
+                        entry.getSecond(),
+                        entry.getThird(),
+                        entry.getFourth().getFirst(),
+                        entry.getFourth().getSecond()
+                ));
+    }
+
+    private static Stream<Pair<Type<?>, Type<?>>> getNumericTypes(Properties properties) {
+        String value = properties.containsKey("numericTypes") ?
+                properties.get("numericTypes").toString()
+                : "Integer,Float,Double";
+
+        return Arrays.stream(value.split(","))
+                .map(i -> {
+                    switch(i) {
+                        case "Integer":
+                            return new Pair<>(new IntegerType(), new IntegralIntegerType(1));
+                        case "Float":
+                            return new Pair<Type<?>, Type<?>>(new FloatType(), new IntegralFloatType(1));
+                        case "Double":
+                            return new Pair<Type<?>, Type<?>>(new DoubleType(), new IntegralDoubleType(1));
+                        default:
+                            throw new IllegalArgumentException(i);
+                    }
+                });
+    }
+
+    private static Properties readProperties(Supplier<InputStream> inputStreamSupplier) {
+        try {
+            try(val is = inputStreamSupplier.get()) {
+                val properties = new Properties();
+                properties.load(is);
+                return properties;
+            }
+        } catch(IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     private <V> TreeMap<Interval, V> filterNull(TreeMap<Interval, V> map) {

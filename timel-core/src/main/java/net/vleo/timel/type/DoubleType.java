@@ -23,6 +23,8 @@ package net.vleo.timel.type;
  */
 
 import lombok.EqualsAndHashCode;
+import net.vleo.timel.impl.downscaler.DoubleDownscaler;
+import net.vleo.timel.impl.downscaler.Downscaler;
 
 /**
  * Double type.
@@ -34,5 +36,10 @@ public class DoubleType extends Type {
     @Override
     public String getName() {
         return "Double";
+    }
+
+    @Override
+    public Downscaler<?> getDownscaler() {
+        return new DoubleDownscaler();
     }
 }

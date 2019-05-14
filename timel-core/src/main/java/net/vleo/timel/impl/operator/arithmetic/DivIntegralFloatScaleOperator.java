@@ -44,5 +44,5 @@ import net.vleo.timel.type.IntegralFloatType;
                 }
         )
 })
-public class DivIntegralFloatScaleOperator extends MulFloatOperator {
+public class DivIntegralFloatScaleOperator extends DivFloatOperator {
 }

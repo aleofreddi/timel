@@ -38,16 +38,23 @@ import java.util.List;
 @Getter
 public class FunctionCall extends AbstractSyntaxTree {
     private final Function<Object> function;
+    private final String prototype;
     private final List<AbstractSyntaxTree> arguments;
 
-    public FunctionCall(AbstractParseTree reference, Function<Object> function, List<AbstractSyntaxTree> arguments, Type returnType) {
+    public FunctionCall(AbstractParseTree reference, Function<Object> function, String prototype, Type returnType, List<AbstractSyntaxTree> arguments) {
         super(reference, returnType, arguments);
         this.function = function;
+        this.prototype = prototype;
         this.arguments = arguments;
     }
 
     @Override
     public <T> T accept(SyntaxTreeVisitor<T> visitor) {
         return visitor.visit(this);
+    }
+
+    @Override
+    public String toString() {
+        return function.getClass() + " " + prototype + "->(" + arguments + ")";
     }
 }

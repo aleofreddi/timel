@@ -44,5 +44,5 @@ import net.vleo.timel.type.IntegralIntegerType;
                 }
         )
 })
-public class DivIntegralIntegerScaleOperator extends MulIntegerOperator {
+public class DivIntegralIntegerScaleOperator extends DivIntegerOperator {
 }

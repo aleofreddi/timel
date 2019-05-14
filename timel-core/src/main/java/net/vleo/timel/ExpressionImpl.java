@@ -24,6 +24,7 @@ package net.vleo.timel;
 
 import lombok.RequiredArgsConstructor;
 import lombok.Value;
+import net.vleo.timel.executor.ExecutorContext;
 import net.vleo.timel.impl.target.tree.AbstractTargetTree;
 import net.vleo.timel.type.Type;
 
@@ -36,6 +37,7 @@ import net.vleo.timel.type.Type;
 @RequiredArgsConstructor
 public class ExpressionImpl<T> implements Expression<T> {
     private final AbstractTargetTree tree;
+    private final ExecutorContext executorContext;
 
     @Override
     public Type<T> getReturnType() {
