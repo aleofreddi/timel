@@ -28,6 +28,8 @@ import net.vleo.timel.time.Interval;
 import net.vleo.timel.time.IntervalMaps;
 import net.vleo.timel.time.Sample;
 import net.vleo.timel.tuple.Pair;
+import net.vleo.timel.tuple.Tuple3;
+import net.vleo.timel.type.*;
 import net.vleo.timel.variable.TreeMapVariable;
 import net.vleo.timel.variable.Variable;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -59,14 +61,14 @@ public class IntegrationTest {
     private static final String DATA_CSV_FILE = "data.csv";
     private static final String INTEGRATION_DIR = "integration";
 
-    @ParameterizedTest(name = "{0}")
+    @ParameterizedTest(name = "{0}, numeric={3}, integral={4}")
     @MethodSource("getSourceStream")
-    void testExpression(String testName, Supplier<InputStream> metaReader, Supplier<InputStream> dataReader) throws IOException, ParseException {
+    void testExpression(String testName, Properties properties, Supplier<InputStream> dataReader, Type<?> numericType, Type<?> integralNumericType)
+            throws IOException, ParseException {
         try(
-                InputStream meta = metaReader.get();
                 InputStream data = dataReader.get()
         ) {
-            IntegrationTestContext context = new IntegrationTestContext(meta, data);
+            IntegrationTestContext context = new IntegrationTestContext(properties, data, numericType, integralNumericType);
             Expression expression = compile(context.getSource(), context.getEvaluationVariables());
 
             // Execute the program
@@ -138,9 +140,54 @@ public class IntegrationTest {
         } else
             throw new UnsupportedOperationException("Cannot load integration tests from URL " + url);
 
+        // Cross factor all the tests with the numeric types
         return tests.entrySet().stream()
                 .sorted(Comparator.comparing(Map.Entry::getKey))
-                .map(entry -> Arguments.of(entry.getKey(), entry.getValue().getFirst(), entry.getValue().getSecond()));
+                .map(entry -> new Tuple3<>(
+                        entry.getKey(),
+                        readProperties(entry.getValue().getFirst()),
+                        entry.getValue().getSecond()
+                ))
+                .flatMap(entry -> getNumericTypes(entry.getSecond()).map(entry::append))
+                .map(entry -> Arguments.of(
+                        entry.getFirst(),
+                        entry.getSecond(),
+                        entry.getThird(),
+                        entry.getFourth().getFirst(),
+                        entry.getFourth().getSecond()
+                ));
+    }
+
+    private static Stream<Pair<Type<?>, Type<?>>> getNumericTypes(Properties properties) {
+        String value = properties.containsKey("numericTypes") ?
+                properties.get("numericTypes").toString()
+                : "Integer,Float,Double";
+
+        return Arrays.stream(value.split(","))
+                .map(i -> {
+                    switch(i) {
+                        case "Integer":
+                            return new Pair<>(new IntegerType(), new IntegralIntegerType(1));
+                        case "Float":
+                            return new Pair<Type<?>, Type<?>>(new FloatType(), new IntegralFloatType(1));
+                        case "Double":
+                            return new Pair<Type<?>, Type<?>>(new DoubleType(), new IntegralDoubleType(1));
+                        default:
+                            throw new IllegalArgumentException(i);
+                    }
+                });
+    }
+
+    private static Properties readProperties(Supplier<InputStream> inputStreamSupplier) {
+        try {
+            try(val is = inputStreamSupplier.get()) {
+                val properties = new Properties();
+                properties.load(is);
+                return properties;
+            }
+        } catch(IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     private <V> TreeMap<Interval, V> filterNull(TreeMap<Interval, V> map) {

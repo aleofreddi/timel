@@ -24,21 +24,19 @@ package net.vleo.timel;
 
 import lombok.Value;
 import net.vleo.timel.csv.CsvReader;
-import net.vleo.timel.variable.TreeMapVariable;
 import net.vleo.timel.iterator.TimeIterator;
 import net.vleo.timel.time.Interval;
 import net.vleo.timel.time.Sample;
 import net.vleo.timel.type.*;
+import net.vleo.timel.variable.TreeMapVariable;
 import net.vleo.timel.variable.Variable;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.file.Path;
 import java.util.*;
 
 import static java.util.stream.Collectors.toList;
@@ -80,14 +78,10 @@ public class IntegrationTestContext {
      *
      * @throws IOException
      */
-    public IntegrationTestContext(InputStream meta, InputStream data) throws IOException {
+    public IntegrationTestContext(Properties properties, InputStream data, Type<?> numericType, Type<?> numericIntegralType) throws IOException {
         DateTimeZone tz = DateTimeZone.getDefault();
         List<List<String>> records = CsvReader.read(data);
         Long forcedIntervalStart = null, forcedIntervalStop = null;
-
-        // Load test properties
-        Properties properties = new Properties();
-        properties.load(meta);
 
         // Parse test properties
         source = properties.get("expression").toString();
@@ -125,12 +119,16 @@ public class IntegrationTestContext {
             if(variable == null) {
                 Type type;
 
-                if(id.startsWith("boolean_"))
+                if(id.startsWith("b_")) {
                     type = new BooleanType();
-                else if(id.startsWith("I"))
-                    type = new IntegralFloatType(1);
-                else
+                } else if(id.startsWith("n_")) {
+                    type = numericType;
+                } else if(id.startsWith("in_")) {
+                    type = numericIntegralType;
+                } else if(id.startsWith("f_")) {
                     type = new FloatType();
+                } else
+                    throw new IllegalArgumentException("Unable to guess variable type from id " + id);
 
                 variable = new VariableInstance();
 
@@ -195,6 +193,9 @@ public class IntegrationTestContext {
     private Object parseValue(String valueStr, Type type) {
         if(type.equals(new BooleanType()))
             return "1".equals(valueStr) || "true".equals(valueStr.toLowerCase());
+        else if(type.equals(new IntegerType())
+                || type.template().equals(new IntegralIntegerType()))
+            return (int) Float.parseFloat(valueStr);
         else if(type.equals(new FloatType())
                 || type.template().equals(new IntegralFloatType()))
             return Float.parseFloat(valueStr);
