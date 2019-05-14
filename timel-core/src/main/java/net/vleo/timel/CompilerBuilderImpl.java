@@ -81,7 +81,7 @@ class CompilerBuilderImpl implements CompilerBuilder {
         CompilerBuilderImpl next = new CompilerBuilderImpl(this);
         switch(key) {
             case "compile.dump":
-                next.dumpTrees = true;
+                next.dumpTrees = (Boolean) value;
                 break;
             case "eval.trace":
                 next.traceExecution = (Boolean) value;
