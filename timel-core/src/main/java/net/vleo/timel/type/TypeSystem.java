@@ -88,12 +88,12 @@ public class TypeSystem {
      * Get the least upper bound given a set of types, either for implicit or explicit conversions.
      *
      * @param implicit If true, use the implicit type conversions
-     * @param types Input elements
+     * @param types    Input elements
      * @return The least upper bound if any
      */
     public Optional<Type<?>> leastUpperBound(boolean implicit, Set<Type<?>> types) {
         return (implicit ? implicitPoset : explicitPoset)
-                .leastUpperBound(types.stream().map(type -> type.template()).collect(Collectors.toSet()));
+                .leastUpperBound(types.stream().map(Type::template).collect(Collectors.toSet()));
     }
 
     /**

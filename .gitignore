@@ -4,3 +4,6 @@
 
 # Java
 /*/target
+
+# macOS
+.DS_Store

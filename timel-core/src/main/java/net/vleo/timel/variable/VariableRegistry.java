@@ -32,7 +32,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Variable registry. This class is reponsible to hold the association between a variable and its implementation details.
+ * Variable registry. This class is responsible to hold the association between a variable and its implementation details.
  *
  * @author Andrea Leofreddi
  */

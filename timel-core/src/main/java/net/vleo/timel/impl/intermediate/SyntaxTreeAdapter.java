@@ -139,8 +139,8 @@ public class SyntaxTreeAdapter implements ParserTreeVisitor<AbstractSyntaxTree> 
         Type sourceType = value.getType();
         val conversionResult = functionRegistry.getTypeSystem().getConcretePath(false, sourceType, targetType);
 
-        if(!targetType.equals(conversionResult.getResultType()))
-            throw new RuntimeException(new ParseException("Cannot conversion " + sourceType + " to " + targetType));
+        if(conversionResult == null || !targetType.equals(conversionResult.getResultType()))
+            throw new RuntimeException(new ParseException("Cannot convert " + sourceType + " to " + targetType));
 
         List<Conversion<Object, Object>> conversions = conversionResult.getConversions();
 
