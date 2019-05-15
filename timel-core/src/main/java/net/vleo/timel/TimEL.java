@@ -22,6 +22,7 @@ package net.vleo.timel;
  * #L%
  */
 
+import net.vleo.timel.impl.CompilerBuilderImpl;
 import net.vleo.timel.iterator.TimeIterator;
 import net.vleo.timel.time.Interval;
 
@@ -78,7 +79,7 @@ public final class TimEL {
      * @return Result iterator
      */
     public static <V> TimeIterator<V> evaluate(Expression<V> expression, Interval interval) {
-        ExpressionImpl exprImpl = (ExpressionImpl) expression;
+        ExpressionImpl<V> exprImpl = (ExpressionImpl<V>) expression;
 
         return (TimeIterator<V>) exprImpl.getTree().evaluate(interval, exprImpl.getExecutorContext());
     }

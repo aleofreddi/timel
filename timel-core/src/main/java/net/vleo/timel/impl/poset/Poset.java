@@ -45,7 +45,7 @@ public class Poset<N, E extends Poset.OrderEntry<N>> {
     private final Map<Integer, Path<N, E>> closure;
 
     /**
-     * A partial order entry.
+     * A partial order relationship between two items.
      *
      * @param <T> Element type
      */

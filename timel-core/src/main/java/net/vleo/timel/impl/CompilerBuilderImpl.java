@@ -1,4 +1,4 @@
-package net.vleo.timel;
+package net.vleo.timel.impl;
 
 /*-
  * #%L
@@ -23,6 +23,10 @@ package net.vleo.timel;
  */
 
 import lombok.val;
+import net.vleo.timel.CompilerBuilder;
+import net.vleo.timel.Expression;
+import net.vleo.timel.ExpressionImpl;
+import net.vleo.timel.ParseException;
 import net.vleo.timel.conversion.StandardConversions;
 import net.vleo.timel.executor.ExecutorContext;
 import net.vleo.timel.function.Function;
@@ -54,7 +58,7 @@ import java.util.Map;
  *
  * @author Andrea Leofreddi
  */
-class CompilerBuilderImpl implements CompilerBuilder {
+public class CompilerBuilderImpl implements CompilerBuilder {
     private final String source;
     private boolean dumpTrees = false;
     private boolean traceExecution = false;

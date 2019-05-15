@@ -62,7 +62,6 @@ public abstract class SplitAdapterTimeIterator<S, D> implements TimeIterator<D> 
     /**
      * Perform the adaptation.
      *
-     *
      * @param sample Sample to adapt
      * @return A list of adapted samples. When null means that we've reached the end of stream.
      */
