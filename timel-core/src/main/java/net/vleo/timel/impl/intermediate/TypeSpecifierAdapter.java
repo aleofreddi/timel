@@ -24,21 +24,15 @@ package net.vleo.timel.impl.intermediate;
  */
 
 import lombok.RequiredArgsConstructor;
-import lombok.val;
 import net.vleo.timel.ParseException;
-import net.vleo.timel.conversion.Conversion;
-import net.vleo.timel.function.FunctionRegistry;
-import net.vleo.timel.impl.intermediate.tree.*;
 import net.vleo.timel.impl.parser.ParserTreeVisitor;
 import net.vleo.timel.impl.parser.tree.CompilationUnit;
 import net.vleo.timel.impl.parser.tree.FunctionCall;
 import net.vleo.timel.impl.parser.tree.*;
 import net.vleo.timel.type.*;
-import net.vleo.timel.variable.VariableRegistry;
 
 import java.util.*;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 /**
  * An adapter to visit {@link TypeSpecifier}s and convert them into {@link Type}s using a provided {@link TypeSystem}.
@@ -95,7 +89,7 @@ class TypeSpecifierAdapter implements ParserTreeVisitor<Object> {
     }
 
     @Override
-    public Object visit(TypeOf typeOf) {
+    public Object visit(TypeId typeId) {
         return null;
     }
 

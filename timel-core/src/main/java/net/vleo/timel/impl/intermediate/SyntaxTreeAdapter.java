@@ -158,10 +158,10 @@ public class SyntaxTreeAdapter implements ParserTreeVisitor<AbstractSyntaxTree> 
     }
 
     @Override
-    public AbstractSyntaxTree visit(TypeOf typeOf) {
-        Type type = typeOf.getChildren().get(0).accept(this).getType();
+    public AbstractSyntaxTree visit(TypeId typeId) {
+        Type type = typeId.getChildren().get(0).accept(this).getType();
 
-        return new Constant(typeOf, new StringType(), type.toString());
+        return new Constant(typeId, new StringType(), type.toString());
     }
 
     @Override

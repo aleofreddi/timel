@@ -29,14 +29,14 @@ import net.vleo.timel.impl.parser.ParserTreeVisitor;
 import java.util.Collections;
 
 /**
- * TypeOf operator.
+ * TypeId operator.
  *
  * @author Andrea Leofreddi
  */
 @Value
 @EqualsAndHashCode(callSuper = true)
-public class TypeOf extends AbstractParseTree {
-    public TypeOf(AbstractParseTree child) {
+public class TypeId extends AbstractParseTree {
+    public TypeId(AbstractParseTree child) {
         super(Collections.singletonList(child));
     }
 

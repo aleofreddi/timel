@@ -48,7 +48,7 @@ public interface ParserTreeVisitor<T> {
 
     T visit(StringConstant node);
 
-    T visit(TypeOf typeOf);
+    T visit(TypeId typeId);
 
     T visit(TypeSpecifier typeSpecifier);
 
