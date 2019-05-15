@@ -30,16 +30,16 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * An annotation to specify parameter type information. To be used with {@link Prototype}.
+ * An annotation to specify parameter type information. To be used with {@link FunctionPrototype}.
  *
  * @author Andrea Leofreddi
  */
 @Target({ElementType.METHOD, ElementType.PARAMETER})
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Parameter {
-    String variable() default Prototype.NULL_VARIABLE;
+    String variable() default FunctionPrototype.NULL_VARIABLE;
 
-    Class<? extends Type> type() default Prototype.NilType.class;
+    Class<? extends Type> type() default FunctionPrototype.NilType.class;
 
     boolean varArgs() default false;
 }

@@ -38,7 +38,7 @@ import static java.util.Collections.*;
  */
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface Prototype {
+public @interface FunctionPrototype {
     String name();
 
     Returns returns() default @Returns;

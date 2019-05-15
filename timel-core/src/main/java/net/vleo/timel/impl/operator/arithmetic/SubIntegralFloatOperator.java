@@ -24,7 +24,7 @@ package net.vleo.timel.impl.operator.arithmetic;
 
 import lombok.val;
 import net.vleo.timel.annotation.Parameter;
-import net.vleo.timel.annotation.Prototype;
+import net.vleo.timel.annotation.FunctionPrototype;
 import net.vleo.timel.annotation.Returns;
 import net.vleo.timel.type.IntegralFloatType;
 import net.vleo.timel.type.Type;
@@ -39,7 +39,7 @@ import java.util.stream.Collectors;
  *
  * @author Andrea Leofreddi
  */
-@Prototype(
+@FunctionPrototype(
         name = "-",
         returns = @Returns(type = IntegralFloatType.class),
         parameters = {

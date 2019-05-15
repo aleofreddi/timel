@@ -632,7 +632,7 @@ class FunctionRegistryTest {
             }
         }
 
-        @Prototype(
+        @FunctionPrototype(
                 returns = @Returns(variable = "A"),
                 name = "a->a",
                 parameters = {@Parameter(variable = "A")}
@@ -640,7 +640,7 @@ class FunctionRegistryTest {
         static class Fun_A2A extends MockedFunction {
         }
 
-        @Prototype(
+        @FunctionPrototype(
                 returns = @Returns(variable = "A"),
                 name = "aa->a",
                 parameters = {
@@ -651,7 +651,7 @@ class FunctionRegistryTest {
         static class Fun_AA2A extends MockedFunction {
         }
 
-        @Prototype(
+        @FunctionPrototype(
                 returns = @Returns(variable = "A"),
                 name = "a*->a",
                 parameters = {
@@ -661,7 +661,7 @@ class FunctionRegistryTest {
         static class Fun_AStar2A extends MockedFunction {
         }
 
-        @Prototype(
+        @FunctionPrototype(
                 returns = @Returns(type = TestTypes.One.class),
                 name = "a*->1",
                 parameters = {
@@ -671,7 +671,7 @@ class FunctionRegistryTest {
         static class Fun_AStar2One extends MockedFunction {
         }
 
-        @Prototype(
+        @FunctionPrototype(
                 name = "a*->?",
                 parameters = {
                         @Parameter(variable = "A", varArgs = true),
@@ -680,7 +680,7 @@ class FunctionRegistryTest {
         static class Fun_AStar2Unknown extends MockedFunction {
         }
 
-        @Prototype(
+        @FunctionPrototype(
                 returns = @Returns(variable = "B"),
                 name = "(ab)*->b",
                 parameters = {
@@ -691,7 +691,7 @@ class FunctionRegistryTest {
         static class Fun_AB_Star2B extends MockedFunction {
         }
 
-        @Prototype(
+        @FunctionPrototype(
                 returns = @Returns(type = TestTypes.Color.class),
                 name = "cc->c",
                 parameters = {
@@ -718,7 +718,7 @@ class FunctionRegistryTest {
             }
         }
 
-        @Prototype(
+        @FunctionPrototype(
                 returns = @Returns(type = TestTypes.One.class),
                 name = "cc->1",
                 parameters = {
@@ -732,15 +732,15 @@ class FunctionRegistryTest {
         static class Fun_CC2One extends MockedFunction {
         }
 
-        @Prototypes({
-                @Prototype(
+        @FunctionPrototypes({
+                @FunctionPrototype(
                         returns = @Returns(type = TestTypes.One.class),
                         name = "c->1",
                         parameters = {
                                 @Parameter(type = TestTypes.Color.class)
                         }
                 ),
-                @Prototype(
+                @FunctionPrototype(
                         returns = @Returns(type = TestTypes.One.class),
                         name = "l->1",
                         parameters = {

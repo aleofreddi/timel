@@ -23,7 +23,7 @@ package net.vleo.timel.impl.function.interval;
  */
 
 import net.vleo.timel.annotation.Parameter;
-import net.vleo.timel.annotation.Prototype;
+import net.vleo.timel.annotation.FunctionPrototype;
 import net.vleo.timel.annotation.Returns;
 import net.vleo.timel.executor.ExecutorContext;
 import net.vleo.timel.function.Function;
@@ -46,7 +46,7 @@ import org.joda.time.Period;
  *
  * @author Andrea Leofreddi
  */
-@Prototype(
+@FunctionPrototype(
         name = "every",
         returns = @Returns(type = IntervalType.class),
         parameters = {

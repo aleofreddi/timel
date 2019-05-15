@@ -35,7 +35,7 @@ import java.util.Optional;
  *
  * @author Andrea Leofreddi
  */
-@Prototype(
+@FunctionPrototype(
         name = "/",
         parameters = {
                 @Parameter(type = FloatType.class),

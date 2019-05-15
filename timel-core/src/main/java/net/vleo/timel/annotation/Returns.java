@@ -28,13 +28,13 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 
 /**
- * An annotation to specify return type information. To be used with {@link Prototype}.
+ * An annotation to specify return type information. To be used with {@link FunctionPrototype}.
  *
  * @author Andrea Leofreddi
  */
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Returns {
-    String variable() default Prototype.NULL_VARIABLE;
+    String variable() default FunctionPrototype.NULL_VARIABLE;
 
-    Class<? extends Type> type() default Prototype.NilType.class;
+    Class<? extends Type> type() default FunctionPrototype.NilType.class;
 }

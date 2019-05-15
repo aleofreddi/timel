@@ -31,8 +31,8 @@ import net.vleo.timel.type.IntegralDoubleType;
  *
  * @author Andrea Leofreddi
  */
-@Prototypes({
-        @Prototype(
+@FunctionPrototypes({
+        @FunctionPrototype(
                 name = "/",
                 returns = @Returns(variable = "T"),
                 parameters = {

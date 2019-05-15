@@ -22,7 +22,7 @@ package net.vleo.timel.impl.function.conditional;
  * #L%
  */
 
-import net.vleo.timel.annotation.Prototype;
+import net.vleo.timel.annotation.FunctionPrototype;
 import net.vleo.timel.executor.ExecutorContext;
 import net.vleo.timel.time.Sample;
 import net.vleo.timel.impl.target.Evaluable;
@@ -51,7 +51,7 @@ import net.vleo.timel.function.Function;
  * @param <T>
  * @author Andrea Leofreddi
  */
-@Prototype(
+@FunctionPrototype(
         name = "when",
         returns = @Returns(variable = "T"),
         parameters = {

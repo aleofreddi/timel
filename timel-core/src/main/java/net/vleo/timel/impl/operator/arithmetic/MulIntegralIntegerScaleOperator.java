@@ -31,8 +31,8 @@ import net.vleo.timel.type.IntegralIntegerType;
  *
  * @author Andrea Leofreddi
  */
-@Prototypes({
-        @Prototype(
+@FunctionPrototypes({
+        @FunctionPrototype(
                 name = "*",
                 returns = @Returns(variable = "T"),
                 parameters = {
@@ -43,7 +43,7 @@ import net.vleo.timel.type.IntegralIntegerType;
                         @Constraint(variable = "T", template = IntegralIntegerType.class)
                 }
         ),
-        @Prototype(
+        @FunctionPrototype(
                 name = "*",
                 returns = @Returns(variable = "T"),
                 parameters = {

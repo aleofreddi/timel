@@ -23,7 +23,7 @@ package net.vleo.timel.impl.function.eval;
  */
 
 import net.vleo.timel.annotation.Parameter;
-import net.vleo.timel.annotation.Prototype;
+import net.vleo.timel.annotation.FunctionPrototype;
 import net.vleo.timel.annotation.Returns;
 import net.vleo.timel.executor.ExecutorContext;
 import net.vleo.timel.function.Function;
@@ -40,7 +40,7 @@ import net.vleo.timel.type.BooleanType;
  *
  * @author Andrea Leofreddi
  */
-@Prototype(
+@FunctionPrototype(
         name = "defined",
         returns = @Returns(type = BooleanType.class),
         parameters = {

@@ -24,7 +24,7 @@ package net.vleo.timel.impl.operator.arithmetic;
 
 import net.vleo.timel.annotation.Constraint;
 import net.vleo.timel.annotation.Parameter;
-import net.vleo.timel.annotation.Prototype;
+import net.vleo.timel.annotation.FunctionPrototype;
 import net.vleo.timel.type.IntegerType;
 import net.vleo.timel.type.IntegralIntegerType;
 import net.vleo.timel.type.Type;
@@ -37,7 +37,7 @@ import java.util.Optional;
  *
  * @author Andrea Leofreddi
  */
-@Prototype(
+@FunctionPrototype(
         name = "/",
         parameters = {
                 @Parameter(type = IntegerType.class),

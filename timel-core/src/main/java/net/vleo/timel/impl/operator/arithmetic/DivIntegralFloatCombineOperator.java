@@ -22,7 +22,7 @@ package net.vleo.timel.impl.operator.arithmetic;
  * #L%
  */
 
-import net.vleo.timel.annotation.Prototype;
+import net.vleo.timel.annotation.FunctionPrototype;
 import net.vleo.timel.annotation.Parameter;
 import net.vleo.timel.type.FloatType;
 import net.vleo.timel.type.IntegralFloatType;
@@ -36,7 +36,7 @@ import java.util.Optional;
  *
  * @author Andrea Leofreddi
  */
-@Prototype(
+@FunctionPrototype(
         name = "/",
         parameters = {
                 @Parameter(type = IntegralFloatType.class),
