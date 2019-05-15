@@ -56,7 +56,16 @@ import static org.junit.jupiter.api.Assertions.fail;
  * @author Andrea Leofreddi
  */
 public class IntegrationTest {
-    private static final double EPSILON = 0.001;
+    private static final Map<Class<?>, Double> epsilon;
+
+    static {
+        epsilon = new HashMap<>();
+
+        epsilon.put(Integer.class, 1d);
+        epsilon.put(Float.class, 0.01);
+        epsilon.put(Double.class, 0.001);
+    }
+
     private static final String TEST_PROPERTIES_FILE = "test.properties";
     private static final String DATA_CSV_FILE = "data.csv";
     private static final String INTEGRATION_DIR = "integration";
@@ -248,7 +257,7 @@ public class IntegrationTest {
                 } else
                     diff = expected.equals(actual) ? 0.0 : 1.0;
 
-                if(diff > EPSILON)
+                if(diff > epsilon.getOrDefault(expected.getClass(), 0d))
                     fail("Failed result check for interval " + outputEntry.getKey() + " expected " + expected + ", got " + actual);
             }
 
