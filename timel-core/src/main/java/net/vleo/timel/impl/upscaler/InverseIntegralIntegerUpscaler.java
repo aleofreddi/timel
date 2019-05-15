@@ -35,6 +35,6 @@ public class InverseIntegralIntegerUpscaler implements Upscaler<Integer> {
         if(!from.overlaps(to))
             throw new IllegalArgumentException("Interval " + to + " does not overlap sample interval " + from);
 
-        return (int) (value * ((float) from.toDurationMillis() / from.overlap(to).toDurationMillis()));
+        return (int) (value * (float)from.toDurationMillis() / from.overlap(to).toDurationMillis());
     }
 }

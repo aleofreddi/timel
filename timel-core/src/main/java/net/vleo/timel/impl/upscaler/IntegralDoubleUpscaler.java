@@ -35,6 +35,6 @@ public class IntegralDoubleUpscaler implements Upscaler<Double> {
         if(!from.overlaps(to))
             throw new IllegalArgumentException("Interval " + to + " does not overlap sample interval " + from);
 
-        return value * ((double) from.overlap(to).toDurationMillis() / (double) from.toDurationMillis());
+        return value * from.overlap(to).toDurationMillis() / from.toDurationMillis();
     }
 }

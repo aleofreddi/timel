@@ -35,6 +35,6 @@ public class IntegralFloatUpscaler implements Upscaler<Float> {
         if(!from.overlaps(to))
             throw new IllegalArgumentException("Interval " + to + " does not overlap sample interval " + from);
 
-        return value * ((float) from.overlap(to).toDurationMillis() / from.toDurationMillis());
+        return value * from.overlap(to).toDurationMillis() / from.toDurationMillis();
     }
 }
