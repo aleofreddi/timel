@@ -78,6 +78,8 @@ public class CompilerBuilderImpl implements CompilerBuilder {
         this.variableFactory = copy.variableFactory;
         this.variables = new HashMap<>(copy.variables);
         this.functions = new HashSet<>(copy.functions);
+        this.dumpTrees = copy.dumpTrees;
+        this.traceExecution = copy.traceExecution;
     }
 
     @Override
