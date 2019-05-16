@@ -48,7 +48,7 @@
         <lombok.version>1.18.6</lombok.version>
         <maven-compiler-plugin.version>3.8.1</maven-compiler-plugin.version>
         <maven-jar-plugin.version>3.1.1</maven-jar-plugin.version>
-        <maven-jacoco-plugin.version>0.8.3</maven-jacoco-plugin.version>
+        <maven-jacoco-plugin.version>0.8.4</maven-jacoco-plugin.version>
         <maven-javadoc-plugin.version>3.1.0</maven-javadoc-plugin.version>
         <maven-license-plugin.version>1.20</maven-license-plugin.version>
         <maven-source-plugin.version>3.0.1</maven-source-plugin.version>
