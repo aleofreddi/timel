@@ -60,7 +60,7 @@ public abstract class TemplateType<T> extends Type<T> {
     }
 
     public boolean isUnboundTemplate() {
-        return true;
+        return parameters.isEmpty();
     }
 
     public TemplateType template() {

@@ -48,27 +48,21 @@ public interface Conversion<S, T> {
      *
      * <ul>
      * <li>When the source is a specialised template and the target is an unbounded template, specialise the target using the same parameters as the source</li>
-     * <li>When the source is a non-template, and the target is an unbounded template, fail (return empty)</li>
      * <li>No match in any other case</li>
      * </ul>
      *
      * @param source The source type. It is ensured to be a concrete type
-     * @param target The target type. Could be either a non-template or an unbounced template
+     * @param target The target type. Could be either a non-template or an unbounded template
      * @return The specialized return type, or empty when no match
      */
     default Optional<Type<? extends T>> resolveReturnType(Type<? extends S> source, Type<? extends T> target) {
         assert source.isConcrete();
-        if(source.isSpecializedTemplate()) {
-            if(target.isUnboundTemplate())
-                // Copy the source parametrization into the target
-                return Optional.of(target.specialize(source.getParameters().toArray()));
-        } else if(target.isUnboundTemplate())
-            // When source is concrete and target is not, we can't do anything
-            return Optional.empty();
+        if(source.isSpecializedTemplate() && target.isUnboundTemplate())
+            // Copy the source parametrization into the target
+            return Optional.of(target.specialize(source.getParameters().toArray()));
 
-        // Else we accept the target (which is a basic type)
-        assert target.isConcrete();
-        return Optional.of(target);
+        return Optional.empty();
+
     }
 
     /**

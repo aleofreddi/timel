@@ -71,8 +71,10 @@ public class TypeSystem {
         Type<?> type = source;
         for(ConversionOrderEntry conversionEdge : conversionEdges) {
             Conversion<Object, Object> nextConversion = (Conversion<Object, Object>) conversionEdge.getConversion();
+            val targetType = conversionEdge.getTarget();
 
-            val nextType = nextConversion.resolveReturnType(type, conversionEdge.getTarget());
+            val nextType = type.isUnboundTemplate() || type.isSpecializedTemplate() || targetType.isUnboundTemplate() ?
+                    nextConversion.resolveReturnType(type, targetType) : Optional.of(targetType);
 
             if(!nextType.isPresent())
                 return null;
