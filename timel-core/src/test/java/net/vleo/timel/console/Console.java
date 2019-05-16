@@ -43,6 +43,7 @@ import org.joda.time.DateTimeZone;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
+import java.util.Collections;
 
 /**
  * A runnable console usable to do sample tests.
@@ -59,7 +60,7 @@ public class Console {
         DateTime start = new DateTime(2015, 1, 15, 0, 0, 0, 0, timeZone);
         DateTime stop = new DateTime(2016, 2, 14, 0, 0, 0, 0, timeZone);
 
-        final TypeSystem TYPE_SYSTEM = new TypeSystem(StandardConversions.STANDARD_CONVERSIONS);
+        final TypeSystem TYPE_SYSTEM = new TypeSystem(StandardConversions.STANDARD_CONVERSIONS, Collections.emptySet());
 
         while(true) {
             try {

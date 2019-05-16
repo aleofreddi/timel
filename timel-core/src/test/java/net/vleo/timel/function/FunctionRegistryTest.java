@@ -72,7 +72,7 @@ import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
 class FunctionRegistryTest {
     @Spy
-    private TypeSystem typeSystem = new TypeSystem(TestTypes.CONVERSIONS);
+    private TypeSystem typeSystem = new TypeSystem(TestTypes.CONVERSIONS, Collections.emptySet());
 
     private FunctionRegistry functionRegistry;
 

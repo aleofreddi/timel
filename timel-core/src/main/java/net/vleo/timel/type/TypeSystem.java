@@ -125,11 +125,12 @@ public class TypeSystem {
     }
 
     /**
-     * Build a {@link Poset} from the given edges.
+     * Initializes the type system with the given conversions and types.
      *
-     * @param conversions Edges
+     * @param conversions Supported conversions
+     * @param types       Additional types to consider (useful when no conversion exists for such a type)
      */
-    public TypeSystem(Set<Conversion<?, ?>> conversions) {
+    public TypeSystem(Set<Conversion<?, ?>> conversions, Set<Type<?>> types) {
         val groupedConversions = parse(conversions);
 
         groupedConversions.putIfAbsent(true, Collections.emptySet());
@@ -138,14 +139,17 @@ public class TypeSystem {
         implicitPoset = new Poset<>(groupedConversions.get(true));
         explicitPoset = new Poset<>(groupedConversions.values().stream().flatMap(Collection::stream).collect(Collectors.toSet()));
 
-        types = Stream.concat(
-                groupedConversions.getOrDefault(true, Collections.emptySet()).stream(),
-                groupedConversions.get(false).stream()
+        this.types = Stream.concat(
+                Stream.concat(
+                        groupedConversions.getOrDefault(true, Collections.emptySet()).stream(),
+                        groupedConversions.get(false).stream()
+                )
+                        .flatMap(conversion -> Stream.of(conversion.getSource(), conversion.getTarget())),
+                types.stream()
         )
-                .flatMap(conversion -> Stream.of(conversion.getSource(), conversion.getTarget()))
                 .collect(Collectors.toSet());
 
-        idToType = types.stream()
+        idToType = this.types.stream()
                 .collect(Collectors.toMap(
                         Type::getName,
                         Function.identity()
