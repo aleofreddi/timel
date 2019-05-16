@@ -41,7 +41,7 @@ public final class Interval implements Serializable {
 
     private Interval(long start, long end) {
         if(start > end)
-            throw new IllegalArgumentException("Interval end must be greater than start");
+            throw new IllegalArgumentException("Interval end must be greater or equal to start");
 
         this.start = start;
         this.end = end;
