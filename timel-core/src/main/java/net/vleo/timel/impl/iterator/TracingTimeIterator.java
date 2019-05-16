@@ -22,7 +22,6 @@ package net.vleo.timel.impl.iterator;
  * #L%
  */
 
-import net.vleo.timel.impl.target.tree.AbstractTargetTree;
 import net.vleo.timel.iterator.TimeIterator;
 import net.vleo.timel.time.Interval;
 import net.vleo.timel.time.Sample;
