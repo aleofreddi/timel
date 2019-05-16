@@ -58,6 +58,10 @@ public class UpscalerIterator<V> implements UpscalableIterator<V> {
     public Sample<V> peekUpscaleNext(Interval interval) {
         Sample<V> next = peekNext();
 
+        // Skip interpolation on exact match
+        if(interval.equals(next.getInterval()))
+            return next;
+
         Interval nextInterval = next.getInterval();
         Interval toInterval = interval.overlap(nextInterval);
 
