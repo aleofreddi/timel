@@ -31,8 +31,8 @@ import net.vleo.timel.type.IntegralFloatType;
  *
  * @author Andrea Leofreddi
  */
-@Prototypes({
-        @Prototype(
+@FunctionPrototypes({
+        @FunctionPrototype(
                 name = "*",
                 returns = @Returns(variable = "T"),
                 parameters = {
@@ -43,7 +43,7 @@ import net.vleo.timel.type.IntegralFloatType;
                         @Constraint(variable = "T", template = IntegralFloatType.class)
                 }
         ),
-        @Prototype(
+        @FunctionPrototype(
                 name = "*",
                 returns = @Returns(variable = "T"),
                 parameters = {

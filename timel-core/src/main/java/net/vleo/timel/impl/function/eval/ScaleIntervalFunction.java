@@ -22,7 +22,7 @@ package net.vleo.timel.impl.function.eval;
  * #L%
  */
 
-import net.vleo.timel.annotation.Prototype;
+import net.vleo.timel.annotation.FunctionPrototype;
 import net.vleo.timel.annotation.Parameter;
 import net.vleo.timel.annotation.Returns;
 import net.vleo.timel.executor.ExecutorContext;
@@ -43,7 +43,7 @@ import net.vleo.timel.type.IntervalType;
  *
  * @author Andrea Leofreddi
  */
-@Prototype(
+@FunctionPrototype(
         name = "scale",
         returns = @Returns(variable = "T"),
         parameters = {

@@ -29,9 +29,9 @@ import lombok.val;
 import net.vleo.timel.ConfigurationException;
 import net.vleo.timel.ParseException;
 import net.vleo.timel.annotation.Constraint;
+import net.vleo.timel.annotation.FunctionPrototypes;
 import net.vleo.timel.annotation.Parameter;
-import net.vleo.timel.annotation.Prototype;
-import net.vleo.timel.annotation.Prototypes;
+import net.vleo.timel.annotation.FunctionPrototype;
 import net.vleo.timel.conversion.Conversion;
 import net.vleo.timel.impl.intermediate.tree.AbstractSyntaxTree;
 import net.vleo.timel.impl.intermediate.tree.Cast;
@@ -47,7 +47,7 @@ import java.util.stream.Stream;
 
 import static java.util.Collections.*;
 import static java.util.stream.Collectors.*;
-import static net.vleo.timel.annotation.Prototype.NULL_VARIABLE;
+import static net.vleo.timel.annotation.FunctionPrototype.NULL_VARIABLE;
 
 /**
  * Function registry. This class will hold references to all the known {@link Function}s, and allow the resolution of the correct one given its arguments.
@@ -59,7 +59,7 @@ public class FunctionRegistry {
     @Data
     private static class FunctionCallMatch {
         private final Function<Object> function;
-        private final Prototype prototype;
+        private final FunctionPrototype functionPrototype;
         private final Type<?> returnType;
         private final List<AbstractSyntaxTree> arguments;
 
@@ -88,7 +88,7 @@ public class FunctionRegistry {
 
     @Getter
     private final TypeSystem typeSystem;
-    private final Map<String, Set<Pair<Prototype, Function<?>>>> functions = new HashMap<>();
+    private final Map<String, Set<Pair<FunctionPrototype, Function<?>>>> functions = new HashMap<>();
 
     /**
      * Add a function to the registry.
@@ -98,17 +98,17 @@ public class FunctionRegistry {
     public void add(Function<?> function) {
         val functionClass = function.getClass();
 
-        Prototype prototype = functionClass.getDeclaredAnnotation(Prototype.class);
-        Prototypes prototypes = functionClass.getDeclaredAnnotation(Prototypes.class);
+        FunctionPrototype functionPrototype = functionClass.getDeclaredAnnotation(FunctionPrototype.class);
+        FunctionPrototypes functionPrototypes = functionClass.getDeclaredAnnotation(FunctionPrototypes.class);
 
-        if(prototype != null && prototypes != null)
-            throw new IllegalArgumentException("Class " + functionClass + " is annotated with both " + Prototype.class.getName() + " and " + Prototypes.class.getName());
-        if(prototype == null && prototypes == null)
-            throw new IllegalArgumentException("Class " + functionClass + " should be annotated with " + Prototype.class.getName() + " or " + Prototypes.class.getName());
+        if(functionPrototype != null && functionPrototypes != null)
+            throw new IllegalArgumentException("Class " + functionClass + " is annotated with both " + FunctionPrototype.class.getName() + " and " + FunctionPrototypes.class.getName());
+        if(functionPrototype == null && functionPrototypes == null)
+            throw new IllegalArgumentException("Class " + functionClass + " should be annotated with " + FunctionPrototype.class.getName() + " or " + FunctionPrototypes.class.getName());
 
         // Register all the prototypes
-        (prototype == null ? Arrays.asList(prototypes.value()) : singletonList(prototype)).stream()
-                .map(entry -> new Pair<Prototype, Function<?>>(entry, function))
+        (functionPrototype == null ? Arrays.asList(functionPrototypes.value()) : singletonList(functionPrototype)).stream()
+                .map(entry -> new Pair<FunctionPrototype, Function<?>>(entry, function))
                 .forEach(entry ->
                         functions.computeIfAbsent(entry.getFirst().name(), key -> new HashSet<>())
                                 .add(entry)
@@ -147,27 +147,27 @@ public class FunctionRegistry {
         if(alternatives.size() > 1 && alternatives.get(0).getWeight() == alternatives.get(1).getWeight())
             throw new ParseException("Ambiguous function call, matches: " +
                     alternatives.stream()
-                            .map(alternative -> getSignature(alternative.getPrototype()))
+                            .map(alternative -> getSignature(alternative.getFunctionPrototype()))
                             .collect(Collectors.joining("; ")));
 
         val match = alternatives.get(0);
         return new FunctionCall(
                 reference,
                 match.getFunction(),
-                getSignature(match.getPrototype()),
+                getSignature(match.getFunctionPrototype()),
                 match.getReturnType(),
                 match.getArguments()
         );
     }
 
-    private FunctionCallMatch functionMatches(Prototype prototype, Function<?> function, List<AbstractSyntaxTree> arguments) throws ConfigurationException {
+    private FunctionCallMatch functionMatches(FunctionPrototype functionPrototype, Function<?> function, List<AbstractSyntaxTree> arguments) throws ConfigurationException {
         val functionClass = function.getClass();
-        val metaReturns = prototype.returns();
-        val metaParameters = prototype.parameters();
+        val metaReturns = functionPrototype.returns();
+        val metaParameters = functionPrototype.parameters();
 
         List<Parameter> declaredParameters = new ArrayList<>(), declaredVarArgs = new ArrayList<>();
 
-        Map<String, Class<? extends TemplateType>> variableContraints = Arrays.stream(prototype.constraints())
+        Map<String, Class<? extends TemplateType>> variableContraints = Arrays.stream(functionPrototype.constraints())
                 .collect(toMap(
                         Constraint::variable,
                         Constraint::template
@@ -303,7 +303,7 @@ public class FunctionRegistry {
         if(!NULL_VARIABLE.equals(metaReturns.variable()))
             // If return intermediate is a variable, get it
             returnType = typeVariables.get(metaReturns.variable());
-        else if(metaReturns.type() != Prototype.NilType.class)
+        else if(metaReturns.type() != FunctionPrototype.NilType.class)
             returnType = newInstance(metaReturns.type());
 
         // If the return intermediate is a non-specialized template, rely on Function's resolveReturnType
@@ -324,7 +324,7 @@ public class FunctionRegistry {
 
         return new FunctionCallMatch(
                 (Function<Object>) function,
-                prototype,
+                functionPrototype,
                 returnType,
                 functionArguments.stream()
                         .map(arg -> arg.output)
@@ -342,15 +342,15 @@ public class FunctionRegistry {
                 + ")";
     }
 
-    private String getSignature(Prototype prototype) {
-        val parameters = prototype.parameters();
+    private String getSignature(FunctionPrototype functionPrototype) {
+        val parameters = functionPrototype.parameters();
 
-        return prototype.name() + "(" +
+        return functionPrototype.name() + "(" +
                 Arrays.stream(parameters)
                         .map(parameter -> {
                             String type;
 
-                            if(parameter.type() != Prototype.NilType.class) {
+                            if(parameter.type() != FunctionPrototype.NilType.class) {
                                 type = Types.instance((Class<? extends Type<Object>>) parameter.type()).toString();
                                 try {
                                     type = parameter.type().getDeclaredConstructor().newInstance().toString();

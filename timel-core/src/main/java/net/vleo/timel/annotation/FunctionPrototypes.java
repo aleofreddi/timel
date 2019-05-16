@@ -22,45 +22,18 @@ package net.vleo.timel.annotation;
  * #L%
  */
 
-import net.vleo.timel.type.Type;
-
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-import static java.util.Collections.*;
-
 /**
- * An annotation to declare a TimEL function.
+ * An annotation to declare multiple prototypes for a function.
  *
  * @author Andrea Leofreddi
  */
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface Prototype {
-    String name();
-
-    Returns returns() default @Returns;
-
-    Parameter[] parameters();
-
-    Constraint[] constraints() default {};
-
-    /**
-     * A placeholder value to be used as empty value for variable names.
-     */
-    String NULL_VARIABLE = "";
-
-    /**
-     * A placeholder class to be used as empty value for types.
-     *
-     * @author Andrea Leofreddi
-     */
-    class NilType extends Type {
-        NilType() {
-            super(emptyList());
-            throw new AssertionError();
-        }
-    }
+public @interface FunctionPrototypes {
+    FunctionPrototype[] value();
 }

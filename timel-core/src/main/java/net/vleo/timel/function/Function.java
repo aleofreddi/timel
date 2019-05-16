@@ -22,7 +22,8 @@ package net.vleo.timel.function;
  * #L%
  */
 
-import net.vleo.timel.annotation.Prototype;
+import net.vleo.timel.annotation.FunctionPrototype;
+import net.vleo.timel.annotation.FunctionPrototypes;
 import net.vleo.timel.executor.ExecutorContext;
 import net.vleo.timel.impl.target.Evaluable;
 import net.vleo.timel.impl.downscaler.Downscaler;
@@ -36,7 +37,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 /**
- * An interface to define a TimEL function. This interface should be annotated with {@link Prototype} (or {@link net.vleo.timel.annotation.Prototypes}) so to
+ * An interface to define a TimEL function. This interface should be annotated with {@link FunctionPrototype} (or {@link FunctionPrototypes}) so to
  * properly declare the function prototype.
  *
  * @author Andrea Leofreddi

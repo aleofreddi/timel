@@ -1,4 +1,4 @@
-package net.vleo.timel.impl.parser.tree;
+package net.vleo.timel.conversion;
 
 /*-
  * #%L
@@ -22,26 +22,21 @@ package net.vleo.timel.impl.parser.tree;
  * #L%
  */
 
-import lombok.EqualsAndHashCode;
-import lombok.Value;
-import net.vleo.timel.impl.parser.ParserTreeVisitor;
+import lombok.val;
+import org.junit.jupiter.api.Test;
 
-import java.util.Collections;
+import static org.hamcrest.MatcherAssert.*;
+import static org.hamcrest.Matchers.*;
 
 /**
- * TypeOf operator.
- *
  * @author Andrea Leofreddi
  */
-@Value
-@EqualsAndHashCode(callSuper = true)
-public class TypeOf extends AbstractParseTree {
-    public TypeOf(AbstractParseTree child) {
-        super(Collections.singletonList(child));
+class IntegralFloatToIntegralIntegerConversionTest {
+    @Test
+    void shouldConvert() {
+        val actual = new IntegralFloatToIntegralIntegerConversion().apply(42f);
+
+        assertThat(actual, is(42));
     }
 
-    @Override
-    public <T> T accept(ParserTreeVisitor<T> visitor) {
-        return visitor.visit(this);
-    }
 }

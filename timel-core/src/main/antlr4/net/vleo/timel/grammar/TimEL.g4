@@ -110,7 +110,7 @@ assignmentExpression
 
 unaryExpression
     : postfixExpression
-    | TypeOf '(' expression ')'
+    | TypeId '(' expression ')'
     | unaryOperator castExpression
     ;
 
@@ -226,7 +226,7 @@ Comma : ',';
 Equal : '==';
 NotEqual : '!=';
 
-TypeOf : 'typeOf';
+TypeId : 'typeId';
 
 Identifier
     :   IdentifierNondigit (IdentifierNondigit|Digit)*

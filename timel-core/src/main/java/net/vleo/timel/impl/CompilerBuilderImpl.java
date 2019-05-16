@@ -49,6 +49,7 @@ import net.vleo.timel.variable.Variable;
 import net.vleo.timel.variable.VariableFactory;
 import net.vleo.timel.variable.VariableRegistry;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -78,6 +79,8 @@ public class CompilerBuilderImpl implements CompilerBuilder {
         this.variableFactory = copy.variableFactory;
         this.variables = new HashMap<>(copy.variables);
         this.functions = new HashSet<>(copy.functions);
+        this.dumpTrees = copy.dumpTrees;
+        this.traceExecution = copy.traceExecution;
     }
 
     @Override
@@ -150,7 +153,7 @@ public class CompilerBuilderImpl implements CompilerBuilder {
     }
 
     private FunctionRegistry setupFunctionRegistry() {
-        final TypeSystem TYPE_SYSTEM = new TypeSystem(StandardConversions.STANDARD_CONVERSIONS);
+        final TypeSystem TYPE_SYSTEM = new TypeSystem(StandardConversions.STANDARD_CONVERSIONS, Collections.emptySet());
         FunctionRegistry functionRegistry = new FunctionRegistry(TYPE_SYSTEM);
         functionRegistry.addAll(StandardFunctions.STANDARD_FUNCTIONS);
 

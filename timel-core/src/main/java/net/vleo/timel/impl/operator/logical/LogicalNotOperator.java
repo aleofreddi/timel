@@ -22,7 +22,7 @@ package net.vleo.timel.impl.operator.logical;
  * #L%
  */
 
-import net.vleo.timel.annotation.Prototype;
+import net.vleo.timel.annotation.FunctionPrototype;
 import net.vleo.timel.annotation.Parameter;
 import net.vleo.timel.annotation.Returns;
 import net.vleo.timel.executor.ExecutorContext;
@@ -49,7 +49,7 @@ import net.vleo.timel.function.Function;
  *
  * @author Andrea Leofreddi
  */
-@Prototype(
+@FunctionPrototype(
         name = "!",
         returns = @Returns(type = BooleanType.class),
         parameters = {

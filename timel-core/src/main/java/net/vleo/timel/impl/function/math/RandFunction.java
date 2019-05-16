@@ -23,8 +23,8 @@ package net.vleo.timel.impl.function.math;
  */
 
 import net.vleo.timel.annotation.Parameter;
-import net.vleo.timel.annotation.Prototype;
-import net.vleo.timel.annotation.Prototypes;
+import net.vleo.timel.annotation.FunctionPrototype;
+import net.vleo.timel.annotation.FunctionPrototypes;
 import net.vleo.timel.annotation.Returns;
 import net.vleo.timel.executor.ExecutorContext;
 import net.vleo.timel.function.Function;
@@ -47,13 +47,13 @@ import java.util.Random;
  *
  * @author Andrea Leofreddi
  */
-@Prototypes({
-        @Prototype(
+@FunctionPrototypes({
+        @FunctionPrototype(
                 name = "rand",
                 returns = @Returns(type = DoubleType.class),
                 parameters = {}
         ),
-        @Prototype(
+        @FunctionPrototype(
                 name = "rand",
                 returns = @Returns(type = DoubleType.class),
                 parameters = {

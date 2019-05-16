@@ -1,4 +1,4 @@
-package net.vleo.timel.annotation;
+package net.vleo.timel.conversion;
 
 /*-
  * #%L
@@ -22,18 +22,20 @@ package net.vleo.timel.annotation;
  * #L%
  */
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import lombok.val;
+import org.junit.jupiter.api.Test;
+
+import static org.hamcrest.MatcherAssert.*;
+import static org.hamcrest.Matchers.*;
 
 /**
- * An annotation to declare multiple prototypes for a function.
- *
  * @author Andrea Leofreddi
  */
-@Target(ElementType.TYPE)
-@Retention(RetentionPolicy.RUNTIME)
-public @interface Prototypes {
-    Prototype[] value();
+class IntegerToFloatConversionTest {
+    @Test
+    void shouldConvert() {
+        val actual = new IntegerToFloatConversion().apply(42);
+
+        assertThat(actual, is(42f));
+    }
 }

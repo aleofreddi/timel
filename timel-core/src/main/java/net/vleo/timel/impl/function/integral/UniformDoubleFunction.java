@@ -23,7 +23,7 @@ package net.vleo.timel.impl.function.integral;
  */
 
 import net.vleo.timel.annotation.Parameter;
-import net.vleo.timel.annotation.Prototype;
+import net.vleo.timel.annotation.FunctionPrototype;
 import net.vleo.timel.annotation.Returns;
 import net.vleo.timel.executor.ExecutorContext;
 import net.vleo.timel.function.Function;
@@ -45,7 +45,7 @@ import java.util.Optional;
  *
  * @author Andrea Leofreddi
  */
-@Prototype(
+@FunctionPrototype(
         name = "uniform",
         returns = @Returns(type = IntegralDoubleType.class),
         parameters = {

@@ -22,7 +22,7 @@ package net.vleo.timel.impl.function.conditional;
  * #L%
  */
 
-import net.vleo.timel.annotation.Prototype;
+import net.vleo.timel.annotation.FunctionPrototype;
 import net.vleo.timel.annotation.Parameter;
 import net.vleo.timel.annotation.Returns;
 import net.vleo.timel.function.Function;
@@ -40,7 +40,7 @@ import net.vleo.timel.time.Interval;
  *
  * @author Andrea Leofreddi
  */
-@Prototype(
+@FunctionPrototype(
         name = "coalesce",
         returns = @Returns(variable = "T"),
         parameters = {

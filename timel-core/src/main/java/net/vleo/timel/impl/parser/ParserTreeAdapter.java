@@ -93,8 +93,8 @@ class ParserTreeAdapter implements TimELVisitor<AbstractParseTree> {
         if(ctx.getChildCount() == 1)
             return passthroughFirst(ctx);
         if(ctx.getChildCount() == 4) {
-            assert ctx.getChild(0).getText().equals("typeOf");
-            return new TypeOf(ctx.getChild(2).accept(this));
+            assert ((TerminalNode) ctx.getChild(0)).getSymbol().getType() == TimELLexer.TypeId;
+            return new TypeId(ctx.getChild(2).accept(this));
         }
         assertChildCount(ctx, 2);
         return new FunctionCall(ctx.getChild(0).getText(), singletonList(ctx.getChild(1).accept(this)));

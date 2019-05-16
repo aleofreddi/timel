@@ -1,4 +1,4 @@
-package net.vleo.timel.time;
+package net.vleo.timel.conversion;
 
 /*-
  * #%L
@@ -22,30 +22,20 @@ package net.vleo.timel.time;
  * #L%
  */
 
-import org.joda.time.DateTime;
+import lombok.val;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.hamcrest.MatcherAssert.*;
+import static org.hamcrest.Matchers.*;
 
 /**
- * Unit test for the {@link Interval} class.
- *
  * @author Andrea Leofreddi
  */
-class IntervalsTest {
+class FloatToDoubleConversionTest {
     @Test
-    void shouldOverlap() {
-        Interval i = Interval.of(
-                new DateTime(2014, 12, 15, 0, 0, 0).getMillis(),
-                new DateTime(2015, 2, 1, 0, 0, 0).getMillis()
-        );
+    void shouldConvert() {
+        val actual = new FloatToDoubleConversion().apply(42f);
 
-        Interval j = Interval.of(
-                new DateTime(2015, 1, 3, 0, 0, 0).getMillis(),
-                new DateTime(2015, 1, 28, 0, 0, 0).getMillis()
-        );
-
-        assertTrue(i.overlaps(j));
-        assertTrue(j.overlaps(i));
+        assertThat(actual, is(42d));
     }
 }

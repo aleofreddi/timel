@@ -26,6 +26,7 @@ import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import net.vleo.timel.ConfigurationException;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
@@ -60,15 +61,11 @@ public abstract class TemplateType<T> extends Type<T> {
     }
 
     public boolean isUnboundTemplate() {
-        return true;
+        return parameters.isEmpty();
     }
 
-    public TemplateType template() {
-        try {
-            return getClass().getDeclaredConstructor().newInstance();
-        } catch(InstantiationException | IllegalAccessException | NoSuchMethodException | InvocationTargetException e) {
-            throw new RuntimeException("Failed to instance template intermediate for " + this, e);
-        }
+    public TemplateType<T> template() {
+        return (TemplateType<T>) Types.instance((Class<? extends Type<T>>) this.getClass());
     }
 
     public TemplateType<T> specialize(Object... parameters) {
@@ -80,19 +77,19 @@ public abstract class TemplateType<T> extends Type<T> {
         try {
             constructor = getClass().getDeclaredConstructor(parameterTypes);
         } catch(NoSuchMethodException e) {
-            throw new RuntimeException(e); // FIXME
+            throw new ConfigurationException("Failed to retrieve type " + getClass() + " constructor for " + Arrays.toString(parameterTypes));
         }
 
         try {
             return (TemplateType<T>) constructor.newInstance(parameters);
         } catch(InstantiationException | IllegalAccessException | InvocationTargetException e) {
-            throw new RuntimeException(e); // FIXME
+            throw new ConfigurationException("Unable to instantiate type " + getClass(), e);
         }
     }
 
     @Override
     public String toString() {
-        if(parameters != null)
+        if(isSpecializedTemplate())
             return getName() +
                     parameters.stream()
                             .map(Objects::toString)

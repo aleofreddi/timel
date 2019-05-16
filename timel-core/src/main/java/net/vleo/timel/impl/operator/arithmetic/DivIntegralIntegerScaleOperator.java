@@ -31,8 +31,8 @@ import net.vleo.timel.type.IntegralIntegerType;
  *
  * @author Andrea Leofreddi
  */
-@Prototypes({
-        @Prototype(
+@FunctionPrototypes({
+        @FunctionPrototype(
                 name = "/",
                 returns = @Returns(variable = "T"),
                 parameters = {
