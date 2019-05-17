@@ -30,6 +30,7 @@ TimEL requires Java 8 and will run in any J2SE or J2EE container.  For complete 
 
 To use TimEL you need to import the following dependency:
 
+### Maven
 ```xml
 <dependency>
     <groupId>net.vleo.timel</groupId>
@@ -38,7 +39,12 @@ To use TimEL you need to import the following dependency:
 </dependency>
 ```
 
-And now you're ready to go! For a more detailed guide refer to the [quickstart guide](https://timel.vleo.net/dokuwiki/doku.php/quickstart) on TimEL's website.
+### Gradle
+```
+implementation 'net.vleo.timel:timel-core:0.9.1'
+```
+
+Now you're ready to go! For a more detailed guide refer to the [quickstart guide](https://timel.vleo.net/dokuwiki/doku.php/quickstart) on TimEL's website.
 
 ## Language
 
