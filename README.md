@@ -33,7 +33,7 @@ is handled by the interpreter so the user does not need to worry no more about t
 
 ## Features
 
-TimEL's aim is to provide an easy to use - yet powerful language - to model, aggregate and manipulate time-series. With TimEL you can:
+With TimEL you can:
 
   * **Mix multiple time frames** - for example you can sum daily data with hourly data, or even non-regular data like monthly data;
   * **Express** easily recurrent quantities, like 10 units every hour;
