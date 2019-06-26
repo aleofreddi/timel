@@ -34,7 +34,7 @@
 grammar TimEL;
 
 compilationUnit
-    : statement (';' statement)* EOF
+    : statement (';' statement)* ';'? EOF
     ;
 
 expressionUnit
