@@ -59,20 +59,4 @@ public class Parser {
             throw new ParseException(e.getMessage());
         }
     }
-
-    public ParseTree preparse(String source) throws ParseException {
-        try {
-            ANTLRInputStream input = new ANTLRInputStream(source);
-            TimELLexer lexer = new TimELLexer(input);
-            lexer.addErrorListener(THROWING_ERROR_LISTENER);
-            CommonTokenStream tokens = new CommonTokenStream(lexer);
-            TimELParser parser = new TimELParser(tokens);
-            parser.addErrorListener(THROWING_ERROR_LISTENER);
-            ParseTree tree = parser.compilationUnit();
-            return tree;
-        } catch(ParseCancellationException e) {
-            throw new ParseException(e.getMessage());
-        }
-    }
-
 }
