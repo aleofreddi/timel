@@ -173,7 +173,7 @@ public final class IntersectIterator extends BufferedTimeIterator<Object[]> impl
     /**
      * Construct a intersect iterator from the given arguments.
      *
-     * @param iterators
+     * @param iterators Source iterators
      */
     public IntersectIterator(UpscalableIterator<?>... iterators) {
         this(iterators.length);
@@ -185,7 +185,7 @@ public final class IntersectIterator extends BufferedTimeIterator<Object[]> impl
     /**
      * Construct a intesect iterator from the given arguments.
      *
-     * @param arguments
+     * @param arguments Source iterators
      */
     public IntersectIterator(Collection<UpscalableIterator<?>> arguments) {
         this(arguments.size());

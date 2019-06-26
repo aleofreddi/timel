@@ -31,6 +31,8 @@ import java.util.function.Function;
  * <p>
  * The adapter function is called once per sample and its result is cached to serve multiple next or peekNext calls.
  *
+ * @param <S> Source value Java type
+ * @param <D> Target value Java type
  * @author Andrea Leofreddi
  */
 public final class ValueAdapterTimeIterator<S, D> extends AdapterTimeIterator<S, D> {
@@ -39,8 +41,8 @@ public final class ValueAdapterTimeIterator<S, D> extends AdapterTimeIterator<S,
     /**
      * Build a new adapter around the given delegate, using the given mapping adapter function.
      *
-     * @param delegate
-     * @param adapter
+     * @param delegate Source iterator
+     * @param adapter  Value adpater
      */
     public ValueAdapterTimeIterator(TimeIterator<S> delegate, Function<S, D> adapter) {
         super(delegate);

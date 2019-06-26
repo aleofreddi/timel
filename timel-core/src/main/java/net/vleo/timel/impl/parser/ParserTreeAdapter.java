@@ -234,7 +234,7 @@ class ParserTreeAdapter implements TimELVisitor<AbstractParseTree> {
     public AbstractParseTree visitCompilationUnit(TimELParser.CompilationUnitContext ctx) {
         assertChildCount(ctx, 1, Integer.MAX_VALUE);
         LinkedList<AbstractParseTree> children = new LinkedList<>();
-        for(int i = 0; i < ctx.getChildCount(); i += 2)
+        for(int i = 0; i < ctx.getChildCount() && !isEof(ctx.getChild(i)); i += 2)
             children.add(ctx.getChild(i).accept(this));
         return new CompilationUnit(children);
     }
@@ -313,6 +313,13 @@ class ParserTreeAdapter implements TimELVisitor<AbstractParseTree> {
                 .boxed()
                 .map(ctx::getChild)
                 .collect(toList());
+    }
+
+    private boolean isEof(ParseTree ctx) {
+        if(!(ctx instanceof TerminalNode))
+            return false;
+
+        return ((TerminalNode) ctx).getSymbol().getType() == TimELLexer.EOF;
     }
 
     private AbstractParseTree passthroughFirst(ParseTree ctx) {

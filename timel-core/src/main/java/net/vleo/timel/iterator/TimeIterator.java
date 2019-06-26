@@ -28,25 +28,26 @@ import java.util.NoSuchElementException;
 
 /**
  * A time iterator is a forward, read-only iterator which allows streaming of time serie data expressed as {@link Sample}s.
- *
+ * <p>
  * This interface provides similar semantics to Java's Iterator, with the added capability of peeking the next value without moving forward the iterator.
  *
+ * @param <V> Value Java type
  * @author Andrea Leofreddi
  */
 public interface TimeIterator<V> {
     /**
      * Move forward the iterator and return the next value.
      *
-     * @return
-     * @throws NoSuchElementException
+     * @return The next sample
+     * @throws NoSuchElementException If there is no next element
      */
     Sample<V> next() throws NoSuchElementException;
 
     /**
      * Peek the next element without moving forward the iterator.
      *
-     * @return The next element
-     * @throws NoSuchElementException
+     * @return The next sample
+     * @throws NoSuchElementException If there is no next element
      */
     Sample<V> peekNext() throws NoSuchElementException;
 

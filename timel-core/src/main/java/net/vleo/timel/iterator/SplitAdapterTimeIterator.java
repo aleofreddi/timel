@@ -35,6 +35,8 @@ import java.util.NoSuchElementException;
  * <p>
  * The adapt function is called once per sample and its result is cached to serve multiple next or peekNext calls.
  *
+ * @param <S> Source value Java type
+ * @param <D> Target value Java type
  * @author Andrea Leofreddi
  */
 public abstract class SplitAdapterTimeIterator<S, D> implements TimeIterator<D> {
@@ -49,7 +51,7 @@ public abstract class SplitAdapterTimeIterator<S, D> implements TimeIterator<D> 
     /**
      * Build a new adapter around the given delegate.
      *
-     * @param delegate
+     * @param delegate Source iterator
      */
     public SplitAdapterTimeIterator(TimeIterator<S> delegate) {
         this.delegate = delegate;

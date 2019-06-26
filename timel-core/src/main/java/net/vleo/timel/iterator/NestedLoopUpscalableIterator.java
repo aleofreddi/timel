@@ -30,6 +30,8 @@ import java.util.NoSuchElementException;
 /**
  * Upscalable iterator version of NestedLoopTimeIterator.
  *
+ * @param <S> Source value Java type
+ * @param <D> Target value Java type
  * @author Andrea Leofreddi
  */
 public abstract class NestedLoopUpscalableIterator<S, D> extends NestedLoopTimeIterator<S, D> implements UpscalableIterator<D> {
@@ -38,7 +40,7 @@ public abstract class NestedLoopUpscalableIterator<S, D> extends NestedLoopTimeI
     /**
      * Protected constructor.
      *
-     * @param iterator
+     * @param iterator Source iterator
      */
     protected NestedLoopUpscalableIterator(TimeIterator<S> iterator) {
         super(iterator);
@@ -53,7 +55,7 @@ public abstract class NestedLoopUpscalableIterator<S, D> extends NestedLoopTimeI
             nestedIterator = nestedIterator(iterator.next());
         }
 
-        return ((UpscalableIterator<D>)nestedIterator).peekUpscaleNext(interval);
+        return ((UpscalableIterator<D>) nestedIterator).peekUpscaleNext(interval);
     }
 
     @Override

@@ -202,6 +202,12 @@ public final class UnionIterator extends BufferedTimeIterator<Object[]> implemen
         return result;
     }
 
+    /**
+     * Peek the next value upscaling it for the given interval.
+     *
+     * @param interval The interval to upscale the values with
+     * @return Upscaled next values
+     */
     @Override
     public final Sample<Object[]> peekUpscaleNext(Interval interval) {
         // Adjust interval to match the next sample interval (which is already upscaled to match the minimum possible length of the next combination)
@@ -224,8 +230,8 @@ public final class UnionIterator extends BufferedTimeIterator<Object[]> implemen
     /**
      * Construct a intersect iterator from the given arguments.
      *
-     * @param first
-     * @param others
+     * @param first  First source iterator
+     * @param others Rest source iterators
      */
     public UnionIterator(UpscalableIterator<?> first, UpscalableIterator<?>... others) {
         this(others.length + 1);
@@ -239,7 +245,7 @@ public final class UnionIterator extends BufferedTimeIterator<Object[]> implemen
     /**
      * Construct a intesect iterator from the given arguments.
      *
-     * @param arguments
+     * @param arguments Source iterators
      */
     public UnionIterator(Collection<UpscalableIterator<?>> arguments) {
         this(arguments.size());

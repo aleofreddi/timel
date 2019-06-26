@@ -97,6 +97,23 @@ class ParserTest {
         assertThat(navigate(parseTree, 0, 0, 1, 1, 0), instanceOf(DoubleConstant.class));
     }
 
+    @ParameterizedTest
+    @CsvSource({
+            "1,1",
+            "1;,1",
+            "1;2,2",
+            "1;2;,2",
+    })
+    void shouldAcceptOptionalSemicolonClosedLastStatement(String source, int expectedUnits) throws ParseException {
+        val actual = new Parser().parse(source);
+
+        assertThat(actual, instanceOf(CompilationUnit.class));
+        assertThat(actual.getChildren().size(), is(expectedUnits));
+
+        for(int i = 0; i < expectedUnits; i++)
+            assertThat(navigate(actual, i), instanceOf(IntegerConstant.class));
+    }
+
     private AbstractParseTree navigate(AbstractParseTree tree, int... path) {
         for(int i : path)
             tree = tree.getChildren().get(i);

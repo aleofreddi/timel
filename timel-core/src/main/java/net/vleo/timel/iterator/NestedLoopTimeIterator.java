@@ -30,6 +30,8 @@ import java.util.NoSuchElementException;
  * A nested loop iterator which allows, for each iteration of a given TimeIterator,
  * to loop over a nested iterator.
  *
+ * @param <S> Source value Java type
+ * @param <D> Target value Java type
  * @author Andrea Leofreddi
  */
 public abstract class NestedLoopTimeIterator<S, D> implements TimeIterator<D> {
@@ -40,7 +42,7 @@ public abstract class NestedLoopTimeIterator<S, D> implements TimeIterator<D> {
     /**
      * Protected constructor.
      *
-     * @param iterator
+     * @param iterator Source iterator
      */
     protected NestedLoopTimeIterator(TimeIterator<S> iterator) {
         this.iterator = iterator;
