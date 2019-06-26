@@ -31,22 +31,27 @@ import net.vleo.timel.type.Type;
 /**
  * Interface for variables. A variable should be a consistent sample store.
  *
+ * @param <V> Value Java type
  * @author Andrea Leofreddi
  */
 public interface Variable<V> {
     /**
      * Read the given interval returning a forward time iterator from start to end.
+     * More specifically, return an iterator for all the samples whose interval overlaps or is contained by interval.
      *
      * @param interval The interval to read
      * @param context  Evaluation context
+     * @return A {@link TimeIterator} reading the map forward for the given interval.
      */
     TimeIterator<V> readForward(Interval interval, ExecutorContext context);
 
     /**
      * Read the given interval returning a reverse time iterator from the end to start.
+     * More specifically, return an iterator for all the samples whose interval overlaps or is contained by interval in reverse order.
      *
      * @param interval The interval to read
      * @param context  Evaluation context
+     * @return A {@link TimeIterator} reading the map backward for the given interval.
      */
     TimeIterator<V> readBackward(Interval interval, ExecutorContext context);
 
@@ -54,6 +59,7 @@ public interface Variable<V> {
      * Write a sample into the variable.
      *
      * @param sample The sample to store
+     * @param context Executor context
      */
     void write(Sample<V> sample, ExecutorContext context);
 }

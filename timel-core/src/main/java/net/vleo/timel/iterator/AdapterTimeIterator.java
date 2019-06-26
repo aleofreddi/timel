@@ -28,12 +28,13 @@ import java.util.NoSuchElementException;
 
 /**
  * A TimeIterator that will adapt values from a source intermediate S to a destination intermediate D, using the adapt function.
- *
+ * <p>
  * The adapt function is called once per sample and its result is cached to serve multiple next or peekNext calls.
  *
- * @deprecated Use {@link ValueAdapterTimeIterator}
- *
+ * @param <S> Source value type to adapt from
+ * @param <D> Target value type to adapt to
  * @author Andrea Leofreddi
+ * @deprecated Use {@link ValueAdapterTimeIterator}
  */
 @Deprecated
 public abstract class AdapterTimeIterator<S, D> implements TimeIterator<D> {
@@ -44,7 +45,7 @@ public abstract class AdapterTimeIterator<S, D> implements TimeIterator<D> {
     /**
      * Build a new adapter around the given delegate.
      *
-     * @param delegate
+     * @param delegate Source iterator
      */
     public AdapterTimeIterator(TimeIterator<S> delegate) {
         this.delegate = delegate;

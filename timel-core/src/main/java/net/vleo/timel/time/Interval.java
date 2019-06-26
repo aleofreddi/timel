@@ -50,8 +50,8 @@ public final class Interval implements Serializable {
     /**
      * Retrieve an interval in between start and end instants.
      *
-     * @param start
-     * @param end
+     * @param start Start instant
+     * @param end   End instant
      * @return Interval [start, end)
      */
     public static Interval of(Instant start, Instant end) {
@@ -61,8 +61,8 @@ public final class Interval implements Serializable {
     /**
      * Retrieve an interval in between start and end expressed as millis from epoch.
      *
-     * @param start
-     * @param end
+     * @param start Start time (epoch millis)
+     * @param end   End time (epoch millis)
      * @return Interval [start, end)
      */
     public static Interval of(long start, long end) {
@@ -72,7 +72,7 @@ public final class Interval implements Serializable {
     /**
      * Test if this interval contains the given instant.
      *
-     * @param instant
+     * @param instant Instant (epoch millis)
      * @return Test result
      */
     public boolean contains(long instant) {
@@ -82,7 +82,7 @@ public final class Interval implements Serializable {
     /**
      * Test if this interval contains the given interval.
      *
-     * @param interval
+     * @param interval Interval to test
      * @return Test result
      */
     public boolean contains(Interval interval) {

@@ -51,10 +51,10 @@ public final class IntervalMaps {
     /**
      * Retrieves a navigable map initialized with the given values.
      *
-     * @param first
-     * @param others
-     * @param <V>
-     * @return
+     * @param first First sample
+     * @param others Rest samples
+     * @param <V> Value Java type
+     * @return A NavigableMap filled with the given samples
      */
     public static <V> NavigableMap<Interval, V> of(
             Sample<V> first,
@@ -71,14 +71,13 @@ public final class IntervalMaps {
     }
 
     /**
-     * Returns the supremum of interval on given map, that is an iterator that will iterate
-     * all map intervals overlapping the given interval parameter.
+     * Returns the supremum of interval on given map, that is an iterator that will iterate all map intervals overlapping the given interval parameter.
      *
      * <b>For this method to work properly, it is mandatory that the map is ordered by Interval.end (see #getIntervalEndComparator)</b>
      *
      * @param map      The map to iterate
      * @param interval Interval to use as a reference for the supremum intersection
-     * @param <V>      Value type
+     * @param <V>      Value Java type
      * @return Supremum time iterator
      */
     public static <V> TimeIterator<V> supremum(final NavigableMap<Interval, V> map, final Interval interval) {
@@ -110,7 +109,7 @@ public final class IntervalMaps {
      *
      * @param map      The map to iterate
      * @param interval Interval to use as a reference for the supremum intersection
-     * @param <V>      Value type
+     * @param <V>      Value Java type
      * @return The backward supremum time iterator
      */
     public static <V> TimeIterator<V> supremumBackward(final NavigableMap<Interval, V> map, final Interval interval) {
@@ -145,6 +144,7 @@ public final class IntervalMaps {
      *
      * <b>For this method to work it is mandatory that the map is ordered by Interval.end (see #getIntervalEndComparator)</b>
      *
+     * @param <V> Value Java type
      * @param map The map to iterate
      * @return A time iterator
      */

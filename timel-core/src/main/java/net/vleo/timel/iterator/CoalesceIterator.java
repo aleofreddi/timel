@@ -154,21 +154,20 @@ public final class CoalesceIterator<V> extends BufferedTimeIterator<V> {
     /**
      * Construct a coalesce iterator from the given arguments.
      *
-     * @param first
-     * @param others
+     * @param first  First source iterator, which is not required to be upscalable
+     * @param others Rest source iterators
      */
     public CoalesceIterator(TimeIterator<?> first, UpscalableIterator<?>... others) {
         this(others.length + 1);
 
         arguments.add(first);
-
         arguments.addAll(Arrays.asList(others));
     }
 
     /**
      * Construct a coalesce iterator from the given arguments.
      *
-     * @param arguments
+     * @param arguments Source iterators
      */
     public CoalesceIterator(Collection<UpscalableIterator<V>> arguments) {
         this(arguments.size());
@@ -179,7 +178,7 @@ public final class CoalesceIterator<V> extends BufferedTimeIterator<V> {
     /**
      * Construct a coalesce iterator from the given arguments.
      *
-     * @param arguments
+     * @param arguments Source iterators
      */
     public CoalesceIterator(UpscalableIterator<V>... arguments) {
         this(arguments.length);

@@ -50,9 +50,9 @@ public interface Function<T> {
      * <p>
      * By overriding this method, one can change the default behavior so to accept different templates specializations.
      *
-     * @param variable
-     * @param template
-     * @param argumentTypes
+     * @param variable      Variable name to specialize
+     * @param template      Template type to specialize
+     * @param argumentTypes List of argument types
      * @return The deduced template type if any
      */
     default Optional<Type<?>> specializeVariableTemplate(String variable, TemplateType template, Type<?>... argumentTypes) {
@@ -90,18 +90,19 @@ public interface Function<T> {
     /**
      * Evaluates the function.
      *
-     * @param interval
-     * @param context
-     * @param upscaler
-     * @param downscaler
-     * @param arguments
-     * @return
+     * @param interval   Evaluation interval
+     * @param context    Executor context
+     * @param upscaler   Result upscaler. This one is provided to be coherent with the expected return type.
+     * @param downscaler Result downscaler. This one is provided to be coherent with the expected return type.
+     * @param arguments  List of arguments to evaluate.
+     * @return Evaluation result iterator
      */
     UpscalableIterator<T> evaluate(Interval interval, ExecutorContext context, Upscaler<T> upscaler, Downscaler<T> downscaler, Evaluable<?>... arguments);
 
     /**
      * Convenience function to evaluate all the given arguments for the same interval and context.
      *
+     * @param <T>       Expected return value Java type
      * @param interval  Evaluation interval
      * @param context   Evaluation context
      * @param arguments Arguments to evaluate

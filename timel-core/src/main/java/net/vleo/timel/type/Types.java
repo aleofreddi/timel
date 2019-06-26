@@ -40,7 +40,7 @@ public final class Types {
      * Instance a type from a given class. The resulting instance will be either a non-template instance, or an unbounded template one.
      *
      * @param class_ Type class
-     * @param <T>
+     * @param <T>    Value Java type
      * @return Type instance
      */
     public static <T> Type<T> instance(Class<? extends Type<T>> class_) {

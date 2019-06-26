@@ -38,9 +38,9 @@ public final class Sample<V> {
     /**
      * Static factory method to instance a new Sample.
      *
-     * @param interval
-     * @param value
-     * @param <T>
+     * @param interval Sample interval
+     * @param value Sample value
+     * @param <T> Value Java type
      * @return The new sample object
      */
     public static <T> Sample<T> of(Interval interval, T value) {
@@ -66,6 +66,7 @@ public final class Sample<V> {
     /**
      * Clone the current Sample into a new one with the same interval but different value.
      *
+     * @param <T> Target value Java type
      * @param newValue The value of the new sample
      * @return The new sample
      */

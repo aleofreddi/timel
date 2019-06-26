@@ -30,9 +30,10 @@ import java.util.NoSuchElementException;
  * An abstract base for TimeIterators which ease the development
  * taking care of the #peek and #next methods, which are implemented
  * in terms of #concreteNext method.
- *
+ * <p>
  * Note that this implementation will buffer the next entry.
  *
+ * @param <V> Value Java type
  * @author Andrea Leofreddi
  */
 public abstract class BufferedTimeIterator<V> implements TimeIterator<V> {
@@ -40,10 +41,10 @@ public abstract class BufferedTimeIterator<V> implements TimeIterator<V> {
 
     /**
      * Fetch the next element.
+     * <p>
+     * This method must return null when reaching the end of the stream.
      *
-     * This method must return null when reaching the end of the iterator.
-     *
-     * @return
+     * @return Next sample, or null if at the end of the stream
      */
     protected abstract Sample<V> concreteNext();
 

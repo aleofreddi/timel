@@ -72,6 +72,7 @@ public interface CompilerBuilder {
     /**
      * Compile the expression with an expected result type.
      *
+     * @param <T> Value Java type
      * @param type Expected return type
      * @return The compiled expression
      * @throws ParseException When the parsing fails or the expression cannot be converted to type.
@@ -82,6 +83,7 @@ public interface CompilerBuilder {
      * Compile the expression.
      *
      * @return The compiled expression
+     * @throws ParseException When the parsing fails or the expression cannot be converted to type.
      */
     Expression<?> compile() throws ParseException;
 }

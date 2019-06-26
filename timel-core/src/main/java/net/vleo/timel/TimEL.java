@@ -61,7 +61,7 @@ public final class TimEL {
     /**
      * Initiates the compilation of the given source. The method will return a compiler builder.
      *
-     * @param source
+     * @param source Source to parse
      * @return The compiler builder
      */
     public static CompilerBuilder parse(String source) {
@@ -76,6 +76,8 @@ public final class TimEL {
      * is returned.
      *
      * @param expression The expression to evaluate
+     * @param interval Evaluation interval
+     * @param <V> Value Java type
      * @return Result iterator
      */
     public static <V> TimeIterator<V> evaluate(Expression<V> expression, Interval interval) {

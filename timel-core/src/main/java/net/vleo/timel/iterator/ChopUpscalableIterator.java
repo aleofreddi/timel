@@ -52,8 +52,8 @@ public final class ChopUpscalableIterator<V> implements UpscalableIterator<V> {
     /**
      * Instance a new ChopUpscalableIterator for the given delegate and interval.
      *
-     * @param delegate
-     * @param interval
+     * @param delegate Source iterator
+     * @param interval Chop interval
      */
     public ChopUpscalableIterator(UpscalableIterator<V> delegate, Interval interval) {
         this.interval = interval;
