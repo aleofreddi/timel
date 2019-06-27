@@ -1,4 +1,4 @@
-package net.vleo.timel.type;
+package net.vleo.timel.impl.target.tree;
 
 /*-
  * #%L
@@ -22,30 +22,26 @@ package net.vleo.timel.type;
  * #L%
  */
 
-import lombok.EqualsAndHashCode;
-import net.vleo.timel.impl.downscaler.Downscaler;
-import net.vleo.timel.impl.downscaler.IntegerDownscaler;
-import net.vleo.timel.impl.upscaler.Upscaler;
+import lombok.val;
+import net.vleo.timel.impl.target.Evaluable;
+import net.vleo.timel.type.StringType;
 
 /**
- * A type for integer values.
+ * Commodity functions to ease target tree mocking.
  *
  * @author Andrea Leofreddi
  */
-@EqualsAndHashCode(callSuper = true)
-public class IntegerType extends Type<Integer> {
-    @Override
-    public String getName() {
-        return "Integer";
+public class TargetTreeMocks {
+    public static Evaluable<String> constant(String value) {
+        val node = (Evaluable<?>) new Constant(
+                null,
+                new StringType().getUpscaler(),
+                value
+        );
+
+        return (Evaluable<String>) node;
     }
 
-    @Override
-    public Upscaler<Integer> getUpscaler() {
-        return (Upscaler<Integer>) super.getUpscaler();
-    }
-
-    @Override
-    public Downscaler<Integer> getDownscaler() {
-        return new IntegerDownscaler();
+    private TargetTreeMocks() {
     }
 }
