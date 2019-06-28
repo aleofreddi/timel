@@ -59,7 +59,6 @@ import org.joda.time.Period;
 public class EveryFunction implements Function<Interval> {
     @Override
     public UpscalableIterator<Interval> evaluate(Interval interval, ExecutorContext context, Upscaler<Interval> upscaler, Downscaler<Interval> downscaler, Evaluable<?>... arguments) {
-        assert arguments.length == 3;
         return new UpscalerIterator<>(
                 upscaler,
                 // (1) For every values in size, field an tz

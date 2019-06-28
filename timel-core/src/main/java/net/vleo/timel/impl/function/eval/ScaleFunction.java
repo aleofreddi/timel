@@ -50,7 +50,6 @@ import net.vleo.timel.function.Function;
 public class ScaleFunction<T> implements Function<T> {
     @Override
     public UpscalableIterator<T> evaluate(Interval interval, ExecutorContext context, Upscaler<T> upscaler, Downscaler<T> downscaler, Evaluable<?>[] arguments) {
-        assert arguments.length == 1;
         return new UpscalerIterator<>(
                 upscaler,
                 context.debug(this, "Scale.outer", interval,
