@@ -43,7 +43,7 @@ import net.vleo.timel.type.IntegerType;
 import java.util.Random;
 
 /**
- * Produce a (deterministic) random value in the range [0.0, 1.0) for its given start interval and an optional integer seed.
+ * Produce a (deterministic) random value in the range [0.0, 1.0) for its given start interval and an optional integer seed (defaults to 0).
  *
  * @author Andrea Leofreddi
  */
