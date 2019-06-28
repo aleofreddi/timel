@@ -53,7 +53,6 @@ import net.vleo.timel.type.FloatType;
 public class SubFloatOperator implements Function<Float> {
     @Override
     public UpscalableIterator<Float> evaluate(Interval interval, ExecutorContext context, Upscaler<Float> upscaler, Downscaler<Float> downscaler, Evaluable<?>... arguments) {
-        assert arguments.length == 2;
         return new UpscalerIterator<>(
                 upscaler,
                 new ValueAdapterTimeIterator<>(

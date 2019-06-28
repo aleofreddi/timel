@@ -44,7 +44,6 @@ public abstract class AbstractBinaryPredicate<T> implements Function<Boolean> {
 
     @Override
     public final UpscalableIterator<Boolean> evaluate(Interval interval, ExecutorContext context, Upscaler<Boolean> upscaler, Downscaler<Boolean> downscaler, Evaluable<?>... arguments) {
-        assert arguments.length == 2;
         return new UpscalerIterator<>(
                 upscaler,
                 new AdapterTimeIterator<Object[], Boolean>(

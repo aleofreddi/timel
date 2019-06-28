@@ -50,7 +50,6 @@ import net.vleo.timel.function.Function;
 public class AddDoubleOperator implements Function<Double> {
     @Override
     public UpscalableIterator<Double> evaluate(Interval interval, ExecutorContext context, Upscaler<Double> upscaler, Downscaler<Double> downscaler, Evaluable<?>... arguments) {
-        assert arguments.length == 2;
         return new UpscalerIterator<>(
                 upscaler,
                 new ValueAdapterTimeIterator<>(

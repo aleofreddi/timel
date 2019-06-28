@@ -53,7 +53,6 @@ import net.vleo.timel.type.IntegerType;
 public class DivIntegerOperator implements Function<Integer> {
     @Override
     public UpscalableIterator<Integer> evaluate(Interval interval, ExecutorContext context, Upscaler<Integer> upscaler, Downscaler<Integer> downscaler, Evaluable<?>... arguments) {
-        assert arguments.length == 2;
         return new UpscalerIterator<>(
                 upscaler,
                 new ValueAdapterTimeIterator<>(

@@ -50,7 +50,6 @@ import net.vleo.timel.type.BooleanType;
 public class DefinedFunction implements Function<Boolean> {
     @Override
     public final UpscalableIterator<Boolean> evaluate(Interval interval, ExecutorContext context, Upscaler<Boolean> upscaler, Downscaler<Boolean> downscaler, Evaluable<?>... arguments) {
-        assert arguments.length == 1;
         return new UpscalerIterator<>(
                 upscaler,
                 new CoalesceIterator<>(

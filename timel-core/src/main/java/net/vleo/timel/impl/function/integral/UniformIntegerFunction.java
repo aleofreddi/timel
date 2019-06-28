@@ -61,7 +61,6 @@ public class UniformIntegerFunction<T> implements Function<T> {
 
     @Override
     public UpscalableIterator<T> evaluate(Interval interval, ExecutorContext context, Upscaler<T> upscaler, Downscaler<T> downscaler, Evaluable<?>[] arguments) {
-        assert arguments.length == 1;
         return new UpscalerIterator<>(
                 upscaler,
                 ((Evaluable<T>) arguments[0]).evaluate(interval, context)

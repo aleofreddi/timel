@@ -43,7 +43,7 @@ import net.vleo.timel.type.IntegerType;
 import java.util.Random;
 
 /**
- * Produce a (deterministic) random value in the range [0.0, 1.0) for its given start interval and an optional integer seed.
+ * Produce a (deterministic) random value in the range [0.0, 1.0) for its given start interval and an optional integer seed (defaults to 0).
  *
  * @author Andrea Leofreddi
  */
@@ -64,7 +64,6 @@ import java.util.Random;
 public class RandFunction implements Function<Double> {
     @Override
     public UpscalableIterator<Double> evaluate(Interval interval, ExecutorContext context, Upscaler<Double> upscaler, Downscaler<Double> downscaler, Evaluable<?>[] arguments) {
-        assert arguments.length == 0 || arguments.length == 1;
         return new UpscalerIterator<>(
                 upscaler,
                 new SampleAdapterTimeIterator<>(
