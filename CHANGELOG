@@ -4,8 +4,18 @@ All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
-### Fixed
+- Add extract(field, tz) function (GH-11)
+- Accept optional closing semicolon on last statement
+- Add github issue templates
+
+## [0.9.1] - 2019-05-16
 - Many type system fixes
+- Support nested template types
+- Rename typeOf to typeId
+- Rename Prototype(s) to FunctionPrototype(s) 
+- Rename CastPrototype to ConversionPrototype
+- Improve interpolation
+- Improve integration tests naming convention
 - Improve test coverage
 
 ## [0.9.0] - 2019-05-11
