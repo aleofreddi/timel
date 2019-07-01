@@ -32,13 +32,13 @@ import net.vleo.timel.time.Sample;
  * @author Andrea Leofreddi
  */
 public class TracingUpscalableTimeIterator<V> extends TracingTimeIterator<V> implements UpscalableIterator<V> {
-    public TracingUpscalableTimeIterator(Object reference, String id, Interval interval, UpscalableIterator<V> delegate) {
-        super(reference, id, interval, delegate);
+    public TracingUpscalableTimeIterator(Object reference, String id, Interval interval, TracingPolicy traceContext, UpscalableIterator<V> delegate) {
+        super(reference, id, interval, traceContext, delegate);
     }
 
     @Override
     public Sample<V> peekUpscaleNext(final Interval interval) {
-        return DebugContexts.get().apply(
+        return tracePolicy.apply(
                 reference,
                 id,
                 this.interval,

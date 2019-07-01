@@ -76,13 +76,13 @@ public final class TimEL {
      * is returned.
      *
      * @param expression The expression to evaluate
-     * @param interval Evaluation interval
-     * @param <V> Value Java type
+     * @param interval   Evaluation interval
+     * @param <V>        Value Java type
      * @return Result iterator
      */
     public static <V> TimeIterator<V> evaluate(Expression<V> expression, Interval interval) {
         ExpressionImpl<V> exprImpl = (ExpressionImpl<V>) expression;
 
-        return (TimeIterator<V>) exprImpl.getTree().evaluate(interval, exprImpl.getExecutorContext());
+        return (TimeIterator<V>) exprImpl.getTree().evaluate(interval, exprImpl.getExecutorContextSupplier().get());
     }
 }

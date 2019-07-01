@@ -22,23 +22,15 @@ package net.vleo.timel.impl.iterator;
  * #L%
  */
 
+import net.vleo.timel.time.Interval;
+
+import java.util.concurrent.Callable;
+
 /**
- * A class to hold debug contexts.
+ * A policy to trace calls.
  *
  * @author Andrea Leofreddi
  */
-public class DebugContexts {
-    private static ThreadLocal<DebugContext> localContext = new ThreadLocal<DebugContext>();
-
-    public static DebugContext get() {
-        DebugContext context = localContext.get();
-
-        if(context == null) {
-            context = new DebugContext();
-
-            localContext.set(context);
-        }
-
-        return context;
-    }
+public interface TracingPolicy {
+    <T> T apply(Object node, String id, Interval interval, String method, Callable<T> callable);
 }
