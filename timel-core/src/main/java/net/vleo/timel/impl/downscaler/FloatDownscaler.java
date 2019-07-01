@@ -22,6 +22,7 @@ package net.vleo.timel.impl.downscaler;
  * #L%
  */
 
+import lombok.val;
 import net.vleo.timel.time.Sample;
 
 /**
@@ -30,7 +31,7 @@ import net.vleo.timel.time.Sample;
  * @author Andrea Leofreddi
  */
 public class FloatDownscaler implements Downscaler<Float> {
-    private Float value;
+    private Double value;
     private long length;
 
     public FloatDownscaler() {
@@ -39,24 +40,26 @@ public class FloatDownscaler implements Downscaler<Float> {
 
     @Override
     public void reset() {
-        value = 0f;
+        value = null;
         length = 0;
     }
 
     @Override
     public void add(Sample<Float> sample) {
+        long duration = sample.getInterval().toDurationMillis();
         if(value != null) {
-            long duration = sample.getInterval().toDurationMillis();
-            value += sample.getValue() * duration;
+            value += (double)sample.getValue() * duration;
             length += duration;
+        } else {
+            value = (double)sample.getValue() * duration;
+            length = duration;
         }
     }
 
     @Override
     public Float reduce() {
-        float result = value / length;
-        value = 0f;
-        length = 0;
-        return result;
+        val result = value / length;
+        reset();
+        return (float) result;
     }
 }
