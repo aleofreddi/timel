@@ -58,6 +58,8 @@ public class IntegerDownscaler implements Downscaler<Integer> {
 
     @Override
     public Integer reduce() {
+        if(value == null)
+            return null;
         val result = value / length;
         reset();
         return (int) result;

@@ -58,6 +58,8 @@ public class DoubleDownscaler implements Downscaler<Double> {
 
     @Override
     public Double reduce() {
+        if(value == null)
+            return null;
         val result = value / length;
         reset();
         return result;

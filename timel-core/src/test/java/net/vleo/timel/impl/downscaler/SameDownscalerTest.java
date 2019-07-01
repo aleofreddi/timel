@@ -32,20 +32,30 @@ import static org.hamcrest.MatcherAssert.*;
 /**
  * @author Andrea Leofreddi
  */
-class DoubleDownscalerTest extends DownscalerTest {
+class SameDownscalerTest extends DownscalerTest {
     @Test
-    void reduceShouldDownscale() {
-        val downscaler = new DoubleDownscaler();
+    void reduceShouldReturnValueWhenSame() {
+        val downscaler = new SameDownscaler();
 
-        downscaler.add(epochSample(1000, 1000d));
-        downscaler.add(epochSample(1000, 2000d));
+        downscaler.add(epochSample(1000, 1000));
+        downscaler.add(epochSample(1000, 1000));
 
-        assertThat(downscaler.reduce(), is(1500d));
+        assertThat(downscaler.reduce(), is(1000));
+    }
+
+    @Test
+    void reduceShouldReturnNullWhenDifferent() {
+        val downscaler = new SameDownscaler();
+
+        downscaler.add(epochSample(1000, 1000));
+        downscaler.add(epochSample(1000, 2000));
+
+        assertThat(downscaler.reduce(), nullValue());
     }
 
     @Test
     void reduceShouldReturnNullWhenEmpty() {
-        val downscaler = new DoubleDownscaler();
+        val downscaler = new SameDownscaler();
 
         val actual = downscaler.reduce();
 
@@ -54,8 +64,8 @@ class DoubleDownscalerTest extends DownscalerTest {
 
     @Test
     void reduceShouldReturnNullWhenReset() {
-        val downscaler = new DoubleDownscaler();
-        downscaler.add(epochSample(1000, 1000d));
+        val downscaler = new SameDownscaler();
+        downscaler.add(epochSample(1000, 1000));
         downscaler.reduce();
 
         val actual = downscaler.reduce();

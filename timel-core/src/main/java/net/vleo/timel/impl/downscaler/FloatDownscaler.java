@@ -48,16 +48,18 @@ public class FloatDownscaler implements Downscaler<Float> {
     public void add(Sample<Float> sample) {
         long duration = sample.getInterval().toDurationMillis();
         if(value != null) {
-            value += (double)sample.getValue() * duration;
+            value += (double) sample.getValue() * duration;
             length += duration;
         } else {
-            value = (double)sample.getValue() * duration;
+            value = (double) sample.getValue() * duration;
             length = duration;
         }
     }
 
     @Override
     public Float reduce() {
+        if(value == null)
+            return null;
         val result = value / length;
         reset();
         return (float) result;
