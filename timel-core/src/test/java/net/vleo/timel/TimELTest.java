@@ -30,8 +30,10 @@ import org.junit.jupiter.api.Test;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 
+import static net.vleo.timel.ctor.HasPrivateThrowingCtor.hasPrivateThrowingCtor;
 import static org.hamcrest.MatcherAssert.*;
 import static org.hamcrest.Matchers.*;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 /**
  * @author Andrea Leofreddi
@@ -54,5 +56,15 @@ class TimELTest {
 
         assertThat(result, instanceOf(Integer.class));
         assertThat(result, is(2));
+    }
+
+    @Test
+    void parseShouldThrowNullPointerExceptionWhenNullSource() {
+        assertThrows(NullPointerException.class, () -> TimEL.parse(null));
+    }
+
+    @Test
+    void shouldNotBeConstructable() {
+        assertThat(TimEL.class, hasPrivateThrowingCtor());
     }
 }

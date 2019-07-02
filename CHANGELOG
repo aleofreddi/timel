@@ -12,7 +12,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 - Many type system fixes
 - Support nested template types
 - Rename typeOf to typeId
-- Rename Prototype(s) to FunctionPrototype(s) 
+- Rename Prototype(s) to FunctionPrototype(s)
 - Rename CastPrototype to ConversionPrototype
 - Improve interpolation
 - Improve integration tests naming convention

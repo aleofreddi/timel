@@ -36,6 +36,7 @@ import net.vleo.timel.impl.executor.ExecutorContextImpl;
 import net.vleo.timel.impl.intermediate.SyntaxTreeAdapter;
 import net.vleo.timel.impl.intermediate.SyntaxTreeDumper;
 import net.vleo.timel.impl.intermediate.tree.AbstractSyntaxTree;
+import net.vleo.timel.impl.iterator.StdoutTracingPolicy;
 import net.vleo.timel.impl.parser.Parser;
 import net.vleo.timel.impl.parser.ParserTreeDumper;
 import net.vleo.timel.impl.parser.tree.AbstractParseTree;
@@ -126,9 +127,8 @@ public class CompilerBuilderImpl implements CompilerBuilder {
         val functionRegistry = setupFunctionRegistry();
 
         val targetTree = compile("(" + expected.toString() + ")(" + source + ")", variableRegistry, functionRegistry);
-        ExecutorContext executorContext = new ExecutorContextImpl(traceExecution);
 
-        return new ExpressionImpl<>(targetTree, executorContext);
+        return new ExpressionImpl<>(targetTree, this::getExecutorContext);
     }
 
     @Override
@@ -137,9 +137,12 @@ public class CompilerBuilderImpl implements CompilerBuilder {
         val functionRegistry = setupFunctionRegistry();
 
         val targetTree = compile(source, variableRegistry, functionRegistry);
-        ExecutorContext executorContext = new ExecutorContextImpl(traceExecution);
 
-        return new ExpressionImpl<>(targetTree, executorContext);
+        return new ExpressionImpl<>(targetTree, this::getExecutorContext);
+    }
+
+    private ExecutorContext getExecutorContext() {
+        return new ExecutorContextImpl(traceExecution ? new StdoutTracingPolicy() : null);
     }
 
     private VariableRegistry setupVariableRegistry(VariableFactory variableFactory, Map<String, Pair<Type, Variable<?>>> variables) {

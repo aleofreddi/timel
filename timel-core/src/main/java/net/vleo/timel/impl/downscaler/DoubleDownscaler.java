@@ -22,6 +22,7 @@ package net.vleo.timel.impl.downscaler;
  * #L%
  */
 
+import lombok.val;
 import net.vleo.timel.time.Sample;
 
 /**
@@ -39,24 +40,28 @@ public class DoubleDownscaler implements Downscaler<Double> {
 
     @Override
     public void reset() {
-        value = 0.0;
+        value = null;
         length = 0;
     }
 
     @Override
     public void add(Sample<Double> sample) {
+        long duration = sample.getInterval().toDurationMillis();
         if(value != null) {
-            long duration = sample.getInterval().toDurationMillis();
             value += sample.getValue() * duration;
             length += duration;
+        } else {
+            value = sample.getValue() * duration;
+            length = duration;
         }
     }
 
     @Override
     public Double reduce() {
-        double result = value / length;
-        value = 0.0;
-        length = 0;
+        if(value == null)
+            return null;
+        val result = value / length;
+        reset();
         return result;
     }
 }

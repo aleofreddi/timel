@@ -22,8 +22,9 @@ package net.vleo.timel.impl.executor;
  * #L%
  */
 
-import lombok.Value;
+import lombok.Data;
 import net.vleo.timel.executor.ExecutorContext;
+import net.vleo.timel.impl.iterator.TracingPolicy;
 import net.vleo.timel.impl.iterator.TracingTimeIterator;
 import net.vleo.timel.impl.iterator.TracingUpscalableTimeIterator;
 import net.vleo.timel.iterator.TimeIterator;
@@ -35,21 +36,21 @@ import net.vleo.timel.time.Interval;
  *
  * @author Andrea Leofreddi
  */
-@Value
+@Data
 public class ExecutorContextImpl implements ExecutorContext {
-    private final boolean trace;
+    private final TracingPolicy tracingPolicy;
 
     @Override
     public <V> TimeIterator<V> debug(Object reference, String id, Interval interval, TimeIterator<V> delegate) {
-        if(trace)
-            return new TracingTimeIterator<>(reference, id, interval, delegate);
+        if(tracingPolicy != null)
+            return new TracingTimeIterator<>(reference, id, interval, tracingPolicy, delegate);
         return delegate;
     }
 
     @Override
     public <V> UpscalableIterator<V> debug(Object reference, String id, Interval interval, UpscalableIterator<V> delegate) {
-        if(trace)
-            return new TracingUpscalableTimeIterator<>(reference, id, interval, delegate);
+        if(tracingPolicy != null)
+            return new TracingUpscalableTimeIterator<>(reference, id, interval, tracingPolicy, delegate);
         return delegate;
     }
 }

@@ -22,28 +22,15 @@ package net.vleo.timel.impl.iterator;
  * #L%
  */
 
-import net.vleo.timel.iterator.UpscalableIterator;
 import net.vleo.timel.time.Interval;
-import net.vleo.timel.time.Sample;
+
+import java.util.concurrent.Callable;
 
 /**
- * A passthrough tracing {@link UpscalableIterator}. This class is useful to debug unexpected behaviors.
+ * A policy to trace calls.
  *
  * @author Andrea Leofreddi
  */
-public class TracingUpscalableTimeIterator<V> extends TracingTimeIterator<V> implements UpscalableIterator<V> {
-    public TracingUpscalableTimeIterator(Object reference, String id, Interval interval, TracingPolicy traceContext, UpscalableIterator<V> delegate) {
-        super(reference, id, interval, traceContext, delegate);
-    }
-
-    @Override
-    public Sample<V> peekUpscaleNext(final Interval interval) {
-        return tracePolicy.apply(
-                reference,
-                id,
-                this.interval,
-                "peekUpscaleNext",
-                () -> ((UpscalableIterator<V>) delegate).peekUpscaleNext(interval)
-        );
-    }
+public interface TracingPolicy {
+    <T> T apply(Object node, String id, Interval interval, String method, Callable<T> callable);
 }

@@ -1,4 +1,4 @@
-package net.vleo.timel.impl.iterator;
+package net.vleo.timel.impl.downscaler;
 
 /*-
  * #%L
@@ -22,23 +22,14 @@ package net.vleo.timel.impl.iterator;
  * #L%
  */
 
+import net.vleo.timel.time.Interval;
+import net.vleo.timel.time.Sample;
+
 /**
- * A class to hold debug contexts.
- *
  * @author Andrea Leofreddi
  */
-public class DebugContexts {
-    private static ThreadLocal<DebugContext> localContext = new ThreadLocal<DebugContext>();
-
-    public static DebugContext get() {
-        DebugContext context = localContext.get();
-
-        if(context == null) {
-            context = new DebugContext();
-
-            localContext.set(context);
-        }
-
-        return context;
+class DownscalerTest {
+    protected <V> Sample<V> epochSample(long duration, V value) {
+        return Sample.of(Interval.of(0, duration), value);
     }
 }

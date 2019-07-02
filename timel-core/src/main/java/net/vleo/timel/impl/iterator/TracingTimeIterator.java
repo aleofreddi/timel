@@ -37,18 +37,20 @@ public class TracingTimeIterator<V> implements TimeIterator<V> {
     protected final Object reference;
     protected final String id;
     protected final Interval interval;
+    protected final TracingPolicy tracePolicy;
     protected final TimeIterator<V> delegate;
 
-    public TracingTimeIterator(Object reference, String id, Interval interval, TimeIterator<V> delegate) {
+    public TracingTimeIterator(Object reference, String id, Interval interval, TracingPolicy tracePolicy, TimeIterator<V> delegate) {
         this.reference = reference;
         this.id = id;
         this.interval = interval;
+        this.tracePolicy = tracePolicy;
         this.delegate = delegate;
     }
 
     @Override
     public Sample<V> next() throws NoSuchElementException {
-        return DebugContexts.get().apply(
+        return tracePolicy.apply(
                 reference,
                 id,
                 interval,
@@ -59,7 +61,7 @@ public class TracingTimeIterator<V> implements TimeIterator<V> {
 
     @Override
     public Sample<V> peekNext() throws NoSuchElementException {
-        return DebugContexts.get().apply(
+        return tracePolicy.apply(
                 reference,
                 id,
                 interval,
@@ -70,7 +72,7 @@ public class TracingTimeIterator<V> implements TimeIterator<V> {
 
     @Override
     public boolean hasNext() {
-        return DebugContexts.get().apply(
+        return tracePolicy.apply(
                 reference,
                 id,
                 interval,

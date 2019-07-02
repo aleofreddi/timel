@@ -36,6 +36,7 @@ public class SameDownscaler<T> implements Downscaler<T> {
     @Override
     public void reset() {
         seen = false;
+        value = null;
     }
 
     @Override
@@ -43,18 +44,15 @@ public class SameDownscaler<T> implements Downscaler<T> {
         if(!seen) {
             value = sample.getValue();
             seen = true;
-        } else {
-            if(value == null && sample.getValue() != null
-                    || value != null && !value.equals(sample))
-                value = null;
+        } else if(value == null && sample.getValue() != null || value != null && !value.equals(sample.getValue())) {
+            value = null;
         }
     }
 
     @Override
     public T reduce() {
         T t = value;
-        value = null;
-        seen = false;
+        reset();
         return t;
     }
 }

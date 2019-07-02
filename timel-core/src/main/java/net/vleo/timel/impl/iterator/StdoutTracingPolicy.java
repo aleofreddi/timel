@@ -27,34 +27,14 @@ import net.vleo.timel.time.Interval;
 import java.util.concurrent.Callable;
 
 /**
- * Context to support the evaluation debugging.
+ * Tracing policy that will log to standard output.
  *
  * @author Andrea Leofreddi
  */
-public class DebugContext {
+public class StdoutTracingPolicy implements TracingPolicy {
     private int depth = 0;
 
-    private String getIndent() {
-        StringBuilder sb = new StringBuilder();
-
-        for(int i = 0; i < depth; i++)
-            sb.append("    ");
-
-        return sb.toString();
-    }
-
-    public int getDepth() {
-        return depth;
-    }
-
-    public void setDepth(int depth) {
-        this.depth = depth;
-    }
-
-    public boolean dump(String method) {
-        return "next".equals(method) || "hasNext".equals(method);
-    }
-
+    @Override
     public <T> T apply(Object node, String id, Interval interval, String method, Callable<T> callable) {
         if(dump(method))
             System.out.println(getIndent() + node.toString() + " " + id + "." + method + " for " + interval + " ?");
@@ -75,5 +55,18 @@ public class DebugContext {
             System.out.println(getIndent() + node.toString() + " " + id + "." + method + " for " + interval + " -> " + value);
 
         return value;
+    }
+
+    private String getIndent() {
+        StringBuilder sb = new StringBuilder();
+
+        for(int i = 0; i < depth; i++)
+            sb.append("    ");
+
+        return sb.toString();
+    }
+
+    private boolean dump(String method) {
+        return "next".equals(method) || "hasNext".equals(method);
     }
 }
