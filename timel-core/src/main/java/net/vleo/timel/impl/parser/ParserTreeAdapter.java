@@ -23,13 +23,12 @@ package net.vleo.timel.impl.parser;
  * #L%
  */
 
+import net.vleo.timel.grammar.TimELBaseVisitor;
 import net.vleo.timel.grammar.TimELLexer;
 import net.vleo.timel.grammar.TimELParser;
-import net.vleo.timel.grammar.TimELVisitor;
 import net.vleo.timel.impl.parser.tree.*;
 import org.antlr.v4.runtime.tree.ErrorNode;
 import org.antlr.v4.runtime.tree.ParseTree;
-import org.antlr.v4.runtime.tree.RuleNode;
 import org.antlr.v4.runtime.tree.TerminalNode;
 
 import java.util.LinkedList;
@@ -45,7 +44,7 @@ import static java.util.stream.Collectors.toList;
  *
  * @author Andrea Leofreddi
  */
-class ParserTreeAdapter implements TimELVisitor<AbstractParseTree> {
+class ParserTreeAdapter extends TimELBaseVisitor<AbstractParseTree> {
     @Override
     public AbstractParseTree visitPrimaryExpression(TimELParser.PrimaryExpressionContext ctx) {
         if(ctx.getChildCount() == 1)
@@ -247,16 +246,6 @@ class ParserTreeAdapter implements TimELVisitor<AbstractParseTree> {
     @Override
     public AbstractParseTree visitConstant(TimELParser.ConstantContext ctx) {
         return passthroughFirst(ctx);
-    }
-
-    @Override
-    public AbstractParseTree visit(ParseTree parseTree) {
-        return null;
-    }
-
-    @Override
-    public AbstractParseTree visitChildren(RuleNode ruleNode) {
-        return null;
     }
 
     @Override

@@ -30,15 +30,27 @@ import net.vleo.timel.impl.intermediate.tree.*;
  * @author Andrea Leofreddi
  */
 public interface SyntaxTreeVisitor<T> {
-    T visit(Cast cast);
+    default T visit(Cast cast) {
+        return null;
+    }
 
-    T visit(CompilationUnit compilationUnit);
+    default T visit(CompilationUnit compilationUnit) {
+        return null;
+    }
 
-    T visit(Constant constant);
+    default T visit(Constant constant) {
+        return null;
+    }
 
-    T visit(FunctionCall functionCall);
+    default T visit(FunctionCall functionCall) {
+        return null;
+    }
 
-    T visit(VariableWriter variableWriter);
+    default T visit(VariableWriter variableWriter) {
+        return null;
+    }
 
-    T visit(VariableReader variableReader);
+    default T visit(VariableReader variableReader) {
+        return null;
+    }
 }
