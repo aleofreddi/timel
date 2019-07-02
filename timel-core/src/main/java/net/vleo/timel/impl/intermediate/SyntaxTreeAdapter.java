@@ -122,11 +122,6 @@ public class SyntaxTreeAdapter implements ParserTreeVisitor<AbstractSyntaxTree> 
     }
 
     @Override
-    public AbstractSyntaxTree visit(Declaration node) {
-        return null;
-    }
-
-    @Override
     public AbstractSyntaxTree visit(DoubleConstant doubleConstant) {
         return constant(doubleConstant, new DoubleType());
     }

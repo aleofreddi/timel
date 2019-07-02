@@ -30,29 +30,55 @@ import net.vleo.timel.impl.parser.tree.*;
  * @author Andrea Leofreddi
  */
 public interface ParserTreeVisitor<T> {
-    T visit(Assignment assignment);
+    default T visit(Assignment assignment) {
+        return null;
+    }
 
-    T visit(CompilationUnit compilationUnit);
+    default T visit(CompilationUnit compilationUnit) {
+        return null;
+    }
 
-    T visit(Declaration node);
+    default T visit(Declaration node) {
+        return null;
+    }
 
-    T visit(DoubleConstant node);
+    default T visit(DoubleConstant node) {
+        return null;
+    }
 
-    T visit(ExplicitCast explicitCast);
+    default T visit(ExplicitCast explicitCast) {
+        return null;
+    }
 
-    T visit(FloatConstant node);
+    default T visit(FloatConstant node) {
+        return null;
+    }
 
-    T visit(FunctionCall node);
+    default T visit(FunctionCall node) {
+        return null;
+    }
 
-    T visit(IntegerConstant node);
+    default T visit(IntegerConstant node) {
+        return null;
+    }
 
-    T visit(StringConstant node);
+    default T visit(StringConstant node) {
+        return null;
+    }
 
-    T visit(TypeId typeId);
+    default T visit(TypeId typeId) {
+        return null;
+    }
 
-    T visit(TypeSpecifier typeSpecifier);
+    default T visit(TypeSpecifier typeSpecifier) {
+        return null;
+    }
 
-    T visit(Variable variable);
+    default T visit(Variable variable) {
+        return null;
+    }
 
-    T visit(ZeroConstant node);
+    default T visit(ZeroConstant node) {
+        return null;
+    }
 }

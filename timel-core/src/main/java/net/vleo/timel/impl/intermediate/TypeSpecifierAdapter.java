@@ -44,56 +44,6 @@ class TypeSpecifierAdapter implements ParserTreeVisitor<Object> {
     private final TypeSystem typeSystem;
 
     @Override
-    public Object visit(Assignment assignment) {
-        return null;
-    }
-
-    @Override
-    public Object visit(CompilationUnit compilationUnit) {
-        return null;
-    }
-
-    @Override
-    public Object visit(Declaration node) {
-        return null;
-    }
-
-    @Override
-    public Object visit(DoubleConstant node) {
-        return null;
-    }
-
-    @Override
-    public Object visit(ExplicitCast explicitCast) {
-        return null;
-    }
-
-    @Override
-    public Object visit(FloatConstant node) {
-        return null;
-    }
-
-    @Override
-    public Object visit(FunctionCall node) {
-        return null;
-    }
-
-    @Override
-    public Object visit(IntegerConstant node) {
-        return null;
-    }
-
-    @Override
-    public Object visit(StringConstant node) {
-        return null;
-    }
-
-    @Override
-    public Object visit(TypeId typeId) {
-        return null;
-    }
-
-    @Override
     public Object visit(TypeSpecifier typeSpecifier) {
         String typeId = typeSpecifier.getType();
 
@@ -106,15 +56,5 @@ class TypeSpecifierAdapter implements ParserTreeVisitor<Object> {
         } catch(ParseException e) {
             throw new RuntimeException(e);
         }
-    }
-
-    @Override
-    public Object visit(Variable variable) {
-        return null;
-    }
-
-    @Override
-    public Object visit(ZeroConstant node) {
-        return null;
     }
 }
