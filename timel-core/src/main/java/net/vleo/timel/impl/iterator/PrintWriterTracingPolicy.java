@@ -22,22 +22,26 @@ package net.vleo.timel.impl.iterator;
  * #L%
  */
 
+import lombok.RequiredArgsConstructor;
 import net.vleo.timel.time.Interval;
 
+import java.io.PrintWriter;
 import java.util.concurrent.Callable;
 
 /**
- * Tracing policy that will log to standard output.
+ * Tracing policy that will log to an output stream.
  *
  * @author Andrea Leofreddi
  */
-public class StdoutTracingPolicy implements TracingPolicy {
+@RequiredArgsConstructor
+public class PrintWriterTracingPolicy implements TracingPolicy {
+    private final PrintWriter writer;
     private int depth = 0;
 
     @Override
     public <T> T apply(Object node, String id, Interval interval, String method, Callable<T> callable) {
         if(dump(method))
-            System.out.println(getIndent() + node.toString() + " " + id + "." + method + " for " + interval + " ?");
+            writer.println(getIndent() + node.toString() + " " + id + "." + method + " for " + interval + " ?");
 
         depth++;
 
@@ -52,9 +56,14 @@ public class StdoutTracingPolicy implements TracingPolicy {
         depth--;
 
         if(dump(method))
-            System.out.println(getIndent() + node.toString() + " " + id + "." + method + " for " + interval + " -> " + value);
+            writer.println(getIndent() + node.toString() + " " + id + "." + method + " for " + interval + " -> " + value);
 
         return value;
+    }
+
+    @Override
+    public void close() {
+        writer.close();
     }
 
     private String getIndent() {

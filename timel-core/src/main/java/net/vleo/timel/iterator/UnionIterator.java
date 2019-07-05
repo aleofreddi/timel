@@ -50,7 +50,7 @@ public final class UnionIterator extends BufferedTimeIterator<Object[]> implemen
             // In case the next entry has the same interval end for both t and u, take one randomly
             // as it is not important in which order they go into the queue.
             //
-            // Note that we can't return 0 here because TreeSet would then specializeReturnType that t == u and suppress one entry.
+            // Note that we can't return 0 here because it would imply that t == u (so the either t or u gets suppressed as duplicate).
 
             return 1;
         }

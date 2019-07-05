@@ -1,4 +1,4 @@
-package net.vleo.timel.impl.iterator;
+package net.vleo.timel.impl.function.version;
 
 /*-
  * #%L
@@ -22,20 +22,31 @@ package net.vleo.timel.impl.iterator;
  * #L%
  */
 
+import lombok.val;
+import net.vleo.timel.impl.downscaler.SameDownscaler;
+import net.vleo.timel.impl.target.Evaluable;
+import net.vleo.timel.impl.upscaler.SameUpscaler;
 import net.vleo.timel.time.Interval;
+import org.junit.jupiter.api.Test;
 
-import java.util.concurrent.Callable;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.MatcherAssert.*;
 
 /**
- * A policy to trace calls.
- *
  * @author Andrea Leofreddi
  */
-public interface TracingPolicy {
-    <T> T apply(Object node, String id, Interval interval, String method, Callable<T> callable);
+class VersionFunctionTest {
+    private static final Interval INTERVAL = Interval.of(0, 1000);
 
-    /**
-     * Invoked when the trace session is done. Can be used to flush data if needed.
-     */
-    void close();
+    @Test
+    void evaluateShouldReturnVersionAndCommitId() {
+        val version = new VersionFunction();
+
+        val itor = version.evaluate(INTERVAL, null, new SameUpscaler<>(), new SameDownscaler<>(), new Evaluable[0]);
+
+        assertThat(itor.hasNext(), is(true));
+        val actual = itor.next();
+        assertThat(actual.getInterval(), is(INTERVAL));
+        assertThat(actual.getValue(), is("V1 (42)"));
+    }
 }

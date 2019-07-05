@@ -34,6 +34,7 @@ import net.vleo.timel.impl.function.integral.UniformIntegerFunction;
 import net.vleo.timel.impl.function.interval.EveryFunction;
 import net.vleo.timel.impl.function.math.RandFunction;
 import net.vleo.timel.impl.function.time.ExtractFunction;
+import net.vleo.timel.impl.function.version.VersionFunction;
 import net.vleo.timel.impl.operator.arithmetic.*;
 import net.vleo.timel.impl.operator.logical.LogicalAndOperator;
 import net.vleo.timel.impl.operator.logical.LogicalNotOperator;
@@ -128,7 +129,10 @@ public final class StandardFunctions {
             new LessOrEqualOperator(),
 
             // Time
-            new ExtractFunction()
+            new ExtractFunction(),
+
+            // Version
+            new VersionFunction()
     ).collect(Collectors.toSet());
 
     private StandardFunctions() {
