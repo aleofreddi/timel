@@ -24,8 +24,13 @@ package net.vleo.timel.impl.iterator;
 
 import lombok.val;
 import net.vleo.timel.time.Interval;
+import org.hamcrest.core.StringStartsWith;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -33,9 +38,11 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.io.PrintWriter;
 import java.util.concurrent.Callable;
 
+import static org.hamcrest.MatcherAssert.*;
+import static org.hamcrest.Matchers.*;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.*;
 
 /**
  * @author Andrea Leofreddi
@@ -46,15 +53,60 @@ class PrintWriterTracingPolicyTest {
     private PrintWriter printWriter;
     @Mock
     private Callable<?> callback;
+    @Captor
+    ArgumentCaptor<String> capturedEntries;
     @InjectMocks
     private PrintWriterTracingPolicy policy;
 
-    @Test
-    void applyShouldWriteToStream() throws Exception {
-        policy.apply("node1", "id42", Interval.of(0, 1000), "next", callback);
+    @ParameterizedTest
+    @ValueSource(strings = {"next", "hasNext"})
+    void applyShouldWriteASingleEntryToStream(String method) throws Exception {
+        policy.apply("node1", "id42", Interval.of(0, 1000), method, callback);
 
         verify(printWriter, times(2)).println(any(String.class));
         verify(callback).call();
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"peek", "peekUpscale"})
+    void applyShouldIgnoreOtherMethods(String method) throws Exception {
+        policy.apply("node1", "id42", Interval.of(0, 1000), method, callback);
+
+        verifyNoMoreInteractions(printWriter);
+        verify(callback).call();
+    }
+
+    @Test
+    void applyShouldRethrowCallbackException() throws Exception {
+        val expected = new IllegalArgumentException();
+
+        val actual = assertThrows(RuntimeException.class, () ->
+                policy.apply("node1", "id42", Interval.of(0, 1000), "next", () -> {
+                    throw expected;
+                })
+        );
+
+        assertThat(actual.getCause(), sameInstance(expected));
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"next", "hasNext"})
+    void applyShouldIndentNestedEntries(String method) throws Exception {
+        Callable<Void> nested = () -> {
+            policy.apply("node1", "id42", Interval.of(0, 1000), "next", callback);
+            return null;
+        };
+
+        policy.apply("node1", "id42", Interval.of(0, 1000), "next", nested);
+
+        verify(printWriter, times(4)).println(capturedEntries.capture());
+        val logs = capturedEntries.getAllValues();
+        verify(callback).call();
+
+        assertThat(logs.get(0), not(StringStartsWith.startsWith("    ")));
+        assertThat(logs.get(1), StringStartsWith.startsWith("    "));
+        assertThat(logs.get(2), StringStartsWith.startsWith("    "));
+        assertThat(logs.get(3), not(StringStartsWith.startsWith("    ")));
     }
 
     @Test
