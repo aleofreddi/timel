@@ -69,6 +69,14 @@ public class IntegrationTestContext {
             .map(DateTimeFormat::forPattern)
             .collect(toList());
 
+    private static final Map<String, Type> SIGNATURE_TO_TYPE = new HashMap<>();
+
+    static {
+        SIGNATURE_TO_TYPE.put("b", new BooleanType());
+        SIGNATURE_TO_TYPE.put("i", new IntegerType());
+        SIGNATURE_TO_TYPE.put("f", new FloatType());
+    }
+
     private final String source;
     private final Interval interval;
     private final HashMap<String, VariableInstance> evaluationVariables = new HashMap<>(), expectedVariables = new HashMap<>();
@@ -119,15 +127,15 @@ public class IntegrationTestContext {
             if(variable == null) {
                 Type type;
 
-                if(id.startsWith("b_")) {
-                    type = new BooleanType();
-                } else if(id.startsWith("n_")) {
+                String prefix = id.split("_")[0];
+                if("n".equals(prefix))
                     type = numericType;
-                } else if(id.startsWith("in_")) {
+                else if("in".equals(prefix))
                     type = numericIntegralType;
-                } else if(id.startsWith("f_")) {
-                    type = new FloatType();
-                } else
+                else
+                    type = SIGNATURE_TO_TYPE.get(prefix);
+
+                if(type == null)
                     throw new IllegalArgumentException("Unable to guess variable type from id " + id);
 
                 variable = new VariableInstance();
