@@ -23,6 +23,7 @@ package net.vleo.timel;
  */
 
 import lombok.val;
+import net.vleo.timel.impl.downscaler.IntegerDownscaler;
 import net.vleo.timel.iterator.TimeIterator;
 import net.vleo.timel.time.Interval;
 import net.vleo.timel.time.IntervalMaps;
@@ -254,8 +255,10 @@ public class IntegrationTest {
                     diff = Math.abs((Float) expected - (Float) actual);
                 } else if(expected.getClass() == Double.class) {
                     diff = Math.abs((Double) expected - (Double) actual);
+                } else if(expected.getClass() == Integer.class) {
+                    diff = Math.abs((Integer) expected - (Integer) actual);
                 } else
-                    diff = expected.equals(actual) ? 0.0 : 1.0;
+                    diff = expected.equals(actual) ? 0.0 : 2.0;
 
                 if(diff > epsilon.getOrDefault(expected.getClass(), 0d))
                     fail("Failed result check for interval " + outputEntry.getKey() + " expected " + expected + ", got " + actual);
