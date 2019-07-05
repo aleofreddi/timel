@@ -33,4 +33,9 @@ import java.util.concurrent.Callable;
  */
 public interface TracingPolicy {
     <T> T apply(Object node, String id, Interval interval, String method, Callable<T> callable);
+
+    /**
+     * Invoked when the trace session is done. Can be used to flush data if needed.
+     */
+    void close();
 }

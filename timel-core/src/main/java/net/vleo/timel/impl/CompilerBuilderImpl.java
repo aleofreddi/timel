@@ -36,7 +36,7 @@ import net.vleo.timel.impl.executor.ExecutorContextImpl;
 import net.vleo.timel.impl.intermediate.SyntaxTreeAdapter;
 import net.vleo.timel.impl.intermediate.SyntaxTreeDumper;
 import net.vleo.timel.impl.intermediate.tree.AbstractSyntaxTree;
-import net.vleo.timel.impl.iterator.StdoutTracingPolicy;
+import net.vleo.timel.impl.iterator.PrintWriterTracingPolicy;
 import net.vleo.timel.impl.parser.Parser;
 import net.vleo.timel.impl.parser.ParserTreeDumper;
 import net.vleo.timel.impl.parser.tree.AbstractParseTree;
@@ -50,6 +50,7 @@ import net.vleo.timel.variable.Variable;
 import net.vleo.timel.variable.VariableFactory;
 import net.vleo.timel.variable.VariableRegistry;
 
+import java.io.PrintWriter;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -63,7 +64,7 @@ import java.util.Map;
 public class CompilerBuilderImpl implements CompilerBuilder {
     private final String source;
     private boolean dumpTrees = false;
-    private boolean traceExecution = false;
+    private PrintWriter traceWriter = null;
 
     private VariableFactory variableFactory;
     private Map<String, Pair<Type, Variable<?>>> variables;
@@ -81,7 +82,7 @@ public class CompilerBuilderImpl implements CompilerBuilder {
         this.variables = new HashMap<>(copy.variables);
         this.functions = new HashSet<>(copy.functions);
         this.dumpTrees = copy.dumpTrees;
-        this.traceExecution = copy.traceExecution;
+        this.traceWriter = copy.traceWriter;
     }
 
     @Override
@@ -92,7 +93,7 @@ public class CompilerBuilderImpl implements CompilerBuilder {
                 next.dumpTrees = (Boolean) value;
                 break;
             case "eval.trace":
-                next.traceExecution = (Boolean) value;
+                next.traceWriter = (PrintWriter) value;
                 break;
             default:
                 throw new IllegalArgumentException("Unknown option " + key);
@@ -142,7 +143,7 @@ public class CompilerBuilderImpl implements CompilerBuilder {
     }
 
     private ExecutorContext getExecutorContext() {
-        return new ExecutorContextImpl(traceExecution ? new StdoutTracingPolicy() : null);
+        return new ExecutorContextImpl(traceWriter == null ? null : new PrintWriterTracingPolicy(traceWriter));
     }
 
     private VariableRegistry setupVariableRegistry(VariableFactory variableFactory, Map<String, Pair<Type, Variable<?>>> variables) {
