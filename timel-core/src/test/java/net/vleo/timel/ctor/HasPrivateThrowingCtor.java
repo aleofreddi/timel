@@ -31,6 +31,8 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Modifier;
 
 /**
+ * A hamcrest matcher to ensure a class has only a private, {@link AssertionError} throwing constructor.
+ *
  * @author Andrea Leofreddi
  */
 public class HasPrivateThrowingCtor extends TypeSafeMatcher<Class<?>> {

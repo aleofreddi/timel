@@ -45,8 +45,8 @@ import net.vleo.timel.type.BooleanType;
 import net.vleo.timel.function.Function;
 
 /**
- * A function similar to C's select statement, that accepts a list or condition-value pairs and will return the value of the first pair where the condition
- * evaluates true.
+ * A function similar to C's switch block. When accepts a list or condition-value pairs and will return the value of the first pair where the condition
+ * evaluates to true.
  *
  * @param <T>
  * @author Andrea Leofreddi
