@@ -22,17 +22,10 @@ package net.vleo.timel.impl.operator.arithmetic;
  * #L%
  */
 
-import lombok.val;
 import net.vleo.timel.annotation.FunctionPrototype;
 import net.vleo.timel.annotation.Parameter;
 import net.vleo.timel.annotation.Returns;
 import net.vleo.timel.type.IntegralFloatType;
-import net.vleo.timel.type.Type;
-
-import java.util.Arrays;
-import java.util.Map;
-import java.util.Optional;
-import java.util.stream.Collectors;
 
 /**
  * Integral float add implementation.
@@ -47,13 +40,5 @@ import java.util.stream.Collectors;
                 @Parameter(type = IntegralFloatType.class)
         }
 )
-public class AddIntegralFloatOperator extends AddFloatOperator {
-    @Override
-    public Optional<Type> resolveReturnType(Type proposed, Map<String, Type> variables, Type... argumentTypes) {
-        val specialisations = Arrays.stream(argumentTypes)
-                .map(Type::getParameters)
-                .collect(Collectors.toSet());
-
-        return specialisations.size() == 1 ? Optional.of(argumentTypes[0]) : Optional.empty();
-    }
+public class AddIntegralFloatOperator extends AddFloatOperator implements SameTypeArgumentsFunction<Float> {
 }
