@@ -22,23 +22,28 @@ package net.vleo.timel.impl.operator.arithmetic;
  * #L%
  */
 
-import net.vleo.timel.annotation.FunctionPrototype;
-import net.vleo.timel.annotation.Parameter;
-import net.vleo.timel.annotation.Returns;
-import net.vleo.timel.type.IntegralIntegerType;
+import lombok.val;
+import net.vleo.timel.function.Function;
+import net.vleo.timel.type.Type;
+
+import java.util.Arrays;
+import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 /**
- * Integral integer add implementation.
+ * A function that resolves return type from its same type arguments.
  *
+ * @param <T> Return value Java type
  * @author Andrea Leofreddi
  */
-@FunctionPrototype(
-        name = "+",
-        returns = @Returns(type = IntegralIntegerType.class),
-        parameters = {
-                @Parameter(type = IntegralIntegerType.class),
-                @Parameter(type = IntegralIntegerType.class)
-        }
-)
-public class AddIntegralIntegerOperator extends AddIntegerOperator implements SameTypeArgumentsFunction<Integer> {
+public interface SameTypeArgumentsFunction<T> extends Function<T> {
+    @Override
+    default Optional<Type> resolveReturnType(Type proposed, Map<String, Type> variables, Type... argumentTypes) {
+        val specialisations = Arrays.stream(argumentTypes)
+                .map(Type::getParameters)
+                .collect(Collectors.toSet());
+
+        return specialisations.size() == 1 ? Optional.of(argumentTypes[0]) : Optional.empty();
+    }
 }

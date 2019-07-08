@@ -22,13 +22,13 @@ package net.vleo.timel.impl.operator.arithmetic;
  * #L%
  */
 
-import net.vleo.timel.annotation.Parameter;
 import net.vleo.timel.annotation.FunctionPrototype;
+import net.vleo.timel.annotation.Parameter;
 import net.vleo.timel.annotation.Returns;
 import net.vleo.timel.executor.ExecutorContext;
 import net.vleo.timel.function.Function;
-import net.vleo.timel.impl.target.Evaluable;
 import net.vleo.timel.impl.downscaler.Downscaler;
+import net.vleo.timel.impl.target.Evaluable;
 import net.vleo.timel.impl.upscaler.Upscaler;
 import net.vleo.timel.iterator.IntersectIterator;
 import net.vleo.timel.iterator.UpscalableIterator;

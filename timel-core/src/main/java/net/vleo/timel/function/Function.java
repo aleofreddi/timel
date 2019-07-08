@@ -40,6 +40,7 @@ import java.util.stream.Collectors;
  * An interface to define a TimEL function. This interface should be annotated with {@link FunctionPrototype} (or {@link FunctionPrototypes}) so to
  * properly declare the function prototype.
  *
+ * @param <T> Return value Java type
  * @author Andrea Leofreddi
  */
 public interface Function<T> {
