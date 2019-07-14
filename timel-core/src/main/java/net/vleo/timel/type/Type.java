@@ -22,13 +22,11 @@ package net.vleo.timel.type;
  * #L%
  */
 
-import net.vleo.timel.ConfigurationException;
 import net.vleo.timel.impl.downscaler.Downscaler;
 import net.vleo.timel.impl.downscaler.SameDownscaler;
 import net.vleo.timel.impl.upscaler.SameUpscaler;
 import net.vleo.timel.impl.upscaler.Upscaler;
 
-import java.lang.reflect.InvocationTargetException;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -65,7 +63,7 @@ public abstract class Type<T> {
     }
 
     /**
-     * @return True if template is a concrete type, that is either not a template  or it is a specialized template
+     * @return True iff this type is a concrete one, that is either a specialized template or a non-template.
      */
     public boolean isConcrete() {
         return !isUnboundTemplate() || isSpecializedTemplate();

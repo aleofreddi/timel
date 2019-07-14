@@ -26,6 +26,7 @@ import lombok.val;
 import net.vleo.timel.ConfigurationException;
 import org.junit.jupiter.api.Test;
 
+import static net.vleo.timel.ctor.HasPrivateThrowingCtor.hasPrivateThrowingCtor;
 import static org.hamcrest.MatcherAssert.*;
 import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -49,6 +50,11 @@ class TypesTest {
 
     @Test
     void shouldThrowConfigurationErrorOnFailure() {
-        ConfigurationException actual = assertThrows(ConfigurationException.class, () -> Types.instance(ErrorTestType.class));
+        assertThrows(ConfigurationException.class, () -> Types.instance(ErrorTestType.class));
+    }
+
+    @Test
+    void shouldNotBeConstructable() {
+        assertThat(Types.class, hasPrivateThrowingCtor());
     }
 }
