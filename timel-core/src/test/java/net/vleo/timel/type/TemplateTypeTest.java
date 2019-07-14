@@ -26,6 +26,8 @@ import lombok.NoArgsConstructor;
 import lombok.val;
 import net.vleo.timel.ConfigurationException;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 
 import java.util.Collections;
 
@@ -59,8 +61,15 @@ class TemplateTypeTest {
     }
 
     @NoArgsConstructor
-    protected static class UnspecializableType extends TemplateType<Object> {
-        public UnspecializableType(Object p) {
+    protected static class MissingCtorUnspecializableType extends TemplateType<Object> {
+        public MissingCtorUnspecializableType(Integer a, Integer b) {
+            throw new AssertionError();
+        }
+    }
+
+    @NoArgsConstructor
+    protected static class ThrowingUnspecializableType extends TemplateType<Object> {
+        public ThrowingUnspecializableType(Integer p) {
             throw new IllegalArgumentException();
         }
     }
@@ -80,8 +89,26 @@ class TemplateTypeTest {
     }
 
     @Test
-    void shouldThrowConfigurationErrorWhenFailToSpecialize() {
-        val type = new UnspecializableType();
+    void isConcreteShouldWorkWhenUnboundTemplate() {
+        val actual = new TemplateTestType().isConcrete();
+
+        assertThat(actual, is(false));
+    }
+
+    @Test
+    void isConcreteShouldWorkWhenSpecialisedTemplate() {
+        val actual = new TemplateTestType(1).isConcrete();
+
+        assertThat(actual, is(true));
+    }
+
+    @ParameterizedTest
+    @ValueSource(classes = {
+            MissingCtorUnspecializableType.class,
+            ThrowingUnspecializableType.class
+    })
+    void shouldThrowConfigurationErrorWhenFailToSpecialize(Class<?> typeClass) throws Exception {
+        val type = (TemplateType<?>) typeClass.getConstructor().newInstance();
 
         assertThrows(ConfigurationException.class, () -> type.specialize(42));
     }
