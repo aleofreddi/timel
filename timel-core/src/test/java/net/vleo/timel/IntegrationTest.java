@@ -23,7 +23,6 @@ package net.vleo.timel;
  */
 
 import lombok.val;
-import net.vleo.timel.impl.downscaler.IntegerDownscaler;
 import net.vleo.timel.iterator.TimeIterator;
 import net.vleo.timel.time.Interval;
 import net.vleo.timel.time.IntervalMaps;

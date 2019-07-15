@@ -38,10 +38,6 @@ public interface ParserTreeVisitor<T> {
         return null;
     }
 
-    default T visit(Declaration node) {
-        return null;
-    }
-
     default T visit(DoubleConstant node) {
         return null;
     }

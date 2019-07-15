@@ -27,11 +27,13 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 
+import java.util.Collections;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.*;
+import static org.hamcrest.collection.IsEmptyCollection.empty;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 /**
@@ -44,6 +46,16 @@ class TypeTest {
                 Stream.of(1).collect(Collectors.toList())
         ) {
         });
+    }
+
+    @Test
+    void ctorShouldWorkWhenEmptyCollection() {
+        val actual = new Type<Integer>(
+                Collections.emptyList()
+        ) {
+        };
+
+        assertThat(actual.getParameters(), empty());
     }
 
     @Test

@@ -25,8 +25,6 @@ package net.vleo.timel.impl.parser.tree;
 import lombok.Data;
 import net.vleo.timel.impl.parser.ParserTreeVisitor;
 
-import static java.util.Collections.*;
-
 /**
  * An integer constant leaf.
  *
