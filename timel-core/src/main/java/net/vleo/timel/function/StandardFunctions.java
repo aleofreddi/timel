@@ -114,6 +114,13 @@ public final class StandardFunctions {
             new SubIntegralDoubleOperator(),
             new SubIntegralIntegerOperator(),
 
+            new SubUnaryDoubleOperator(),
+            new SubUnaryFloatOperator(),
+            new SubUnaryIntegerOperator(),
+            new SubUnaryIntegralFloatOperator(),
+            new SubUnaryIntegralDoubleOperator(),
+            new SubUnaryIntegralIntegerOperator(),
+
             // Logical
             new LogicalAndOperator(),
             new LogicalOrOperator(),
