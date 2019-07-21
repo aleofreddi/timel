@@ -24,8 +24,10 @@ package net.vleo.timel.console;
 
 import lombok.val;
 import net.vleo.timel.conversion.StandardConversions;
+import net.vleo.timel.executor.ExecutorContext;
 import net.vleo.timel.function.FunctionRegistry;
 import net.vleo.timel.function.StandardFunctions;
+import net.vleo.timel.impl.executor.ExecutorContextImpl;
 import net.vleo.timel.impl.function.interval.EveryFunction;
 import net.vleo.timel.impl.intermediate.SyntaxTreeAdapter;
 import net.vleo.timel.impl.intermediate.SyntaxTreeDumper;
@@ -100,7 +102,7 @@ public class Console {
                 // Evaluate the expression
                 Interval evalInterval = Interval.of(start.getMillis(), stop.getMillis());
                 System.out.println("Evaluating expression for " + evalInterval);
-                TimeIterator<?> iter = targetTree.evaluate(evalInterval, null);
+                TimeIterator<?> iter = targetTree.evaluate(evalInterval, new ExecutorContextImpl(null));
 
                 while(iter.hasNext()) {
                     Sample<?> sample = iter.next();
