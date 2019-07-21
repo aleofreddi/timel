@@ -27,11 +27,9 @@ import net.vleo.timel.time.Sample;
 import java.util.NoSuchElementException;
 
 /**
- * An abstract base for TimeIterators which ease the development
- * taking care of the #peek and #next methods, which are implemented
- * in terms of #concreteNext method.
+ * An abstract base for {@link TimeIterator}s that do buffer the next entry from a delegate iterator.
  * <p>
- * Note that this implementation will buffer the next entry.
+ * This class takes care of the #peek and #next methods, which are implemented in terms of #concreteNext method.
  *
  * @param <V> Value Java type
  * @author Andrea Leofreddi
