@@ -275,8 +275,8 @@ DecimalConstant
     ;
 
 fragment
-NonzeroDigit
-    :   [1-9]
+OctalConstant
+    :   '0' OctalDigit*
     ;
 
 fragment
@@ -287,6 +287,16 @@ HexadecimalConstant
 fragment
 HexadecimalPrefix
     :   '0' [xX]
+    ;
+
+fragment
+NonzeroDigit
+    :   [1-9]
+    ;
+
+fragment
+OctalDigit
+    :   [0-7]
     ;
 
 fragment
@@ -368,8 +378,22 @@ CChar
 
 fragment
 EscapeSequence
-    :   HexadecimalEscapeSequence
+    :   SimpleEscapeSequence // Standard C-like escapes
+    |   OctalEscapeSequence
+    |   HexadecimalEscapeSequence
     |   UniversalCharacterName
+    ;
+
+fragment
+SimpleEscapeSequence
+    :   '\\' ['"?abfnrtv\\]
+    ;
+
+fragment
+OctalEscapeSequence
+    :   '\\' OctalDigit
+    |   '\\' OctalDigit OctalDigit
+    |   '\\' OctalDigit OctalDigit OctalDigit
     ;
 
 fragment

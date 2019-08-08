@@ -23,6 +23,7 @@ package net.vleo.timel.impl.parser;
  * #L%
  */
 
+import lombok.RequiredArgsConstructor;
 import net.vleo.timel.grammar.TimELBaseVisitor;
 import net.vleo.timel.grammar.TimELLexer;
 import net.vleo.timel.grammar.TimELParser;
@@ -44,7 +45,10 @@ import static java.util.stream.Collectors.toList;
  *
  * @author Andrea Leofreddi
  */
+@RequiredArgsConstructor
 class ParserTreeAdapter extends TimELBaseVisitor<AbstractParseTree> {
+    private final StringDecoder stringDecoder;
+
     @Override
     public AbstractParseTree visitPrimaryExpression(TimELParser.PrimaryExpressionContext ctx) {
         if(ctx.getChildCount() == 1)
@@ -335,6 +339,11 @@ class ParserTreeAdapter extends TimELBaseVisitor<AbstractParseTree> {
     }
 
     private String decodeStringLiteral(String text) {
-        return text.substring(1, text.length() - 1);
+        if(text.length() < 2)
+            throw new AssertionError("Unexpected invalid string token");
+        if(text.charAt(0) != '"' || text.charAt(text.length() - 1) != '"')
+            throw new AssertionError("Unexpected string format");
+
+        return stringDecoder.decode(text.substring(1, text.length() - 1));
     }
 }

@@ -54,7 +54,7 @@ public class Parser {
             TimELParser parser = new TimELParser(tokens);
             parser.addErrorListener(THROWING_ERROR_LISTENER);
             ParseTree tree = parser.compilationUnit();
-            return tree.accept(new ParserTreeAdapter());
+            return tree.accept(new ParserTreeAdapter(new StringDecoder()));
         } catch(ParseCancellationException e) {
             throw new ParseException(e.getMessage());
         }
