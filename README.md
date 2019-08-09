@@ -54,14 +54,14 @@ To use TimEL you need to import the following dependency:
 <dependency>
     <groupId>net.vleo.timel</groupId>
     <artifactId>timel-core</artifactId>
-    <version>0.9.1</version>
+    <version>0.9.2</version>
 </dependency>
 ```
 
 ### Gradle
 
 ```
-implementation 'net.vleo.timel:timel-core:0.9.1'
+implementation 'net.vleo.timel:timel-core:0.9.2'
 ```
 
 Now you're ready to go! Let's count how many days passed since (unix) epoch:
