@@ -3,6 +3,7 @@
 *.iml
 
 # Java
+/target
 /*/target
 
 # macOS
