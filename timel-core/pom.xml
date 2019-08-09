@@ -47,10 +47,8 @@
     <properties>
         <!-- Software version -->
         <antlr4.version>4.5.3</antlr4.version>
-        <joda.version>2.7</joda.version>
-        <cron4j.version>2.2.5</cron4j.version>
         <git-commit-id-plugin.version>2.2.4</git-commit-id-plugin.version>
-        <matheclipse.version>1.0.1</matheclipse.version>
+        <joda.version>2.7</joda.version>
     </properties>
 
     <build>
