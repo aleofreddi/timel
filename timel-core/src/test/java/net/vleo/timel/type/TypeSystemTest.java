@@ -81,20 +81,20 @@ class TypeSystemTest {
     void shouldThrowParseExceptionWhenUnknownType() {
         TypeSystem typeSystem = new TypeSystem(Collections.emptySet(), TEST_TYPES);
 
-        assertThrows(ParseException.class, () -> typeSystem.parse("?", Collections.emptyList()));
+        assertThrows(IllegalArgumentException.class, () -> typeSystem.parse("?", Collections.emptyList()));
     }
 
     @Test
     void shouldThrowParseExceptionWhenConcreteTypeAndParameter() {
         TypeSystem typeSystem = new TypeSystem(Collections.emptySet(), TEST_TYPES);
 
-        assertThrows(ParseException.class, () -> typeSystem.parse("Concrete", Collections.singletonList(1)));
+        assertThrows(IllegalArgumentException.class, () -> typeSystem.parse("Concrete", Collections.singletonList(1)));
     }
 
     @Test
     void shouldThrowParseExceptionWhenUnboundedTemplate() {
         TypeSystem typeSystem = new TypeSystem(Collections.emptySet(), TEST_TYPES);
 
-        assertThrows(ParseException.class, () -> typeSystem.parse("Template", Collections.emptyList()));
+        assertThrows(IllegalArgumentException.class, () -> typeSystem.parse("Template", Collections.emptyList()));
     }
 }

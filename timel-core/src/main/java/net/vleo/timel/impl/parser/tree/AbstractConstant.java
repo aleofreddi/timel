@@ -35,8 +35,8 @@ import java.util.Collections;
 public abstract class AbstractConstant extends AbstractParseTree {
     private final Object value;
 
-    AbstractConstant(Object value) {
-        super(Collections.emptyList());
+    AbstractConstant(SourceReference sourceReference, Object value) {
+        super(sourceReference, Collections.emptyList());
         this.value = value;
     }
 }

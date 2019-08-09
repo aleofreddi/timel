@@ -31,6 +31,9 @@ import net.vleo.timel.executor.ExecutorContext;
 import net.vleo.timel.impl.downscaler.Downscaler;
 import net.vleo.timel.impl.intermediate.tree.AbstractSyntaxTree;
 import net.vleo.timel.impl.intermediate.tree.Cast;
+import net.vleo.timel.impl.parser.ParserTreeVisitor;
+import net.vleo.timel.impl.parser.tree.AbstractParseTree;
+import net.vleo.timel.impl.parser.tree.SourceReference;
 import net.vleo.timel.impl.target.Evaluable;
 import net.vleo.timel.impl.upscaler.Upscaler;
 import net.vleo.timel.iterator.UpscalableIterator;
@@ -60,6 +63,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static java.util.Arrays.stream;
+import static java.util.Collections.*;
 import static java.util.stream.Collectors.toList;
 import static org.hamcrest.MatcherAssert.*;
 import static org.hamcrest.Matchers.*;
@@ -71,6 +75,14 @@ import static org.mockito.Mockito.*;
  */
 @ExtendWith(MockitoExtension.class)
 class FunctionRegistryTest {
+    private static final SourceReference SOURCE_REFERENCE = new SourceReference(0, 1, 1, 0);
+    private static final AbstractParseTree SOURCE_NODE = new AbstractParseTree(SOURCE_REFERENCE, emptyList()) {
+        @Override
+        public <T> T accept(ParserTreeVisitor<T> visitor) {
+            return null;
+        }
+    };
+
     @Spy
     private TypeSystem typeSystem = new TypeSystem(TestTypes.CONVERSIONS, Collections.emptySet());
 
@@ -85,7 +97,7 @@ class FunctionRegistryTest {
     void shouldThrowParseExceptionWhenUnknownName() {
         functionRegistry.add(new TestFunctions.Fun_A2A());
 
-        ParseException actual = assertThrows(ParseException.class, () -> functionRegistry.lookup(null, "???", mockArguments()));
+        ParseException actual = assertThrows(ParseException.class, () -> functionRegistry.lookup(SOURCE_NODE, "???", mockArguments()));
 
         assertCannotResolve(actual);
     }
@@ -94,7 +106,7 @@ class FunctionRegistryTest {
     void shouldThrowParseExceptionWhenTooFewArguments() {
         functionRegistry.add(new TestFunctions.Fun_A2A());
 
-        ParseException actual = assertThrows(ParseException.class, () -> functionRegistry.lookup(null, "a->a", mockArguments()));
+        ParseException actual = assertThrows(ParseException.class, () -> functionRegistry.lookup(SOURCE_NODE, "a->a", mockArguments()));
 
         assertCannotResolve(actual);
     }
@@ -103,7 +115,7 @@ class FunctionRegistryTest {
     void shouldThrowParseExceptionWhenTooManyArguments() {
         functionRegistry.add(new TestFunctions.Fun_A2A());
 
-        ParseException actual = assertThrows(ParseException.class, () -> functionRegistry.lookup(null, "a->a", mockArguments(new TestTypes.Polygon(), new TestTypes.Polygon())));
+        ParseException actual = assertThrows(ParseException.class, () -> functionRegistry.lookup(SOURCE_NODE, "a->a", mockArguments(new TestTypes.Polygon(), new TestTypes.Polygon())));
 
         assertCannotResolve(actual);
     }
@@ -113,7 +125,7 @@ class FunctionRegistryTest {
         functionRegistry.add(new TestFunctions.Fun_A2A());
         functionRegistry.add(new TestFunctions.Fun_A2A());
 
-        ParseException actual = assertThrows(ParseException.class, () -> functionRegistry.lookup(null, "a->a", mockArguments(new TestTypes.Polygon(), new TestTypes.Polygon())));
+        ParseException actual = assertThrows(ParseException.class, () -> functionRegistry.lookup(SOURCE_NODE, "a->a", mockArguments(new TestTypes.Polygon(), new TestTypes.Polygon())));
 
         assertCannotResolve(actual);
     }
@@ -122,7 +134,7 @@ class FunctionRegistryTest {
     void shouldMatchAndResolveReturnTypeFromVariable() throws ParseException {
         functionRegistry.add(new TestFunctions.Fun_A2A());
 
-        val actual = functionRegistry.lookup(null, "a->a", mockArguments(new TestTypes.Polygon()));
+        val actual = functionRegistry.lookup(SOURCE_NODE, "a->a", mockArguments(new TestTypes.Polygon()));
 
         assertThat(actual.getType(), equalTo(new TestTypes.Polygon()));
     }
@@ -131,7 +143,7 @@ class FunctionRegistryTest {
     void shouldMatchAndResolveVariablesWhenSameType() throws ParseException {
         functionRegistry.add(new TestFunctions.Fun_AA2A());
 
-        val actual = functionRegistry.lookup(null, "aa->a", mockArguments(
+        val actual = functionRegistry.lookup(SOURCE_NODE, "aa->a", mockArguments(
                 new TestTypes.Polygon(),
                 new TestTypes.Polygon()
         ));
@@ -143,7 +155,7 @@ class FunctionRegistryTest {
     void shouldMatchAndResolveVariablesWhenConstraintMatches() throws ParseException {
         functionRegistry.add(new TestFunctions.Fun_CC2One());
 
-        val actual = functionRegistry.lookup(null, "cc->1", mockArguments(
+        val actual = functionRegistry.lookup(SOURCE_NODE, "cc->1", mockArguments(
                 new TestTypes.Color(),
                 new TestTypes.Color()
         ));
@@ -155,7 +167,7 @@ class FunctionRegistryTest {
     void shouldThrowParseExceptionWhenConstraintDoesNotMatch() {
         functionRegistry.add(new TestFunctions.Fun_CC2One());
 
-        ParseException actual = assertThrows(ParseException.class, () -> functionRegistry.lookup(null, "cc->1", mockArguments(
+        ParseException actual = assertThrows(ParseException.class, () -> functionRegistry.lookup(SOURCE_NODE, "cc->1", mockArguments(
                 new TestTypes.Polygon(),
                 new TestTypes.Polygon()
         )));
@@ -176,7 +188,7 @@ class FunctionRegistryTest {
     ) throws ParseException {
         functionRegistry.add(new TestFunctions.Fun_AA2A());
 
-        val actual = functionRegistry.lookup(null, "aa->a", mockArguments(t, u));
+        val actual = functionRegistry.lookup(SOURCE_NODE, "aa->a", mockArguments(t, u));
 
         assertThat(actual.getType(), equalTo(expected));
     }
@@ -196,7 +208,7 @@ class FunctionRegistryTest {
     ) throws ParseException {
         functionRegistry.add(new TestFunctions.Fun_AA2A());
 
-        val actual = functionRegistry.lookup(null, "aa->a", mockArguments(t, u));
+        val actual = functionRegistry.lookup(SOURCE_NODE, "aa->a", mockArguments(t, u));
 
         assertThat(actual.getArguments(), hasSize(2));
 
@@ -245,7 +257,7 @@ class FunctionRegistryTest {
     ) {
         functionRegistry.add(new TestFunctions.Fun_AA2A());
 
-        ParseException actual = assertThrows(ParseException.class, () -> functionRegistry.lookup(null, "aa->a", mockArguments(t, u)));
+        ParseException actual = assertThrows(ParseException.class, () -> functionRegistry.lookup(SOURCE_NODE, "aa->a", mockArguments(t, u)));
 
         assertCannotResolve(actual);
     }
@@ -261,7 +273,7 @@ class FunctionRegistryTest {
     ) throws ParseException {
         functionRegistry.add(new TestFunctions.Fun_AStar2A());
 
-        val actual = functionRegistry.lookup(null, "a*->a", mockArguments(t, u));
+        val actual = functionRegistry.lookup(SOURCE_NODE, "a*->a", mockArguments(t, u));
 
         assertThat(actual.getType(), is(expected));
     }
@@ -270,7 +282,7 @@ class FunctionRegistryTest {
     void shouldThrowParseExceptionEmptyVarArgsWhenNeededForReturn() {
         functionRegistry.add(new TestFunctions.Fun_AStar2A());
 
-        ParseException actual = assertThrows(ParseException.class, () -> functionRegistry.lookup(null, "a*->a", mockArguments()));
+        ParseException actual = assertThrows(ParseException.class, () -> functionRegistry.lookup(SOURCE_NODE, "a*->a", mockArguments()));
 
         assertCannotResolve(actual);
     }
@@ -279,7 +291,7 @@ class FunctionRegistryTest {
     void shouldMatchEmptyVarArgs() throws ParseException {
         functionRegistry.add(new TestFunctions.Fun_AStar2One());
 
-        val actual = functionRegistry.lookup(null, "a*->1", mockArguments());
+        val actual = functionRegistry.lookup(SOURCE_NODE, "a*->1", mockArguments());
 
         assertThat(actual.getType(), is(new TestTypes.One()));
     }
@@ -294,7 +306,7 @@ class FunctionRegistryTest {
     ) {
         functionRegistry.add(new TestFunctions.Fun_AStar2A());
 
-        ParseException actual = assertThrows(ParseException.class, () -> functionRegistry.lookup(null, "a*->a", mockArguments(t, u)));
+        ParseException actual = assertThrows(ParseException.class, () -> functionRegistry.lookup(SOURCE_NODE, "a*->a", mockArguments(t, u)));
 
         assertCannotResolve(actual);
     }
@@ -320,7 +332,7 @@ class FunctionRegistryTest {
                 .filter(Objects::nonNull)
                 .toArray(Type[]::new);
 
-        val actual = functionRegistry.lookup(null, "(ab)*->b", mockArguments(arguments));
+        val actual = functionRegistry.lookup(SOURCE_NODE, "(ab)*->b", mockArguments(arguments));
 
         assertThat(actual.getType(), is(expected));
     }
@@ -344,7 +356,7 @@ class FunctionRegistryTest {
                 .filter(Objects::nonNull)
                 .toArray(Type[]::new);
 
-        ParseException actual = assertThrows(ParseException.class, () -> functionRegistry.lookup(null, "(ab)*->b", mockArguments(arguments)));
+        ParseException actual = assertThrows(ParseException.class, () -> functionRegistry.lookup(SOURCE_NODE, "(ab)*->b", mockArguments(arguments)));
 
         assertCannotResolve(actual);
     }
@@ -365,7 +377,7 @@ class FunctionRegistryTest {
                 .filter(Objects::nonNull)
                 .toArray(Type[]::new);
 
-        ParseException actual = assertThrows(ParseException.class, () -> functionRegistry.lookup(null, "(ab)*->b", mockArguments(arguments)));
+        ParseException actual = assertThrows(ParseException.class, () -> functionRegistry.lookup(SOURCE_NODE, "(ab)*->b", mockArguments(arguments)));
 
         assertCannotResolve(actual);
     }
@@ -384,7 +396,7 @@ class FunctionRegistryTest {
                 .filter(Objects::nonNull)
                 .toArray(Type[]::new);
 
-        ParseException actual = assertThrows(ParseException.class, () -> functionRegistry.lookup(null, "a*->1", mockArguments(arguments)));
+        ParseException actual = assertThrows(ParseException.class, () -> functionRegistry.lookup(SOURCE_NODE, "a*->1", mockArguments(arguments)));
 
         assertCannotResolve(actual);
     }
@@ -403,7 +415,7 @@ class FunctionRegistryTest {
                 .filter(Objects::nonNull)
                 .toArray(Type[]::new);
 
-        val actual = functionRegistry.lookup(null, "a*->1", mockArguments(arguments));
+        val actual = functionRegistry.lookup(SOURCE_NODE, "a*->1", mockArguments(arguments));
 
         assertThat(actual.getType(), is(new TestTypes.One()));
     }
@@ -423,7 +435,7 @@ class FunctionRegistryTest {
                 .filter(Objects::nonNull)
                 .toArray(Type[]::new);
 
-        ParseException actual = assertThrows(ParseException.class, () -> functionRegistry.lookup(null, "a*->?", mockArguments(arguments)));
+        ParseException actual = assertThrows(ParseException.class, () -> functionRegistry.lookup(SOURCE_NODE, "a*->?", mockArguments(arguments)));
         verify(function).resolveReturnType(Mockito.isNull(), Mockito.anyMap(), Mockito.any());
 
         assertCannotResolve(actual);
@@ -450,7 +462,7 @@ class FunctionRegistryTest {
                 .filter(Objects::nonNull)
                 .toArray(Type[]::new);
 
-        val actual = functionRegistry.lookup(null, "a*->?", mockArguments(arguments));
+        val actual = functionRegistry.lookup(SOURCE_NODE, "a*->?", mockArguments(arguments));
         verify(function).resolveReturnType(Mockito.isNull(), Mockito.anyMap(), Mockito.any());
 
         assertThat(actual.getType(), is(expected));
@@ -473,7 +485,7 @@ class FunctionRegistryTest {
                 .filter(Objects::nonNull)
                 .toArray(Type[]::new);
 
-        val actual = functionRegistry.lookup(null, "cc->c", mockArguments(arguments));
+        val actual = functionRegistry.lookup(SOURCE_NODE, "cc->c", mockArguments(arguments));
         verify(function).resolveReturnType(Mockito.any(TestTypes.Color.class), Mockito.anyMap(), Mockito.any());
 
         assertThat(actual.getType(), is(expected));
@@ -494,7 +506,7 @@ class FunctionRegistryTest {
                 .filter(Objects::nonNull)
                 .toArray(Type[]::new);
 
-        ParseException actual = assertThrows(ParseException.class, () -> functionRegistry.lookup(null, "cc->c", mockArguments(arguments)));
+        ParseException actual = assertThrows(ParseException.class, () -> functionRegistry.lookup(SOURCE_NODE, "cc->c", mockArguments(arguments)));
         verify(function).resolveReturnType(Mockito.any(TestTypes.Color.class), Mockito.anyMap(), Mockito.any());
 
         assertCannotResolve(actual);
@@ -512,7 +524,7 @@ class FunctionRegistryTest {
     ) throws ParseException {
         functionRegistry.add(new TestFunctions.Fun_M2One());
 
-        val actual = functionRegistry.lookup(null, function, mockArguments(t));
+        val actual = functionRegistry.lookup(SOURCE_NODE, function, mockArguments(t));
 
         assertThat(actual.getType(), equalTo(u));
     }

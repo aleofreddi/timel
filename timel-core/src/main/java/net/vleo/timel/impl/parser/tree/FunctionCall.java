@@ -38,8 +38,8 @@ import java.util.List;
 public class FunctionCall extends AbstractParseTree {
     private final String function;
 
-    public FunctionCall(String function, List<AbstractParseTree> arguments) {
-        super(arguments);
+    public FunctionCall(SourceReference sourceReference, String function, List<AbstractParseTree> arguments) {
+        super(sourceReference, arguments);
         this.function = function;
     }
 

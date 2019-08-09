@@ -36,8 +36,8 @@ import static java.util.Collections.*;
 public class Variable extends AbstractParseTree {
     private final String id;
 
-    public Variable(String id) {
-        super(emptyList());
+    public Variable(SourceReference sourceReference, String id) {
+        super(sourceReference, emptyList());
         this.id = id;
     }
 

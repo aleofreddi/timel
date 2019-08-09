@@ -22,17 +22,35 @@ package net.vleo.timel;
  * #L%
  */
 
+import lombok.Getter;
+import net.vleo.timel.impl.parser.tree.SourceReference;
+
 /**
- * An exception thrown to signal a parse error.
+ * An exception thrown to signal a parse error which carries the source reference at which the error was detected.
  *
  * @author Andrea Leofreddi
  */
+@Getter
 public class ParseException extends Exception {
-    public ParseException(String message) {
+    private final SourceReference sourceReference;
+
+    public ParseException(SourceReference sourceReference, String message, Throwable cause) {
+        super(message, cause);
+        this.sourceReference = sourceReference;
+    }
+
+    public ParseException(SourceReference sourceReference, String message) {
         super(message);
+        this.sourceReference = sourceReference;
+    }
+
+    public ParseException(SourceReference sourceReference, Throwable cause) {
+        super(cause);
+        this.sourceReference = sourceReference;
     }
 
     public ParseException(String message, Throwable cause) {
         super(message, cause);
+        this.sourceReference = null;
     }
 }

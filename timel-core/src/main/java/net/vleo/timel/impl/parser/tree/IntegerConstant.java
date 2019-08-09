@@ -32,8 +32,8 @@ import net.vleo.timel.impl.parser.ParserTreeVisitor;
  */
 @Data
 public class IntegerConstant extends AbstractConstant {
-    public IntegerConstant(int value) {
-        super(value);
+    public IntegerConstant(SourceReference sourceReference, int value) {
+        super(sourceReference, value);
     }
 
     @Override

@@ -38,8 +38,8 @@ import java.util.List;
 public class TypeSpecifier extends AbstractParseTree {
     private final String type;
 
-    public TypeSpecifier(String type, List<AbstractParseTree> templateArguments) {
-        super(templateArguments);
+    public TypeSpecifier(SourceReference sourceReference, String type, List<AbstractParseTree> templateArguments) {
+        super(sourceReference, templateArguments);
         this.type = type;
     }
 

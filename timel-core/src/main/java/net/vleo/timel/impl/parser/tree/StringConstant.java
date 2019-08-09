@@ -34,8 +34,8 @@ import static java.util.Collections.*;
  */
 @Data
 public class StringConstant extends AbstractConstant {
-    public StringConstant(String value) {
-        super(value);
+    public StringConstant(SourceReference sourceReference, String value) {
+        super(sourceReference, value);
     }
 
     @Override

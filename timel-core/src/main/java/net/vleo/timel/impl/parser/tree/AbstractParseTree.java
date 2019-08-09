@@ -34,6 +34,7 @@ import java.util.List;
  */
 @Data
 public abstract class AbstractParseTree {
+    private final SourceReference sourceReference;
     private final List<AbstractParseTree> children;
 
     public abstract <T> T accept(ParserTreeVisitor<T> visitor);

@@ -22,8 +22,10 @@ package net.vleo.timel.impl.parser;
  * #L%
  */
 
+import lombok.val;
 import lombok.var;
 import net.vleo.timel.impl.parser.tree.AbstractParseTree;
+import net.vleo.timel.impl.parser.tree.SourceReference;
 import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
@@ -40,8 +42,10 @@ class ParserTreeDumperTest {
     private final ParserTreeDumper parserTreeDumper = new ParserTreeDumper();
 
     private static class DummyParseTree extends AbstractParseTree {
+        private static final SourceReference SOURCE_REFERENCE = new SourceReference(0, 1, 1, 1);
+
         DummyParseTree(List<AbstractParseTree> children) {
-            super(children);
+            super(SOURCE_REFERENCE, children);
         }
 
         @Override
@@ -56,7 +60,7 @@ class ParserTreeDumperTest {
                 leaf2 = new DummyParseTree(Collections.emptyList()),
                 parent = new DummyParseTree(Arrays.asList(leaf1, leaf2));
 
-        var actual = parserTreeDumper.dump(parent);
+        val actual = parserTreeDumper.dump(parent);
 
         assertThat(actual.length() - actual.replaceAll("\n", "").length(), is(3));
     }

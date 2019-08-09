@@ -22,7 +22,7 @@ package net.vleo.timel.impl.intermediate;
  * #L%
  */
 
-import lombok.var;
+import lombok.val;
 import net.vleo.timel.impl.intermediate.tree.AbstractSyntaxTree;
 import org.junit.jupiter.api.Test;
 
@@ -56,7 +56,7 @@ class SyntaxTreeDumperTest {
                 leaf2 = new DummySyntaxTree(Collections.emptyList()),
                 parent = new DummySyntaxTree(Arrays.asList(leaf1, leaf2));
 
-        var actual = syntaxTreeDumper.dump(parent);
+        val actual = syntaxTreeDumper.dump(parent);
 
         assertThat(actual.length() - actual.replaceAll("\n", "").length(), is(3));
     }

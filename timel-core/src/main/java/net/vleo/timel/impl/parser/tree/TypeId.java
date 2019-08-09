@@ -36,8 +36,8 @@ import java.util.Collections;
 @Value
 @EqualsAndHashCode(callSuper = true)
 public class TypeId extends AbstractParseTree {
-    public TypeId(AbstractParseTree child) {
-        super(Collections.singletonList(child));
+    public TypeId(SourceReference sourceReference, AbstractParseTree child) {
+        super(sourceReference, Collections.singletonList(child));
     }
 
     @Override

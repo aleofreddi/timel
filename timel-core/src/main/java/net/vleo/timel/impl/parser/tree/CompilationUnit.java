@@ -36,8 +36,8 @@ import java.util.List;
 @Value
 @EqualsAndHashCode(callSuper = true)
 public class CompilationUnit extends AbstractParseTree {
-    public CompilationUnit(List<AbstractParseTree> children) {
-        super(children);
+    public CompilationUnit(SourceReference sourceReference, List<AbstractParseTree> children) {
+        super(sourceReference, children);
     }
 
     @Override
