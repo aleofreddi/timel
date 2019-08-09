@@ -29,9 +29,9 @@ import lombok.val;
 import net.vleo.timel.ConfigurationException;
 import net.vleo.timel.ParseException;
 import net.vleo.timel.annotation.Constraint;
+import net.vleo.timel.annotation.FunctionPrototype;
 import net.vleo.timel.annotation.FunctionPrototypes;
 import net.vleo.timel.annotation.Parameter;
-import net.vleo.timel.annotation.FunctionPrototype;
 import net.vleo.timel.conversion.Conversion;
 import net.vleo.timel.impl.intermediate.tree.AbstractSyntaxTree;
 import net.vleo.timel.impl.intermediate.tree.Cast;
@@ -142,10 +142,10 @@ public class FunctionRegistry {
                 .collect(toList());
 
         if(alternatives.isEmpty())
-            throw new ParseException("Cannot resolve function " + getSignature(function, arguments));
+            throw new ParseException(reference.getSourceReference(), "Cannot resolve function " + getSignature(function, arguments));
 
         if(alternatives.size() > 1 && alternatives.get(0).getWeight() == alternatives.get(1).getWeight())
-            throw new ParseException("Ambiguous function call, matches: " +
+            throw new ParseException(reference.getSourceReference(), "Ambiguous function call, matches: " +
                     alternatives.stream()
                             .map(alternative -> getSignature(alternative.getFunctionPrototype()))
                             .collect(Collectors.joining("; ")));
@@ -406,7 +406,7 @@ public class FunctionRegistry {
         try {
             return class_.getDeclaredConstructor().newInstance();
         } catch(InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
-            throw new RuntimeException(new ParseException("Cannot instantiate type " + class_));
+            throw new IllegalArgumentException("Cannot instantiate type " + class_);
         }
     }
 }

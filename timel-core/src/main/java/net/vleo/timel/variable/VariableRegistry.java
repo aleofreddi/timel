@@ -58,11 +58,11 @@ public class VariableRegistry {
         return result.getFirst();
     }
 
-    public <V> Variable<V> newVariable(String id, Type type) throws ParseException {
+    public <V> Variable<V> newVariable(String id, Type type) {
         Pair<Type, Variable<?>> result = variables.get(id);
 
         if(result != null)
-            throw new ParseException("Variable " + id + " is already defined");
+            throw new IllegalArgumentException("Variable " + id + " is already defined");
 
         Variable<?> variable = variableFactory.newVariable(id, type);
         variables.put(id, new Pair<>(type, variable));

@@ -34,8 +34,8 @@ import static java.util.Collections.*;
  */
 @Data
 public class DoubleConstant extends AbstractConstant {
-    public DoubleConstant(double value) {
-        super(value);
+    public DoubleConstant(SourceReference sourceReference, double value) {
+        super(sourceReference, value);
     }
 
     @Override

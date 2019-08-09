@@ -53,8 +53,8 @@ class TypeSpecifierAdapter implements ParserTreeVisitor<Object> {
 
         try {
             return typeSystem.parse(typeId, arguments);
-        } catch(ParseException e) {
-            throw new RuntimeException(e);
+        } catch(Exception e) {
+            throw new RuntimeException(new ParseException(typeSpecifier.getSourceReference(), "Failed to parse type " + typeId, e));
         }
     }
 }

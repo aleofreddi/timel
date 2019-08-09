@@ -37,6 +37,7 @@ import org.junit.jupiter.params.provider.ValueSource;
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
+import javax.script.SimpleBindings;
 
 import static java.util.Collections.*;
 import static org.hamcrest.MatcherAssert.*;
@@ -51,29 +52,38 @@ class ParserTest {
 
     @ParameterizedTest
     @CsvSource({
-            "1+,no viable alternative",
-            "+,no viable alternative"
+            "1+,no viable alternative,2,1,2",
+            "+,no viable alternative,1,1,1",
+            "'  +',no viable alternative,3,1,3",
+            "' \n +',no viable alternative,4,2,2",
     })
-    void shouldThrowParseExceptionWhenInvalidSource(String source, String expectedMessage) {
+    void shouldThrowParseExceptionWhenInvalidSource(String source, String expectedMessage, int expectedOffset, int expectedLine, int expectedColumn) {
         ParseException actual = assertThrows(ParseException.class, () -> new Parser().parse(source));
 
+        assertThat(actual.getSourceReference(), is(new SourceReference(expectedOffset, 0, expectedLine, expectedColumn)));
         assertThat(actual.getMessage(), containsString(expectedMessage));
     }
 
     @ParameterizedTest
     @CsvSource({
-            "1,net.vleo.timel.impl.parser.tree.IntegerConstant,1",
-            "2.0f,net.vleo.timel.impl.parser.tree.FloatConstant,2",
-            "3.0,net.vleo.timel.impl.parser.tree.DoubleConstant,3",
-            "\"test string\",net.vleo.timel.impl.parser.tree.StringConstant,\"test string\""
+            "1,0,1,1,0,net.vleo.timel.impl.parser.tree.IntegerConstant,1",
+            "2.0f,0,4,1,0,net.vleo.timel.impl.parser.tree.FloatConstant,2",
+            "3.0,0,3,1,0,net.vleo.timel.impl.parser.tree.DoubleConstant,3",
+            "\"test string\",0,13,1,0,net.vleo.timel.impl.parser.tree.StringConstant,\"test string\""
     })
-    void shouldParseConstants(String source, String expectedType, String expectedValue) throws ParseException, ScriptException {
+    void shouldParseConstants(String source, int expectedOffset, int expectedLine, int expectedColumn, int expectedLength, String expectedType, String expectedValue) throws ParseException, ScriptException {
         AbstractParseTree actual = new Parser().parse(source);
 
+        val bindings = new SimpleBindings();
+        bindings.put("sourceReference", new SourceReference(expectedOffset, expectedLine, expectedColumn, expectedLength));
+
         assertThat(actual, is(
-                new CompilationUnit(singletonList(
-                        (AbstractParseTree) engine.eval("new (Java.type('" + expectedType + "'))(" + expectedValue + ")")
-                ))
+                new CompilationUnit(
+                        new SourceReference(expectedOffset, expectedLine, expectedColumn, expectedLength),
+                        singletonList(
+                                (AbstractParseTree) engine.eval("new (Java.type('" + expectedType + "'))(sourceReference, " + expectedValue + ")", bindings)
+                        )
+                )
         ));
     }
 
@@ -112,6 +122,14 @@ class ParserTest {
 
         for(int i = 0; i < expectedUnits; i++)
             assertThat(navigate(actual, i), instanceOf(IntegerConstant.class));
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {
+            "0xffffffff"
+    })
+    void parseShouldUnwrapUncheckedParseException(String source) throws ParseException {
+        assertThrows(ParseException.class, () -> new Parser().parse(source));
     }
 
     private AbstractParseTree navigate(AbstractParseTree tree, int... path) {

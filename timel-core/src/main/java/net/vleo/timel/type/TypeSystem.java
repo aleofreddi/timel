@@ -104,19 +104,18 @@ public class TypeSystem {
      * @param id        Type id
      * @param arguments Template arguments (if any)
      * @return Parsed type
-     * @throws ParseException When the type declaration is not consistent
      */
-    public Type parse(String id, List<Object> arguments) throws ParseException {
+    public Type parse(String id, List<Object> arguments) {
         Type result = idToType.get(id);
 
         if(result == null)
-            throw new ParseException("Unknown type " + id);
+            throw new IllegalArgumentException("Unknown type " + id);
 
         if(result.isUnboundTemplate() && arguments.isEmpty())
-            throw new ParseException("Cannot instance template type " + id);
+            throw new IllegalArgumentException("Cannot instance template type " + id);
 
         if(result.isConcrete() && !arguments.isEmpty())
-            throw new ParseException("Type " + id + " is not a template");
+            throw new IllegalArgumentException("Type " + id + " is not a template");
 
         if(arguments.isEmpty())
             return result;

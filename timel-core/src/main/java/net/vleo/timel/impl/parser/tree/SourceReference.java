@@ -22,34 +22,9 @@ package net.vleo.timel.impl.parser.tree;
  * #L%
  */
 
-import lombok.EqualsAndHashCode;
 import lombok.Value;
-import net.vleo.timel.impl.parser.ParserTreeVisitor;
 
-import java.util.Arrays;
-
-/**
- * Variable assignment.
- *
- * @author Andrea Leofreddi
- */
 @Value
-@EqualsAndHashCode(callSuper = true)
-public class Assignment extends AbstractParseTree {
-    public Assignment(SourceReference sourceReference, Variable variable, AbstractParseTree value) {
-        super(sourceReference, Arrays.asList(variable, value));
-    }
-
-    public Variable getVariable() {
-        return (Variable) getChildren().get(0);
-    }
-
-    public AbstractParseTree getValue() {
-        return getChildren().get(1);
-    }
-
-    @Override
-    public <T> T accept(ParserTreeVisitor<T> visitor) {
-        return visitor.visit(this);
-    }
+public class SourceReference {
+    private final Integer offset, length, line, column;
 }

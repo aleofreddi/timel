@@ -60,15 +60,15 @@ public class SyntaxTreeAdapter implements ParserTreeVisitor<AbstractSyntaxTree> 
         AbstractSyntaxTree rhs = assignment.getValue().accept(this);
 
         if(variableWriterMap.get(id) != null || newVariables.contains(id))
-            throw new RuntimeException(new ParseException("Variable " + id + " already declared"));
+            throw new RuntimeException(new ParseException(assignment.getSourceReference(), "Variable " + id + " already declared"));
 
         net.vleo.timel.variable.Variable<?> registryVariable = variableRegistry.getVariable(id);
 
         if(registryVariable == null) {
             try {
                 registryVariable = variableRegistry.newVariable(id, rhs.getType());
-            } catch(ParseException e) {
-                throw new RuntimeException(e);
+            } catch(Exception e) {
+                throw new RuntimeException(new ParseException(assignment.getSourceReference(), e));
             }
         } else {
             // CHECK TYPE HERE! FIXME
@@ -135,7 +135,7 @@ public class SyntaxTreeAdapter implements ParserTreeVisitor<AbstractSyntaxTree> 
         val conversionResult = functionRegistry.getTypeSystem().getConcretePath(false, sourceType, targetType);
 
         if(conversionResult == null || !targetType.equals(conversionResult.getResultType()))
-            throw new RuntimeException(new ParseException("Cannot convert " + sourceType + " to " + targetType));
+            throw new RuntimeException(new ParseException(explicitCast.getSourceReference(), "Cannot convert " + sourceType + " to " + targetType));
 
         List<Conversion<Object, Object>> conversions = conversionResult.getConversions();
 
@@ -181,7 +181,7 @@ public class SyntaxTreeAdapter implements ParserTreeVisitor<AbstractSyntaxTree> 
             val externalVariable = variableRegistry.getVariable(id);
 
             if(externalVariable == null)
-                throw new RuntimeException(new ParseException("Undefined variable " + id));
+                throw new RuntimeException(new ParseException(variable.getSourceReference(), "Undefined variable " + id));
 
             return new VariableReader(
                     variable,

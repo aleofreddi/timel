@@ -59,6 +59,7 @@ import static org.mockito.Mockito.when;
  */
 @ExtendWith(MockitoExtension.class)
 class SyntaxTreeAdapterTest {
+    private static final SourceReference SOURCE_REFERENCE = new SourceReference(0, 1, 1, 0);
     @Mock
     private VariableRegistry variableRegistry;
     @Mock
@@ -76,7 +77,7 @@ class SyntaxTreeAdapterTest {
         when(variableRegistry.newVariable(eq("a"), eq(new IntegerType())))
                 .thenReturn(variable);
 
-        val parseTree = new Assignment(new Variable("a"), new IntegerConstant(1));
+        val parseTree = new Assignment(SOURCE_REFERENCE, new Variable(SOURCE_REFERENCE, "a"), new IntegerConstant(SOURCE_REFERENCE, 1));
         val actual = adapter.visit(parseTree);
 
         verify(variableRegistry).newVariable(eq("a"), eq(new IntegerType()));
@@ -93,9 +94,9 @@ class SyntaxTreeAdapterTest {
                 .thenReturn(variable);
         SyntaxTreeAdapter adapter = new SyntaxTreeAdapter(variableRegistry, null);
 
-        val parseTree = new CompilationUnit(Arrays.asList(
-                new Assignment(new Variable("a"), new IntegerConstant(1)),
-                new Assignment(new Variable("a"), new IntegerConstant(1))
+        val parseTree = new CompilationUnit(SOURCE_REFERENCE, Arrays.asList(
+                new Assignment(SOURCE_REFERENCE, new Variable(SOURCE_REFERENCE, "a"), new IntegerConstant(SOURCE_REFERENCE, 1)),
+                new Assignment(SOURCE_REFERENCE, new Variable(SOURCE_REFERENCE, "a"), new IntegerConstant(SOURCE_REFERENCE, 1))
         ));
 
         RuntimeException actual = assertThrows(RuntimeException.class, () -> adapter.visit(parseTree));
@@ -117,7 +118,7 @@ class SyntaxTreeAdapterTest {
 
         SyntaxTreeAdapter adapter = new SyntaxTreeAdapter(null, functionRegistry);
 
-        val parseTree = new ExplicitCast(new TypeSpecifier("Integer", Collections.emptyList()), new IntegerConstant(1));
+        val parseTree = new ExplicitCast(SOURCE_REFERENCE, new TypeSpecifier(SOURCE_REFERENCE, "Integer", Collections.emptyList()), new IntegerConstant(SOURCE_REFERENCE, 1));
         val actual = adapter.visit(parseTree);
 
         assertThat(actual, instanceOf(Cast.class));
@@ -138,7 +139,7 @@ class SyntaxTreeAdapterTest {
 
         SyntaxTreeAdapter adapter = new SyntaxTreeAdapter(null, functionRegistry);
 
-        val parseTree = new ExplicitCast(new TypeSpecifier("Integer", Collections.emptyList()), new IntegerConstant(1));
+        val parseTree = new ExplicitCast(SOURCE_REFERENCE, new TypeSpecifier(SOURCE_REFERENCE, "Integer", Collections.emptyList()), new IntegerConstant(SOURCE_REFERENCE, 1));
         RuntimeException actual = assertThrows(RuntimeException.class, () -> adapter.visit(parseTree));
 
         assertThat(actual.getCause(), instanceOf(ParseException.class));

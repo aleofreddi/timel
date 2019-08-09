@@ -22,10 +22,12 @@ package net.vleo.timel.impl.parser;
  * #L%
  */
 
+import lombok.val;
 import net.vleo.timel.ParseException;
 import net.vleo.timel.grammar.TimELLexer;
 import net.vleo.timel.grammar.TimELParser;
 import net.vleo.timel.impl.parser.tree.AbstractParseTree;
+import net.vleo.timel.impl.parser.tree.SourceReference;
 import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.misc.ParseCancellationException;
 import org.antlr.v4.runtime.tree.ParseTree;
@@ -39,7 +41,8 @@ public class Parser {
     private static class ThrowingErrorListener extends BaseErrorListener {
         @Override
         public void syntaxError(Recognizer<?, ?> recognizer, Object offendingSymbol, int line, int char_, String message, RecognitionException e) throws ParseCancellationException {
-            throw new ParseCancellationException("line " + line + ":" + char_ + ": " + message, e);
+            Token token = (Token) offendingSymbol;
+            throw new ParseCancellationException(new ParseException(new SourceReference(token.getStartIndex(), 0, token.getLine(), token.getCharPositionInLine()), message, e));
         }
     }
 
@@ -54,9 +57,14 @@ public class Parser {
             TimELParser parser = new TimELParser(tokens);
             parser.addErrorListener(THROWING_ERROR_LISTENER);
             ParseTree tree = parser.compilationUnit();
-            return tree.accept(new ParserTreeAdapter(new StringDecoder()));
+            return tree.accept(new ParserTreeAdapter(tokens, new StringDecoder()));
+        } catch(UncheckedParseException e) {
+            throw (ParseException) e.getCause();
         } catch(ParseCancellationException e) {
-            throw new ParseException(e.getMessage());
+            val nested = e.getCause();
+            if(nested instanceof ParseException)
+                throw (ParseException) nested;
+            throw new ParseException(e.getMessage(), e);
         }
     }
 }

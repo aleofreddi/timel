@@ -36,8 +36,8 @@ import java.util.Arrays;
 @Value
 @EqualsAndHashCode(callSuper = true)
 public class ExplicitCast extends AbstractParseTree {
-    public ExplicitCast(AbstractParseTree type, AbstractParseTree rhs) {
-        super(Arrays.asList(type, rhs));
+    public ExplicitCast(SourceReference sourceReference, AbstractParseTree type, AbstractParseTree rhs) {
+        super(sourceReference, Arrays.asList(type, rhs));
     }
 
     public TypeSpecifier getType() {

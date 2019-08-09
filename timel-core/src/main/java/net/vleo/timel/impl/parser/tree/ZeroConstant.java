@@ -34,8 +34,8 @@ import static java.util.Collections.*;
  */
 @Data
 public class ZeroConstant extends AbstractConstant {
-    public ZeroConstant() {
-        super(0);
+    public ZeroConstant(SourceReference sourceReference) {
+        super(sourceReference, 0);
     }
 
     @Override

@@ -34,8 +34,8 @@ import static java.util.Collections.*;
  */
 @Data
 public class FloatConstant extends AbstractConstant {
-    public FloatConstant(float value) {
-        super(value);
+    public FloatConstant(SourceReference sourceReference, float value) {
+        super(sourceReference, value);
     }
 
     @Override

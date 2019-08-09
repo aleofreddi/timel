@@ -24,10 +24,14 @@ package net.vleo.timel.impl.parser;
  */
 
 import lombok.RequiredArgsConstructor;
+import lombok.val;
+import net.vleo.timel.ParseException;
 import net.vleo.timel.grammar.TimELBaseVisitor;
 import net.vleo.timel.grammar.TimELLexer;
 import net.vleo.timel.grammar.TimELParser;
 import net.vleo.timel.impl.parser.tree.*;
+import org.antlr.v4.runtime.Token;
+import org.antlr.v4.runtime.TokenStream;
 import org.antlr.v4.runtime.tree.ErrorNode;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.TerminalNode;
@@ -47,6 +51,7 @@ import static java.util.stream.Collectors.toList;
  */
 @RequiredArgsConstructor
 class ParserTreeAdapter extends TimELBaseVisitor<AbstractParseTree> {
+    private final TokenStream tokenStream;
     private final StringDecoder stringDecoder;
 
     @Override
@@ -61,7 +66,7 @@ class ParserTreeAdapter extends TimELBaseVisitor<AbstractParseTree> {
     public AbstractParseTree visitArray(TimELParser.ArrayContext ctx) {
         assertChildCount(ctx, 3, Integer.MAX_VALUE);
         List<AbstractParseTree> arguments = parseList(ctx.getChild(1));
-        return new FunctionCall("Array", arguments);
+        return new FunctionCall(toSourceReference(ctx), "array", arguments);
     }
 
     @Override
@@ -75,7 +80,7 @@ class ParserTreeAdapter extends TimELBaseVisitor<AbstractParseTree> {
         String function = ctx.getChild(0).getText();
         List<AbstractParseTree> arguments = ctx.getChildCount() == 3 ?
                 emptyList() : parseList(ctx.getChild(2));
-        return new FunctionCall(function, arguments);
+        return new FunctionCall(toSourceReference(ctx), function, arguments);
     }
 
     @Override
@@ -88,7 +93,7 @@ class ParserTreeAdapter extends TimELBaseVisitor<AbstractParseTree> {
         if(ctx.getChildCount() == 1)
             return passthroughFirst(ctx);
         assertChildCount(ctx, 3);
-        return new Assignment((Variable) ctx.getChild(0).accept(this), ctx.getChild(2).accept(this));
+        return new Assignment(toSourceReference(ctx.getChild(0)), (Variable) ctx.getChild(0).accept(this), ctx.getChild(2).accept(this));
     }
 
     @Override
@@ -97,10 +102,10 @@ class ParserTreeAdapter extends TimELBaseVisitor<AbstractParseTree> {
             return passthroughFirst(ctx);
         if(ctx.getChildCount() == 4) {
             assert ((TerminalNode) ctx.getChild(0)).getSymbol().getType() == TimELLexer.TypeId;
-            return new TypeId(ctx.getChild(2).accept(this));
+            return new TypeId(toSourceReference(ctx), ctx.getChild(2).accept(this));
         }
         assertChildCount(ctx, 2);
-        return new FunctionCall(ctx.getChild(0).getText(), singletonList(ctx.getChild(1).accept(this)));
+        return new FunctionCall(toSourceReference(ctx), ctx.getChild(0).getText(), singletonList(ctx.getChild(1).accept(this)));
     }
 
     @Override
@@ -113,7 +118,7 @@ class ParserTreeAdapter extends TimELBaseVisitor<AbstractParseTree> {
         if(ctx.getChildCount() == 1)
             return passthroughFirst(ctx);
         assertChildCount(ctx, 4);
-        return new ExplicitCast(ctx.getChild(1).accept(this), ctx.getChild(3).accept(this));
+        return new ExplicitCast(toSourceReference(ctx), ctx.getChild(1).accept(this), ctx.getChild(3).accept(this));
     }
 
     @Override
@@ -121,7 +126,7 @@ class ParserTreeAdapter extends TimELBaseVisitor<AbstractParseTree> {
         if(ctx.getChildCount() == 1)
             return passthroughFirst(ctx);
         assertChildCount(ctx, 3);
-        return new FunctionCall(ctx.getChild(1).getText(), asList(ctx.getChild(0).accept(this), ctx.getChild(2).accept(this)));
+        return new FunctionCall(toSourceReference(ctx), ctx.getChild(1).getText(), asList(ctx.getChild(0).accept(this), ctx.getChild(2).accept(this)));
     }
 
     @Override
@@ -129,7 +134,7 @@ class ParserTreeAdapter extends TimELBaseVisitor<AbstractParseTree> {
         if(ctx.getChildCount() == 1)
             return passthroughFirst(ctx);
         assertChildCount(ctx, 3);
-        return new FunctionCall(ctx.getChild(1).getText(), asList(ctx.getChild(0).accept(this), ctx.getChild(2).accept(this)));
+        return new FunctionCall(toSourceReference(ctx), ctx.getChild(1).getText(), asList(ctx.getChild(0).accept(this), ctx.getChild(2).accept(this)));
     }
 
     @Override
@@ -142,7 +147,7 @@ class ParserTreeAdapter extends TimELBaseVisitor<AbstractParseTree> {
         if(ctx.getChildCount() == 1)
             return passthroughFirst(ctx);
         assertChildCount(ctx, 3);
-        return new FunctionCall(ctx.getChild(1).getText(), asList(ctx.getChild(0).accept(this), ctx.getChild(2).accept(this)));
+        return new FunctionCall(toSourceReference(ctx), ctx.getChild(1).getText(), asList(ctx.getChild(0).accept(this), ctx.getChild(2).accept(this)));
     }
 
     @Override
@@ -160,7 +165,7 @@ class ParserTreeAdapter extends TimELBaseVisitor<AbstractParseTree> {
         if(ctx.getChildCount() == 1)
             return passthroughFirst(ctx);
         assertChildCount(ctx, 3);
-        return new FunctionCall(ctx.getChild(1).getText(), asList(ctx.getChild(0).accept(this), ctx.getChild(2).accept(this)));
+        return new FunctionCall(toSourceReference(ctx), ctx.getChild(1).getText(), asList(ctx.getChild(0).accept(this), ctx.getChild(2).accept(this)));
     }
 
     @Override
@@ -173,7 +178,7 @@ class ParserTreeAdapter extends TimELBaseVisitor<AbstractParseTree> {
         if(ctx.getChildCount() == 1)
             return passthroughFirst(ctx);
         assertChildCount(ctx, 3);
-        return new FunctionCall(ctx.getChild(1).getText(), asList(ctx.getChild(0).accept(this), ctx.getChild(2).accept(this)));
+        return new FunctionCall(toSourceReference(ctx), ctx.getChild(1).getText(), asList(ctx.getChild(0).accept(this), ctx.getChild(2).accept(this)));
     }
 
     @Override
@@ -181,7 +186,7 @@ class ParserTreeAdapter extends TimELBaseVisitor<AbstractParseTree> {
         if(ctx.getChildCount() == 1)
             return passthroughFirst(ctx);
         assertChildCount(ctx, 3);
-        return new FunctionCall(ctx.getChild(1).getText(), asList(ctx.getChild(0).accept(this), ctx.getChild(2).accept(this)));
+        return new FunctionCall(toSourceReference(ctx), ctx.getChild(1).getText(), asList(ctx.getChild(0).accept(this), ctx.getChild(2).accept(this)));
     }
 
     @Override
@@ -189,7 +194,7 @@ class ParserTreeAdapter extends TimELBaseVisitor<AbstractParseTree> {
         if(ctx.getChildCount() == 1)
             return passthroughFirst(ctx);
         assertChildCount(ctx, 5);
-        return new FunctionCall("if", asList(ctx.getChild(0).accept(this), ctx.getChild(2).accept(this), ctx.getChild(4).accept(this)));
+        return new FunctionCall(toSourceReference(ctx), "if", asList(ctx.getChild(0).accept(this), ctx.getChild(2).accept(this), ctx.getChild(4).accept(this)));
     }
 
     @Override
@@ -207,7 +212,7 @@ class ParserTreeAdapter extends TimELBaseVisitor<AbstractParseTree> {
         assertChildCount(ctx, 1, 4);
         String type = ctx.getChild(0).getText();
         List<AbstractParseTree> arguments = ctx.getChildCount() == 1 ? emptyList() : parseList(ctx.getChild(2));
-        return new TypeSpecifier(type, arguments);
+        return new TypeSpecifier(toSourceReference(ctx), type, arguments);
     }
 
     @Override
@@ -220,7 +225,7 @@ class ParserTreeAdapter extends TimELBaseVisitor<AbstractParseTree> {
         assertChildCount(ctx, 1, 4);
         String type = ctx.getChild(0).getText();
         List<AbstractParseTree> arguments = ctx.getChildCount() == 1 ? emptyList() : parseList(ctx.getChild(2));
-        return new TypeSpecifier(type, arguments);
+        return new TypeSpecifier(toSourceReference(ctx), type, arguments);
     }
 
     @Override
@@ -239,7 +244,7 @@ class ParserTreeAdapter extends TimELBaseVisitor<AbstractParseTree> {
         LinkedList<AbstractParseTree> children = new LinkedList<>();
         for(int i = 0; i < ctx.getChildCount() && !isEof(ctx.getChild(i)); i += 2)
             children.add(ctx.getChild(i).accept(this));
-        return new CompilationUnit(children);
+        return new CompilationUnit(toSourceReference(ctx), children);
     }
 
     @Override
@@ -254,39 +259,34 @@ class ParserTreeAdapter extends TimELBaseVisitor<AbstractParseTree> {
 
     @Override
     public AbstractParseTree visitTerminal(TerminalNode terminalNode) {
-        switch(terminalNode.getSymbol().getType()) {
-            case TimELLexer.IntegerConstant:
-                return new IntegerConstant(Integer.parseInt(terminalNode.getText()));
+        try {
+            switch(terminalNode.getSymbol().getType()) {
+                case TimELLexer.IntegerConstant:
+                    return new IntegerConstant(toSourceReference(terminalNode.getSymbol()), decodeIntegerConstant(terminalNode.getText()));
 
-            case TimELLexer.FloatingConstant:
-                return parseFloatingConstant(terminalNode.getText());
+                case TimELLexer.FloatingConstant:
+                    return parseFloatingConstant(toSourceReference(terminalNode), terminalNode.getText());
 
-            case TimELLexer.Zero:
-                return new ZeroConstant();
+                case TimELLexer.Zero:
+                    return new ZeroConstant(toSourceReference(terminalNode));
 
-            case TimELLexer.StringLiteral:
-                return new StringConstant(decodeStringLiteral(terminalNode.getText()));
+                case TimELLexer.StringLiteral:
+                    return new StringConstant(toSourceReference(terminalNode), decodeStringLiteral(terminalNode.getText()));
 
-            case TimELLexer.Identifier:
-                return new Variable(terminalNode.getText());
+                case TimELLexer.Identifier:
+                    return new Variable(toSourceReference(terminalNode), terminalNode.getText());
 
-            default:
-                throw new AssertionError("Unknown terminal token " + terminalNode.getSymbol().getType());
+                default:
+                    throw new AssertionError("Unknown terminal token " + terminalNode.getSymbol().getType());
+            }
+        } catch(NumberFormatException e) {
+            throw new UncheckedParseException(new ParseException(toSourceReference(terminalNode), "Invalid number format", e));
         }
     }
 
     @Override
     public AbstractParseTree visitErrorNode(ErrorNode errorNode) {
         throw new IllegalStateException("Parse tree contains an error node: " + errorNode);
-    }
-
-    private AbstractParseTree parseFloatingConstant(String text) {
-        if(text.endsWith("f"))
-            return new FloatConstant(Float.parseFloat(text.substring(0, text.length() - 1)));
-        if(text.endsWith("d"))
-            return new DoubleConstant(Double.parseDouble(text.substring(0, text.length() - 1)));
-
-        return new DoubleConstant(Double.parseDouble(text));
     }
 
     private void assertChildCount(ParseTree ctx, int expectedMin, int expectedMax) {
@@ -335,7 +335,7 @@ class ParserTreeAdapter extends TimELBaseVisitor<AbstractParseTree> {
         if(ctx.getChildCount() == 1)
             return passthroughFirst(ctx);
         assertChildCount(ctx, 3);
-        return new FunctionCall(ctx.getChild(1).getText(), asList(ctx.getChild(0).accept(this), ctx.getChild(2).accept(this)));
+        return new FunctionCall(toSourceReference(ctx), ctx.getChild(1).getText(), asList(ctx.getChild(0).accept(this), ctx.getChild(2).accept(this)));
     }
 
     private String decodeStringLiteral(String text) {
@@ -345,5 +345,34 @@ class ParserTreeAdapter extends TimELBaseVisitor<AbstractParseTree> {
             throw new AssertionError("Unexpected string format");
 
         return stringDecoder.decode(text.substring(1, text.length() - 1));
+    }
+
+    private int decodeIntegerConstant(String text) {
+        if(text.startsWith("0x") || text.startsWith("0X"))
+            return Integer.parseInt(text.substring(2), 16);
+        if(text.startsWith("0"))
+            return Integer.parseInt(text, 8);
+        return Integer.parseInt(text);
+    }
+
+    private AbstractParseTree parseFloatingConstant(SourceReference sourceReference, String text) {
+        if(text.endsWith("f"))
+            return new FloatConstant(sourceReference, Float.parseFloat(text.substring(0, text.length() - 1)));
+        if(text.endsWith("d"))
+            return new DoubleConstant(sourceReference, Double.parseDouble(text.substring(0, text.length() - 1)));
+
+        return new DoubleConstant(sourceReference, Double.parseDouble(text));
+    }
+
+    private SourceReference toSourceReference(ParseTree node) {
+        val interval = node.getSourceInterval();
+        val start = tokenStream.get(interval.a);
+        val stop = tokenStream.get(interval.b);
+
+        return new SourceReference(start.getStartIndex(), Math.max(stop.getStartIndex(), stop.getStopIndex()) - start.getStartIndex(), start.getLine(), start.getCharPositionInLine());
+    }
+
+    private SourceReference toSourceReference(Token token) {
+        return new SourceReference(token.getStartIndex(), token.getText() == null ? 0 : token.getText().length(), token.getLine(), token.getCharPositionInLine());
     }
 }
