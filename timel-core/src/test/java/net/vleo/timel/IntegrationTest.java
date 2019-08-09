@@ -103,7 +103,7 @@ public class IntegrationTest {
 
         if(url.getProtocol().equals("file")) {
             Arrays.stream(Objects.requireNonNull(new File(URLDecoder.decode(url.getFile(), "UTF-8")).listFiles()))
-                    .filter(file -> file.isDirectory())
+                    .filter(File::isDirectory)
                     .filter(file -> limit.length == 0 || Arrays.stream(limit).anyMatch(l -> file.getName().toLowerCase().contains(l.toLowerCase())))
                     .map(File::toPath)
                     .forEach(directory -> {
@@ -169,8 +169,7 @@ public class IntegrationTest {
 
     private static Stream<Pair<Type<?>, Type<?>>> getNumericTypes(Properties properties) {
         String value = properties.containsKey("numericTypes") ?
-                properties.get("numericTypes").toString()
-                : "Integer,Float,Double";
+                properties.get("numericTypes").toString() : "Integer,Float,Double";
 
         return Arrays.stream(value.split(","))
                 .map(i -> {
