@@ -35,7 +35,7 @@
 
     <scm>
         <connection>scm:git:https://github.com/aleofreddi/timel</connection>
-        <developerConnection>scm:git:https://github.com/aleofreddi/timel</developerConnection>
+        <developerConnection>scm:git:git@github.com:aleofreddi/timel</developerConnection>
         <url>https://github.com/aleofreddi/timel</url>
         <tag>HEAD</tag>
     </scm>
