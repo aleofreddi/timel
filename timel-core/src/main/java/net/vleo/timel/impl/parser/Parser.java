@@ -41,8 +41,8 @@ public class Parser {
     private static class ThrowingErrorListener extends BaseErrorListener {
         @Override
         public void syntaxError(Recognizer<?, ?> recognizer, Object offendingSymbol, int line, int char_, String message, RecognitionException e) throws ParseCancellationException {
-            Token token = (Token) offendingSymbol;
-            throw new ParseCancellationException(new ParseException(new SourceReference(token.getStartIndex(), 0, token.getLine(), token.getCharPositionInLine()), message, e));
+            int index = offendingSymbol instanceof Token ? ((Token) offendingSymbol).getStartIndex() : recognizer.getInputStream().index();
+            throw new ParseCancellationException(new ParseException(new SourceReference(index, 0, line, char_), message, e));
         }
     }
 
