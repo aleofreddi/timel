@@ -266,6 +266,7 @@ Zero
 
 IntegerConstant
     : DecimalConstant
+    | OctalConstant
     | HexadecimalConstant
     ;
 
