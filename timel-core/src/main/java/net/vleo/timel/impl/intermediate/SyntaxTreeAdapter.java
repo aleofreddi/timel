@@ -33,6 +33,7 @@ import net.vleo.timel.impl.parser.ParserTreeVisitor;
 import net.vleo.timel.impl.parser.tree.CompilationUnit;
 import net.vleo.timel.impl.parser.tree.FunctionCall;
 import net.vleo.timel.impl.parser.tree.*;
+import net.vleo.timel.impl.sneaky.ScopedSneakyThrower;
 import net.vleo.timel.type.*;
 import net.vleo.timel.variable.VariableRegistry;
 
@@ -47,7 +48,7 @@ import java.util.stream.Collectors;
  * @author Andrea Leofreddi
  */
 @RequiredArgsConstructor
-public class SyntaxTreeAdapter implements ParserTreeVisitor<AbstractSyntaxTree> {
+public class SyntaxTreeAdapter implements ParserTreeVisitor<AbstractSyntaxTree, ParseException> {
     private final VariableRegistry variableRegistry;
     private final FunctionRegistry functionRegistry;
 
@@ -55,49 +56,49 @@ public class SyntaxTreeAdapter implements ParserTreeVisitor<AbstractSyntaxTree> 
     private final Map<String, VariableWriter> variableWriterMap = new HashMap<>();
 
     @Override
-    public AbstractSyntaxTree visit(Assignment assignment) {
-        String id = assignment.getVariable().getId();
-        AbstractSyntaxTree rhs = assignment.getValue().accept(this);
+    public AbstractSyntaxTree visit(Assignment assignment) throws ParseException {
+        return withParseExceptionReference(assignment.getSourceReference(), () -> {
+            String id = assignment.getVariable().getId();
+            AbstractSyntaxTree rhs = assignment.getValue().accept(this);
 
-        if(variableWriterMap.get(id) != null || newVariables.contains(id))
-            throw new RuntimeException(new ParseException(assignment.getSourceReference(), "Variable " + id + " already declared"));
+            if(variableWriterMap.get(id) != null || newVariables.contains(id))
+                throw new ParseException("Variable " + id + " already declared");
 
-        net.vleo.timel.variable.Variable<?> registryVariable = variableRegistry.getVariable(id);
+            net.vleo.timel.variable.Variable<?> registryVariable = variableRegistry.getVariable(id);
 
-        if(registryVariable == null) {
-            try {
-                registryVariable = variableRegistry.newVariable(id, rhs.getType());
-            } catch(Exception e) {
-                throw new RuntimeException(new ParseException(assignment.getSourceReference(), e));
+            if(registryVariable == null) {
+                try {
+                    registryVariable = variableRegistry.newVariable(id, rhs.getType());
+                } catch(IllegalArgumentException e) {
+                    throw new ParseException("Invalid variable", e);
+                }
+            } else {
+                // CHECK TYPE HERE! FIXME
             }
-        } else {
-            // CHECK TYPE HERE! FIXME
-        }
 
-        val variableWriter = new VariableWriter(
-                assignment,
-                rhs.getType(),
-                registryVariable,
-                rhs
-        );
+            val variableWriter = new VariableWriter(
+                    assignment,
+                    rhs.getType(),
+                    registryVariable,
+                    rhs
+            );
 
-        variableWriterMap.put(id, variableWriter);
-        return variableWriter;
+            variableWriterMap.put(id, variableWriter);
+            return variableWriter;
+        });
     }
 
     @Override
-    public AbstractSyntaxTree visit(FunctionCall functionCallNode) {
-        String function = functionCallNode.getFunction();
+    public AbstractSyntaxTree visit(FunctionCall functionCallNode) throws ParseException {
+        return withParseExceptionReference(functionCallNode.getSourceReference(), () -> {
+            String function = functionCallNode.getFunction();
 
-        List<AbstractSyntaxTree> children = functionCallNode.getChildren().stream()
-                .map(parserTree -> parserTree.accept(this))
-                .collect(Collectors.toList());
+            List<AbstractSyntaxTree> children = functionCallNode.getChildren().stream()
+                    .map(new ScopedSneakyThrower<ParseException>().unchecked(parserTree -> parserTree.accept(this)))
+                    .collect(Collectors.toList());
 
-        try {
             return functionRegistry.lookup(null, function, children);
-        } catch(ParseException e) {
-            throw new RuntimeException(e);
-        }
+        });
     }
 
     @Override
@@ -111,14 +112,16 @@ public class SyntaxTreeAdapter implements ParserTreeVisitor<AbstractSyntaxTree> 
     }
 
     @Override
-    public AbstractSyntaxTree visit(CompilationUnit compilationUnit) {
-        newVariables.clear();
-        return new net.vleo.timel.impl.intermediate.tree.CompilationUnit(
-                compilationUnit,
-                compilationUnit.getChildren().stream()
-                        .map(child -> child.accept(this))
-                        .collect(Collectors.toList())
-        );
+    public AbstractSyntaxTree visit(CompilationUnit compilationUnit) throws ParseException {
+        return withParseExceptionReference(compilationUnit.getSourceReference(), () -> {
+            newVariables.clear();
+            return new net.vleo.timel.impl.intermediate.tree.CompilationUnit(
+                    compilationUnit,
+                    compilationUnit.getChildren().stream()
+                            .map(new ScopedSneakyThrower<ParseException>().unchecked(child -> child.accept(this)))
+                            .collect(Collectors.toList())
+            );
+        });
     }
 
     @Override
@@ -127,24 +130,26 @@ public class SyntaxTreeAdapter implements ParserTreeVisitor<AbstractSyntaxTree> 
     }
 
     @Override
-    public AbstractSyntaxTree visit(ExplicitCast explicitCast) {
-        Type targetType = explicitCast.getType().accept(this).getType();
+    public AbstractSyntaxTree visit(ExplicitCast explicitCast) throws ParseException {
+        return withParseExceptionReference(explicitCast.getSourceReference(), () -> {
+            Type targetType = explicitCast.getType().accept(this).getType();
 
-        AbstractSyntaxTree value = explicitCast.getValue().accept(this);
-        Type sourceType = value.getType();
-        val conversionResult = functionRegistry.getTypeSystem().getConcretePath(false, sourceType, targetType);
+            AbstractSyntaxTree value = explicitCast.getValue().accept(this);
+            Type sourceType = value.getType();
+            val conversionResult = functionRegistry.getTypeSystem().getConcretePath(false, sourceType, targetType);
 
-        if(conversionResult == null || !targetType.equals(conversionResult.getResultType()))
-            throw new RuntimeException(new ParseException(explicitCast.getSourceReference(), "Cannot convert " + sourceType + " to " + targetType));
+            if(conversionResult == null || !targetType.equals(conversionResult.getResultType()))
+                throw new ParseException("Cannot convert " + sourceType + " to " + targetType);
 
-        List<Conversion<Object, Object>> conversions = conversionResult.getConversions();
+            List<Conversion<Object, Object>> conversions = conversionResult.getConversions();
 
-        return new Cast(
-                explicitCast,
-                value,
-                targetType,
-                conversions
-        );
+            return new Cast(
+                    explicitCast,
+                    value,
+                    targetType,
+                    conversions
+            );
+        });
     }
 
     @Override
@@ -153,44 +158,48 @@ public class SyntaxTreeAdapter implements ParserTreeVisitor<AbstractSyntaxTree> 
     }
 
     @Override
-    public AbstractSyntaxTree visit(TypeId typeId) {
+    public AbstractSyntaxTree visit(TypeId typeId) throws ParseException {
         Type type = typeId.getChildren().get(0).accept(this).getType();
 
         return new Constant(typeId, new StringType(), type.toString());
     }
 
     @Override
-    public AbstractSyntaxTree visit(TypeSpecifier typeSpecifier) {
-        Type<?> type = (Type<?>) new TypeSpecifierAdapter(functionRegistry.getTypeSystem()).visit(typeSpecifier);
+    public AbstractSyntaxTree visit(TypeSpecifier typeSpecifier) throws ParseException {
+        return withParseExceptionReference(typeSpecifier.getSourceReference(), () -> {
+            Type<?> type = (Type<?>) new TypeSpecifierAdapter(functionRegistry.getTypeSystem()).visit(typeSpecifier);
 
-        // We return an anonymous AbstractSyntaxTree to carry the type. It will be unwrapped by the parent call
-        return new AbstractSyntaxTree(typeSpecifier, type, Collections.emptyList()) {
-            @Override
-            public <T> T accept(SyntaxTreeVisitor<T> visitor) {
-                return null;
-            }
-        };
+            // We return an anonymous AbstractSyntaxTree to carry the type. It will be unwrapped by the parent call
+            return new AbstractSyntaxTree(typeSpecifier, type, Collections.emptyList()) {
+                @Override
+                public <T> T accept(SyntaxTreeVisitor<T> visitor) {
+                    return null;
+                }
+            };
+        });
     }
 
     @Override
-    public AbstractSyntaxTree visit(Variable variable) {
-        String id = variable.getId();
-        VariableWriter variableWriter = variableWriterMap.get(id);
+    public AbstractSyntaxTree visit(Variable variable) throws ParseException {
+        return withParseExceptionReference(variable.getSourceReference(), () -> {
+            String id = variable.getId();
+            VariableWriter variableWriter = variableWriterMap.get(id);
 
-        if(variableWriter == null || newVariables.contains(id)) {
-            val externalVariable = variableRegistry.getVariable(id);
+            if(variableWriter == null || newVariables.contains(id)) {
+                val externalVariable = variableRegistry.getVariable(id);
 
-            if(externalVariable == null)
-                throw new RuntimeException(new ParseException(variable.getSourceReference(), "Undefined variable " + id));
+                if(externalVariable == null)
+                    throw new ParseException("Undefined variable " + id);
 
-            return new VariableReader(
-                    variable,
-                    variableRegistry.getType(id),
-                    externalVariable
-            );
-        }
+                return new VariableReader(
+                        variable,
+                        variableRegistry.getType(id),
+                        externalVariable
+                );
+            }
 
-        return variableWriter;
+            return variableWriter;
+        });
     }
 
     @Override
@@ -200,5 +209,19 @@ public class SyntaxTreeAdapter implements ParserTreeVisitor<AbstractSyntaxTree> 
 
     private AbstractSyntaxTree constant(AbstractConstant constant, Type type) {
         return new Constant(constant, type);
+    }
+
+    @FunctionalInterface
+    private interface ThrowingSupplier<T, E extends Exception> {
+        T get() throws E;
+    }
+
+    private <R> R withParseExceptionReference(SourceReference sourceReference, ThrowingSupplier<R, ParseException> function) throws ParseException {
+        try {
+            return function.get();
+        } catch(ParseException e) {
+            e.setSourceReference(sourceReference);
+            throw e;
+        }
     }
 }

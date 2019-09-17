@@ -24,7 +24,6 @@ package net.vleo.timel.type;
 
 import lombok.val;
 import net.vleo.timel.ConfigurationException;
-import net.vleo.timel.ParseException;
 import net.vleo.timel.annotation.ConversionPrototype;
 import net.vleo.timel.conversion.Conversion;
 import net.vleo.timel.impl.poset.Poset;

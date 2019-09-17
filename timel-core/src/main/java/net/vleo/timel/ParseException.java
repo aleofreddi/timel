@@ -22,6 +22,8 @@ package net.vleo.timel;
  * #L%
  */
 
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import net.vleo.timel.impl.parser.tree.SourceReference;
 
@@ -30,9 +32,10 @@ import net.vleo.timel.impl.parser.tree.SourceReference;
  *
  * @author Andrea Leofreddi
  */
-@Getter
+@Data
+@EqualsAndHashCode(callSuper = true)
 public class ParseException extends Exception {
-    private final SourceReference sourceReference;
+    private SourceReference sourceReference;
 
     public ParseException(SourceReference sourceReference, String message, Throwable cause) {
         super(message, cause);
@@ -51,6 +54,11 @@ public class ParseException extends Exception {
 
     public ParseException(String message, Throwable cause) {
         super(message, cause);
+        this.sourceReference = null;
+    }
+
+    public ParseException(String message) {
+        super(message);
         this.sourceReference = null;
     }
 }

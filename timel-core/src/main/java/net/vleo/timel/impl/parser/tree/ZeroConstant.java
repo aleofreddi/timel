@@ -23,9 +23,9 @@ package net.vleo.timel.impl.parser.tree;
  */
 
 import lombok.Data;
+import lombok.EqualsAndHashCode;
+import net.vleo.timel.ParseException;
 import net.vleo.timel.impl.parser.ParserTreeVisitor;
-
-import static java.util.Collections.*;
 
 /**
  * The zero constant.
@@ -33,13 +33,14 @@ import static java.util.Collections.*;
  * @author Andrea Leofreddi
  */
 @Data
+@EqualsAndHashCode(callSuper = true)
 public class ZeroConstant extends AbstractConstant {
     public ZeroConstant(SourceReference sourceReference) {
         super(sourceReference, 0);
     }
 
     @Override
-    public <T> T accept(ParserTreeVisitor<T> visitor) {
+    public <T> T accept(ParserTreeVisitor<T, ParseException> visitor) throws ParseException {
         return visitor.visit(this);
     }
 }
