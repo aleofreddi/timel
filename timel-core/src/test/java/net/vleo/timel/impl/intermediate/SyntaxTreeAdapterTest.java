@@ -226,9 +226,9 @@ class SyntaxTreeAdapterTest {
     }
 
     @Test
-    void shouldThrowParseExceptionWhenInvalidFunction() throws ParseException {
+    void shouldThrowParseExceptionWhenInvalidFunction() {
         when(functionRegistry.lookup(Mockito.isNull(), Mockito.anyString(), Mockito.anyList()))
-                .thenThrow(new ParseException(""));
+                .thenThrow(new IllegalArgumentException(""));
 
         SyntaxTreeAdapter adapter = new SyntaxTreeAdapter(null, functionRegistry);
 

@@ -97,7 +97,11 @@ public class SyntaxTreeAdapter implements ParserTreeVisitor<AbstractSyntaxTree, 
                     .map(new ScopedSneakyThrower<ParseException>().unchecked(parserTree -> parserTree.accept(this)))
                     .collect(Collectors.toList());
 
-            return functionRegistry.lookup(null, function, children);
+            try {
+                return functionRegistry.lookup(null, function, children);
+            } catch(IllegalArgumentException e) {
+                throw new ParseException("Failed to lookup function " + function, e);
+            }
         });
     }
 
