@@ -24,6 +24,7 @@ package net.vleo.timel.impl.parser;
 
 import lombok.val;
 import lombok.var;
+import net.vleo.timel.ParseException;
 import net.vleo.timel.impl.parser.tree.AbstractParseTree;
 import net.vleo.timel.impl.parser.tree.SourceReference;
 import org.junit.jupiter.api.Test;
@@ -49,7 +50,7 @@ class ParserTreeDumperTest {
         }
 
         @Override
-        public <T> T accept(ParserTreeVisitor<T> visitor) {
+        public <T> T accept(ParserTreeVisitor<T, ParseException> visitor) {
             return null;
         }
     }

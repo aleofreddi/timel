@@ -23,6 +23,8 @@ package net.vleo.timel.impl.parser.tree;
  */
 
 import lombok.Data;
+import lombok.EqualsAndHashCode;
+import net.vleo.timel.ParseException;
 import net.vleo.timel.impl.parser.ParserTreeVisitor;
 
 /**
@@ -31,13 +33,14 @@ import net.vleo.timel.impl.parser.ParserTreeVisitor;
  * @author Andrea Leofreddi
  */
 @Data
+@EqualsAndHashCode(callSuper = true)
 public class IntegerConstant extends AbstractConstant {
     public IntegerConstant(SourceReference sourceReference, int value) {
         super(sourceReference, value);
     }
 
     @Override
-    public <T> T accept(ParserTreeVisitor<T> visitor) {
+    public <T> T accept(ParserTreeVisitor<T, ParseException> visitor) throws ParseException {
         return visitor.visit(this);
     }
 }

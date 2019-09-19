@@ -58,8 +58,6 @@ public class Parser {
             parser.addErrorListener(THROWING_ERROR_LISTENER);
             ParseTree tree = parser.compilationUnit();
             return tree.accept(new ParserTreeAdapter(tokens, new StringDecoder()));
-        } catch(UncheckedParseException e) {
-            throw (ParseException) e.getCause();
         } catch(ParseCancellationException e) {
             val nested = e.getCause();
             if(nested instanceof ParseException)

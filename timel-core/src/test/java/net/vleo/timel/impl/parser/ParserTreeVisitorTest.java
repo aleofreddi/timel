@@ -23,8 +23,11 @@ package net.vleo.timel.impl.parser;
  */
 
 import lombok.val;
+import net.vleo.timel.ParseException;
+import net.vleo.timel.impl.parser.tree.ZeroConstant;
 import org.junit.jupiter.api.Test;
 
+import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Arrays;
@@ -41,7 +44,7 @@ import static org.junit.jupiter.api.Assertions.fail;
 class ParserTreeVisitorTest {
     @Test
     void shouldReturnNullForEachVisitMethod() {
-        val visitor = new ParserTreeVisitor<Object>() {
+        val visitor = new ParserTreeVisitor<Object, ParseException>() {
         };
 
         assertThat(
@@ -54,7 +57,23 @@ class ParserTreeVisitorTest {
         );
     }
 
-    private static Object invokeVisit(Method method, ParserTreeVisitor<Object> visitor) {
+    @Test
+    void shouldSupportUncheckedExceptions() {
+        val visitor = new ParserTreeVisitor<Object, RuntimeException>() {
+        };
+
+        visitor.visit(new ZeroConstant(null));
+    }
+
+    @Test
+    void shouldSupportCheckedExceptions() throws IOException {
+        val visitor = new ParserTreeVisitor<Object, IOException>() {
+        };
+
+        visitor.visit(new ZeroConstant(null));
+    }
+
+    private static Object invokeVisit(Method method, ParserTreeVisitor<Object, ParseException> visitor) {
         try {
             return method.invoke(visitor, new Object[] {null});
         } catch(IllegalAccessException | InvocationTargetException e) {

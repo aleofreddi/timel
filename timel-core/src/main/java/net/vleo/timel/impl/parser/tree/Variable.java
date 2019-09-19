@@ -22,7 +22,9 @@ package net.vleo.timel.impl.parser.tree;
  * #L%
  */
 
+import lombok.EqualsAndHashCode;
 import lombok.Value;
+import net.vleo.timel.ParseException;
 import net.vleo.timel.impl.parser.ParserTreeVisitor;
 
 import static java.util.Collections.*;
@@ -33,6 +35,7 @@ import static java.util.Collections.*;
  * @author Andrea Leofreddi
  */
 @Value
+@EqualsAndHashCode(callSuper = true)
 public class Variable extends AbstractParseTree {
     private final String id;
 
@@ -42,7 +45,7 @@ public class Variable extends AbstractParseTree {
     }
 
     @Override
-    public <T> T accept(ParserTreeVisitor<T> visitor) {
+    public <T> T accept(ParserTreeVisitor<T, ParseException> visitor) throws ParseException {
         return visitor.visit(this);
     }
 }

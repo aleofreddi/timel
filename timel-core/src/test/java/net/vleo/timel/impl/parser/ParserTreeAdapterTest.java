@@ -40,12 +40,10 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import static org.hamcrest.CoreMatchers.instanceOf;
-import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.*;
 import static org.hamcrest.MatcherAssert.*;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.anyInt;
-import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -93,9 +91,9 @@ class ParserTreeAdapterTest {
         when(terminalNode.getSourceInterval()).thenReturn(SOURCE_INTERVAL);
         when(tokenStream.get(anyInt())).thenReturn(SOURCE_TOKEN);
 
-        val actual = assertThrows(UncheckedParseException.class, () -> parserTreeAdapter.visitTerminal(terminalNode));
+        val actual = assertThrows(ParseException.class, () -> parserTreeAdapter.visitTerminal(terminalNode));
 
-        assertThat(actual.getCause(), instanceOf(ParseException.class));
+        assertThat(actual.getCause(), instanceOf(NumberFormatException.class));
     }
 
     @ParameterizedTest
@@ -126,9 +124,9 @@ class ParserTreeAdapterTest {
         when(terminalNode.getSourceInterval()).thenReturn(SOURCE_INTERVAL);
         when(tokenStream.get(anyInt())).thenReturn(SOURCE_TOKEN);
 
-        val actual = assertThrows(UncheckedParseException.class, () -> parserTreeAdapter.visitTerminal(terminalNode));
+        val actual = assertThrows(ParseException.class, () -> parserTreeAdapter.visitTerminal(terminalNode));
 
-        assertThat(actual.getCause(), instanceOf(ParseException.class));
+        assertThat(actual.getCause(), instanceOf(NumberFormatException.class));
     }
 
     @ParameterizedTest
@@ -159,9 +157,9 @@ class ParserTreeAdapterTest {
         when(terminalNode.getSourceInterval()).thenReturn(SOURCE_INTERVAL);
         when(tokenStream.get(anyInt())).thenReturn(SOURCE_TOKEN);
 
-        val actual = assertThrows(UncheckedParseException.class, () -> parserTreeAdapter.visitTerminal(terminalNode));
+        val actual = assertThrows(ParseException.class, () -> parserTreeAdapter.visitTerminal(terminalNode));
 
-        assertThat(actual.getCause(), instanceOf(ParseException.class));
+        assertThat(actual.getCause(), instanceOf(NumberFormatException.class));
     }
 
     @ParameterizedTest

@@ -24,7 +24,6 @@ package net.vleo.timel.variable;
 
 import lombok.Getter;
 import lombok.Setter;
-import net.vleo.timel.ParseException;
 import net.vleo.timel.tuple.Pair;
 import net.vleo.timel.type.Type;
 

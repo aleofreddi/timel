@@ -26,12 +26,12 @@ package net.vleo.timel.impl.intermediate;
 import lombok.RequiredArgsConstructor;
 import net.vleo.timel.ParseException;
 import net.vleo.timel.impl.parser.ParserTreeVisitor;
-import net.vleo.timel.impl.parser.tree.CompilationUnit;
-import net.vleo.timel.impl.parser.tree.FunctionCall;
-import net.vleo.timel.impl.parser.tree.*;
-import net.vleo.timel.type.*;
+import net.vleo.timel.impl.parser.tree.TypeSpecifier;
+import net.vleo.timel.impl.sneaky.ScopedSneakyThrower;
+import net.vleo.timel.type.Type;
+import net.vleo.timel.type.TypeSystem;
 
-import java.util.*;
+import java.util.List;
 import java.util.stream.Collectors;
 
 /**
@@ -40,21 +40,21 @@ import java.util.stream.Collectors;
  * @author Andrea Leofreddi
  */
 @RequiredArgsConstructor
-class TypeSpecifierAdapter implements ParserTreeVisitor<Object> {
+class TypeSpecifierAdapter implements ParserTreeVisitor<Object, ParseException> {
     private final TypeSystem typeSystem;
 
     @Override
-    public Object visit(TypeSpecifier typeSpecifier) {
+    public Object visit(TypeSpecifier typeSpecifier) throws ParseException {
         String typeId = typeSpecifier.getType();
 
         List<Object> arguments = typeSpecifier.getTemplateArguments().stream()
-                .map(argument -> argument.accept(this))
+                .map(new ScopedSneakyThrower<ParseException>().unchecked(argument -> argument.accept(this)))
                 .collect(Collectors.toList());
 
         try {
             return typeSystem.parse(typeId, arguments);
-        } catch(Exception e) {
-            throw new RuntimeException(new ParseException(typeSpecifier.getSourceReference(), "Failed to parse type " + typeId, e));
+        } catch(IllegalArgumentException e) {
+            throw new ParseException(typeSpecifier.getSourceReference(), "Failed to parse type " + typeId, e);
         }
     }
 }

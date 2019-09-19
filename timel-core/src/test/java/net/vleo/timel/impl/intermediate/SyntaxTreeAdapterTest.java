@@ -28,6 +28,7 @@ import net.vleo.timel.conversion.Conversion;
 import net.vleo.timel.function.FunctionRegistry;
 import net.vleo.timel.impl.intermediate.tree.Cast;
 import net.vleo.timel.impl.intermediate.tree.Constant;
+import net.vleo.timel.impl.intermediate.tree.VariableReader;
 import net.vleo.timel.impl.intermediate.tree.VariableWriter;
 import net.vleo.timel.impl.parser.tree.*;
 import net.vleo.timel.type.ConversionResult;
@@ -49,8 +50,7 @@ import java.util.List;
 import static org.hamcrest.MatcherAssert.*;
 import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.anyList;
-import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -89,19 +89,98 @@ class SyntaxTreeAdapterTest {
     }
 
     @Test
-    void shouldThrowWrappedParseExceptionWhenDoubleDeclaration() {
+    void shouldResolveVariableToVariableWriterWhenAssigned() throws ParseException {
+        SyntaxTreeAdapter adapter = new SyntaxTreeAdapter(variableRegistry, null);
+
+        val parseTree = new CompilationUnit(SOURCE_REFERENCE, Arrays.asList(
+                new Assignment(SOURCE_REFERENCE, new Variable(SOURCE_REFERENCE, "a"), new IntegerConstant(SOURCE_REFERENCE, 1)),
+                new Variable(SOURCE_REFERENCE, "a")
+        ));
+
+        val actual = adapter.visit(parseTree);
+
+        assertThat(actual, instanceOf(net.vleo.timel.impl.intermediate.tree.CompilationUnit.class));
+        assertThat(actual.getChildren().size(), is(2));
+
+        val actualVariable = actual.getChildren().get(1);
+        assertThat(actualVariable, instanceOf(VariableWriter.class));
+    }
+
+    @Test
+    void shouldResolveVariableToVariableReaderWhenProvided() throws ParseException {
         when(variableRegistry.getVariable("a"))
                 .thenReturn(variable);
+        SyntaxTreeAdapter adapter = new SyntaxTreeAdapter(variableRegistry, null);
+
+        val parseTree = new CompilationUnit(SOURCE_REFERENCE, Collections.singletonList(
+                new Variable(SOURCE_REFERENCE, "a")
+        ));
+
+        val actual = adapter.visit(parseTree);
+
+        assertThat(actual, instanceOf(net.vleo.timel.impl.intermediate.tree.CompilationUnit.class));
+        assertThat(actual.getChildren().size(), is(1));
+
+        val actualVariable = actual.getChildren().get(0);
+        assertThat(actualVariable, instanceOf(VariableReader.class));
+    }
+
+    @Test
+    void shouldThrowParseExceptionWhenDoubleDeclaration() {
         SyntaxTreeAdapter adapter = new SyntaxTreeAdapter(variableRegistry, null);
 
         val parseTree = new CompilationUnit(SOURCE_REFERENCE, Arrays.asList(
                 new Assignment(SOURCE_REFERENCE, new Variable(SOURCE_REFERENCE, "a"), new IntegerConstant(SOURCE_REFERENCE, 1)),
                 new Assignment(SOURCE_REFERENCE, new Variable(SOURCE_REFERENCE, "a"), new IntegerConstant(SOURCE_REFERENCE, 1))
         ));
+        ParseException actual = assertThrows(ParseException.class, () -> adapter.visit(parseTree));
 
-        RuntimeException actual = assertThrows(RuntimeException.class, () -> adapter.visit(parseTree));
+        assertThat(actual.getMessage(), containsString("already declared"));
+        assertThat(actual.getSourceReference(), sameInstance(SOURCE_REFERENCE));
+    }
 
-        assertThat(actual.getCause(), instanceOf(ParseException.class));
+    @Test
+    void shouldThrowParseExceptionWhenInvalidVariable() {
+        when(variableRegistry.newVariable(Mockito.eq("a"), Mockito.any(Type.class)))
+                .thenThrow(new IllegalArgumentException());
+        SyntaxTreeAdapter adapter = new SyntaxTreeAdapter(variableRegistry, null);
+
+        val parseTree = new CompilationUnit(SOURCE_REFERENCE, Collections.singletonList(
+                new Assignment(SOURCE_REFERENCE, new Variable(SOURCE_REFERENCE, "a"), new IntegerConstant(SOURCE_REFERENCE, 1))
+        ));
+        ParseException actual = assertThrows(ParseException.class, () -> adapter.visit(parseTree));
+
+        assertThat(actual.getMessage(), containsString("Invalid variable"));
+        assertThat(actual.getSourceReference(), sameInstance(SOURCE_REFERENCE));
+    }
+
+    @Test
+    void shouldThrowParseExceptionWhenUndefinedVariable() {
+        SyntaxTreeAdapter adapter = new SyntaxTreeAdapter(variableRegistry, null);
+
+        val parseTree = new CompilationUnit(SOURCE_REFERENCE, Collections.singletonList(
+                new Variable(SOURCE_REFERENCE, "a")
+        ));
+        ParseException actual = assertThrows(ParseException.class, () -> adapter.visit(parseTree));
+
+        assertThat(actual.getMessage(), containsString("Undefined variable"));
+        assertThat(actual.getSourceReference(), sameInstance(SOURCE_REFERENCE));
+    }
+
+    @Test
+    void shouldThrowParseExceptionWhenInvalidType() {
+        when(functionRegistry.getTypeSystem())
+                .thenReturn(typeSystem);
+        IllegalArgumentException expected = new IllegalArgumentException("");
+        when(typeSystem.parse(anyString(), anyList()))
+                .thenThrow(expected);
+        SyntaxTreeAdapter adapter = new SyntaxTreeAdapter(variableRegistry, functionRegistry);
+
+        val parseTree = new TypeSpecifier(SOURCE_REFERENCE, "Integer", Collections.singletonList(new IntegerConstant(null, 1)));
+        ParseException actual = assertThrows(ParseException.class, () -> adapter.visit(parseTree));
+
+        assertThat(actual.getCause(), sameInstance(expected));
+        assertThat(actual.getSourceReference(), sameInstance(SOURCE_REFERENCE));
     }
 
     @Test
@@ -129,7 +208,7 @@ class SyntaxTreeAdapterTest {
     }
 
     @Test
-    void shouldThrowWrapperParseExceptionWhenInvalidExplicitCast() throws ParseException {
+    void shouldThrowParseExceptionWhenInvalidExplicitCast() {
         when(functionRegistry.getTypeSystem())
                 .thenReturn(typeSystem);
         when(typeSystem.parse(eq("Integer"), anyList()))
@@ -140,8 +219,22 @@ class SyntaxTreeAdapterTest {
         SyntaxTreeAdapter adapter = new SyntaxTreeAdapter(null, functionRegistry);
 
         val parseTree = new ExplicitCast(SOURCE_REFERENCE, new TypeSpecifier(SOURCE_REFERENCE, "Integer", Collections.emptyList()), new IntegerConstant(SOURCE_REFERENCE, 1));
-        RuntimeException actual = assertThrows(RuntimeException.class, () -> adapter.visit(parseTree));
+        ParseException actual = assertThrows(ParseException.class, () -> adapter.visit(parseTree));
 
-        assertThat(actual.getCause(), instanceOf(ParseException.class));
+        assertThat(actual.getMessage(), containsString("Cannot convert"));
+        assertThat(actual.getSourceReference(), sameInstance(SOURCE_REFERENCE));
+    }
+
+    @Test
+    void shouldThrowParseExceptionWhenInvalidFunction() throws ParseException {
+        when(functionRegistry.lookup(Mockito.isNull(), Mockito.anyString(), Mockito.anyList()))
+                .thenThrow(new ParseException(""));
+
+        SyntaxTreeAdapter adapter = new SyntaxTreeAdapter(null, functionRegistry);
+
+        val parseTree = new FunctionCall(SOURCE_REFERENCE, "unknown", Collections.emptyList());
+        ParseException actual = assertThrows(ParseException.class, () -> adapter.visit(parseTree));
+
+        assertThat(actual.getSourceReference(), sameInstance(SOURCE_REFERENCE));
     }
 }

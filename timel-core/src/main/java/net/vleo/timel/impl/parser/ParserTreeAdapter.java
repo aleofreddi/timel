@@ -24,6 +24,7 @@ package net.vleo.timel.impl.parser;
  */
 
 import lombok.RequiredArgsConstructor;
+import lombok.SneakyThrows;
 import lombok.val;
 import net.vleo.timel.ParseException;
 import net.vleo.timel.grammar.TimELBaseVisitor;
@@ -46,6 +47,8 @@ import static java.util.stream.Collectors.toList;
 
 /**
  * A ANTLR visitor that will adapt an ANTLR's tree into a {@link AbstractParseTree}.
+ * <p>
+ * Since {@link TimELBaseVisitor} visit methods won't declare any checked exception, we sneakily throw {@link ParseException} where needed.
  *
  * @author Andrea Leofreddi
  */
@@ -257,6 +260,7 @@ class ParserTreeAdapter extends TimELBaseVisitor<AbstractParseTree> {
         return passthroughFirst(ctx);
     }
 
+    @SneakyThrows(ParseException.class)
     @Override
     public AbstractParseTree visitTerminal(TerminalNode terminalNode) {
         try {
@@ -280,7 +284,7 @@ class ParserTreeAdapter extends TimELBaseVisitor<AbstractParseTree> {
                     throw new AssertionError("Unknown terminal token " + terminalNode.getSymbol().getType());
             }
         } catch(NumberFormatException e) {
-            throw new UncheckedParseException(new ParseException(toSourceReference(terminalNode), "Invalid number format", e));
+            throw new ParseException(toSourceReference(terminalNode), "Invalid number format", e);
         }
     }
 
@@ -367,8 +371,9 @@ class ParserTreeAdapter extends TimELBaseVisitor<AbstractParseTree> {
     private SourceReference toSourceReference(ParseTree node) {
         val interval = node.getSourceInterval();
         val start = tokenStream.get(interval.a);
+        if(interval.a == interval.b)
+            return toSourceReference(start);
         val stop = tokenStream.get(interval.b);
-
         return new SourceReference(start.getStartIndex(), Math.max(stop.getStartIndex(), stop.getStopIndex()) - start.getStartIndex(), start.getLine(), start.getCharPositionInLine());
     }
 

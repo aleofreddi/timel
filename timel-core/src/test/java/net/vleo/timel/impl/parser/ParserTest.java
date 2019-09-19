@@ -24,12 +24,7 @@ package net.vleo.timel.impl.parser;
 
 import lombok.val;
 import net.vleo.timel.ParseException;
-import net.vleo.timel.grammar.TimELLexer;
-import net.vleo.timel.grammar.TimELParser;
 import net.vleo.timel.impl.parser.tree.*;
-import org.antlr.v4.runtime.*;
-import org.antlr.v4.runtime.misc.ParseCancellationException;
-import org.antlr.v4.runtime.tree.ParseTree;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.ValueSource;
@@ -48,8 +43,6 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
  * @author Andrea Leofreddi
  */
 class ParserTest {
-    private final ScriptEngine engine = new ScriptEngineManager().getEngineByName("nashorn");
-
     @ParameterizedTest
     @CsvSource({
             "1+,no viable alternative,2,1,2",
@@ -71,15 +64,17 @@ class ParserTest {
             "3.0,0,3,1,0,net.vleo.timel.impl.parser.tree.DoubleConstant,3",
             "\"test string\",0,13,1,0,net.vleo.timel.impl.parser.tree.StringConstant,\"test string\""
     })
-    void shouldParseConstants(String source, int expectedOffset, int expectedLine, int expectedColumn, int expectedLength, String expectedType, String expectedValue) throws ParseException, ScriptException {
+    void shouldParseConstants(String source, int expectedOffset, int expectedLength, int expectedLine, int expectedColumn, String expectedType, String expectedValue) throws ParseException, ScriptException {
+        final ScriptEngine engine = new ScriptEngineManager().getEngineByName("nashorn");
         AbstractParseTree actual = new Parser().parse(source);
 
         val bindings = new SimpleBindings();
-        bindings.put("sourceReference", new SourceReference(expectedOffset, expectedLine, expectedColumn, expectedLength));
+        val expectedSourceReference = new SourceReference(expectedOffset, expectedLength, expectedLine, expectedColumn);
+        bindings.put("sourceReference", expectedSourceReference);
 
         assertThat(actual, is(
                 new CompilationUnit(
-                        new SourceReference(expectedOffset, expectedLine, expectedColumn, expectedLength),
+                        expectedSourceReference,
                         singletonList(
                                 (AbstractParseTree) engine.eval("new (Java.type('" + expectedType + "'))(sourceReference, " + expectedValue + ")", bindings)
                         )

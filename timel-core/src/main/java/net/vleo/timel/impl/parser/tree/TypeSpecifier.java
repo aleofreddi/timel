@@ -24,6 +24,7 @@ package net.vleo.timel.impl.parser.tree;
 
 import lombok.EqualsAndHashCode;
 import lombok.Value;
+import net.vleo.timel.ParseException;
 import net.vleo.timel.impl.parser.ParserTreeVisitor;
 
 import java.util.List;
@@ -48,7 +49,7 @@ public class TypeSpecifier extends AbstractParseTree {
     }
 
     @Override
-    public <T> T accept(ParserTreeVisitor<T> visitor) {
+    public <T> T accept(ParserTreeVisitor<T, ParseException> visitor) throws ParseException {
         return visitor.visit(this);
     }
 }

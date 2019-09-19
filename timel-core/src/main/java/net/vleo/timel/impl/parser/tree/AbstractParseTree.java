@@ -23,6 +23,7 @@ package net.vleo.timel.impl.parser.tree;
  */
 
 import lombok.Data;
+import net.vleo.timel.ParseException;
 import net.vleo.timel.impl.parser.ParserTreeVisitor;
 
 import java.util.List;
@@ -37,7 +38,7 @@ public abstract class AbstractParseTree {
     private final SourceReference sourceReference;
     private final List<AbstractParseTree> children;
 
-    public abstract <T> T accept(ParserTreeVisitor<T> visitor);
+    public abstract <T> T accept(ParserTreeVisitor<T, ParseException> visitor) throws ParseException;
 
     @Override
     public String toString() {

@@ -78,7 +78,7 @@ class FunctionRegistryTest {
     private static final SourceReference SOURCE_REFERENCE = new SourceReference(0, 1, 1, 0);
     private static final AbstractParseTree SOURCE_NODE = new AbstractParseTree(SOURCE_REFERENCE, emptyList()) {
         @Override
-        public <T> T accept(ParserTreeVisitor<T> visitor) {
+        public <T> T accept(ParserTreeVisitor<T, ParseException> visitor) {
             return null;
         }
     };
