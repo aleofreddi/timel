@@ -94,6 +94,7 @@ public class FunctionRegistry {
      * Add a function to the registry.
      *
      * @param function Function to register
+     * @throws IllegalArgumentException If the function is not valid
      */
     public void add(Function<?> function) {
         val functionClass = function.getClass();
@@ -106,8 +107,12 @@ public class FunctionRegistry {
         if(functionPrototype == null && functionPrototypes == null)
             throw new IllegalArgumentException("Class " + functionClass + " should be annotated with " + FunctionPrototype.class.getName() + " or " + FunctionPrototypes.class.getName());
 
-        // Register all the prototypes
-        (functionPrototype == null ? Arrays.asList(functionPrototypes.value()) : singletonList(functionPrototype)).stream()
+        List<FunctionPrototype> prototypes = functionPrototypes == null ? singletonList(functionPrototype) : Arrays.asList(functionPrototypes.value());
+
+        prototypes.stream()
+                .forEach(this::validate);
+
+        prototypes.stream()
                 .map(entry -> new Pair<FunctionPrototype, Function<?>>(entry, function))
                 .forEach(entry ->
                         functions.computeIfAbsent(entry.getFirst().name(), key -> new HashSet<>())
@@ -131,9 +136,9 @@ public class FunctionRegistry {
      * @param function  Function to lookup
      * @param arguments Call arguments
      * @return A {@link FunctionCall} applying the given function to the passed arguments (casting them when needed).
-     * @throws ParseException When the lookup failed
+     * @throws IllegalArgumentException When the lookup failed
      */
-    public FunctionCall lookup(AbstractParseTree reference, String function, List<AbstractSyntaxTree> arguments) throws ParseException {
+    public FunctionCall lookup(AbstractParseTree reference, String function, List<AbstractSyntaxTree> arguments) {
         List<FunctionCallMatch> alternatives = functions.getOrDefault(function, emptySet())
                 .stream()
                 .map(registryFunction -> functionMatches(registryFunction.getFirst(), registryFunction.getSecond(), arguments))
@@ -142,10 +147,10 @@ public class FunctionRegistry {
                 .collect(toList());
 
         if(alternatives.isEmpty())
-            throw new ParseException(reference.getSourceReference(), "Cannot resolve function " + getSignature(function, arguments));
+            throw new IllegalArgumentException("Cannot resolve function " + getSignature(function, arguments));
 
         if(alternatives.size() > 1 && alternatives.get(0).getWeight() == alternatives.get(1).getWeight())
-            throw new ParseException(reference.getSourceReference(), "Ambiguous function call, matches: " +
+            throw new IllegalArgumentException("Ambiguous function call, matches: " +
                     alternatives.stream()
                             .map(alternative -> getSignature(alternative.getFunctionPrototype()))
                             .collect(Collectors.joining("; ")));
@@ -174,15 +179,10 @@ public class FunctionRegistry {
                 ));
 
         // Collect the parameters and varargs
-        boolean varArgs = false;
         for(val metaParameter : metaParameters) {
-            if(varArgs && !metaParameter.varArgs())
-                throw new IllegalStateException("FunctionCall " + functionClass + ": varArgs are only allowed at the tail of the parameters list");
-
-            if(metaParameter.varArgs()) {
-                varArgs = true;
+            if(metaParameter.varArgs())
                 declaredVarArgs.add(metaParameter);
-            } else
+            else
                 declaredParameters.add(metaParameter);
         }
 
@@ -331,6 +331,18 @@ public class FunctionRegistry {
                         .collect(toList()),
                 weight
         );
+    }
+
+    private void validate(FunctionPrototype prototype) {
+        // Validate varargs
+        boolean varArgs = false;
+        for(val metaParameter : prototype.parameters()) {
+            if(varArgs && !metaParameter.varArgs())
+                throw new IllegalArgumentException("Function " + prototype.name() + ": varArgs are only allowed at the tail of the parameters list");
+
+            if(metaParameter.varArgs())
+                varArgs = true;
+        }
     }
 
     private String getSignature(String function, List<AbstractSyntaxTree> arguments) {

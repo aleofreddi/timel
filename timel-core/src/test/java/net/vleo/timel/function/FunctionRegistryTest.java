@@ -94,44 +94,67 @@ class FunctionRegistryTest {
     }
 
     @Test
-    void shouldThrowParseExceptionWhenUnknownName() {
+    void shouldThrowIllegalArgumentExceptionWhenNoPrototype() {
+        IllegalArgumentException actual = assertThrows(IllegalArgumentException.class, () -> functionRegistry.add(new TestFunctions.Fun_Invalid_NoPrototypeAnnotations()));
+
+        assertThat(actual.getMessage(), containsString("should be annotated"));
+    }
+
+    @Test
+    void shouldThrowIllegalArgumentExceptionWhenBothPrototypeAnnotationsAreUsed() {
+        IllegalArgumentException actual = assertThrows(IllegalArgumentException.class, () -> functionRegistry.add(new TestFunctions.Fun_Invalid_MultiplePrototypeAnnotations()));
+
+        assertThat(actual.getMessage(), containsString("annotated with both"));
+    }
+
+    @Test
+    void shouldThrowIllegalArgumentExceptionWhenInvalidPrototypeVarArgs() {
+        IllegalArgumentException actual = assertThrows(IllegalArgumentException.class, () -> functionRegistry.add(new TestFunctions.Fun_Invalid_NonTailVarArgs()));
+
+        assertThat(actual.getMessage(), containsString("varArgs are only allowed"));
+    }
+
+    @Test
+    void shouldThrowIllegalArgumentExceptionWhenUnknownName() {
         functionRegistry.add(new TestFunctions.Fun_A2A());
 
-        ParseException actual = assertThrows(ParseException.class, () -> functionRegistry.lookup(SOURCE_NODE, "???", mockArguments()));
+        IllegalArgumentException actual = assertThrows(IllegalArgumentException.class, () -> functionRegistry.lookup(SOURCE_NODE, "???", mockArguments()));
 
         assertCannotResolve(actual);
     }
 
     @Test
-    void shouldThrowParseExceptionWhenTooFewArguments() {
+    void shouldThrowIllegalArgumentExceptionWhenTooFewArguments() {
         functionRegistry.add(new TestFunctions.Fun_A2A());
 
-        ParseException actual = assertThrows(ParseException.class, () -> functionRegistry.lookup(SOURCE_NODE, "a->a", mockArguments()));
+        IllegalArgumentException actual = assertThrows(IllegalArgumentException.class, () -> functionRegistry.lookup(SOURCE_NODE, "a->a", mockArguments()));
 
         assertCannotResolve(actual);
     }
 
     @Test
-    void shouldThrowParseExceptionWhenTooManyArguments() {
+    void shouldThrowIllegalArgumentExceptionWhenTooManyArguments() {
         functionRegistry.add(new TestFunctions.Fun_A2A());
 
-        ParseException actual = assertThrows(ParseException.class, () -> functionRegistry.lookup(SOURCE_NODE, "a->a", mockArguments(new TestTypes.Polygon(), new TestTypes.Polygon())));
+        IllegalArgumentException actual = assertThrows(IllegalArgumentException.class, () -> functionRegistry.lookup(SOURCE_NODE, "a->a", mockArguments(new TestTypes.Polygon(), new TestTypes.Polygon())));
 
         assertCannotResolve(actual);
     }
 
     @Test
-    void shouldThrowParseExceptionWhenMultipleMatches() {
+    void shouldThrowIllegalArgumentExceptionWhenMultipleMatches() {
+        functionRegistry.add(new TestFunctions.Fun_A2A());
         functionRegistry.add(new TestFunctions.Fun_A2A());
         functionRegistry.add(new TestFunctions.Fun_A2A());
 
-        ParseException actual = assertThrows(ParseException.class, () -> functionRegistry.lookup(SOURCE_NODE, "a->a", mockArguments(new TestTypes.Polygon(), new TestTypes.Polygon())));
+        IllegalArgumentException actual = assertThrows(IllegalArgumentException.class, () -> functionRegistry.lookup(SOURCE_NODE, "a->a", mockArguments(new TestTypes.Polygon())));
 
-        assertCannotResolve(actual);
+        assertThat(actual.getMessage(), containsString("Ambiguous function call"));
+        assertThat(actual.getMessage().chars().filter(c -> c == ';').count(), is(2L));
     }
 
     @Test
-    void shouldMatchAndResolveReturnTypeFromVariable() throws ParseException {
+    void shouldMatchAndResolveReturnTypeFromVariable() {
         functionRegistry.add(new TestFunctions.Fun_A2A());
 
         val actual = functionRegistry.lookup(SOURCE_NODE, "a->a", mockArguments(new TestTypes.Polygon()));
@@ -140,7 +163,7 @@ class FunctionRegistryTest {
     }
 
     @Test
-    void shouldMatchAndResolveVariablesWhenSameType() throws ParseException {
+    void shouldMatchAndResolveVariablesWhenSameType() {
         functionRegistry.add(new TestFunctions.Fun_AA2A());
 
         val actual = functionRegistry.lookup(SOURCE_NODE, "aa->a", mockArguments(
@@ -152,7 +175,7 @@ class FunctionRegistryTest {
     }
 
     @Test
-    void shouldMatchAndResolveVariablesWhenConstraintMatches() throws ParseException {
+    void shouldMatchAndResolveVariablesWhenConstraintMatches() {
         functionRegistry.add(new TestFunctions.Fun_CC2One());
 
         val actual = functionRegistry.lookup(SOURCE_NODE, "cc->1", mockArguments(
@@ -164,10 +187,10 @@ class FunctionRegistryTest {
     }
 
     @Test
-    void shouldThrowParseExceptionWhenConstraintDoesNotMatch() {
+    void shouldThrowIllegalArgumentExceptionWhenConstraintDoesNotMatch() {
         functionRegistry.add(new TestFunctions.Fun_CC2One());
 
-        ParseException actual = assertThrows(ParseException.class, () -> functionRegistry.lookup(SOURCE_NODE, "cc->1", mockArguments(
+        IllegalArgumentException actual = assertThrows(IllegalArgumentException.class, () -> functionRegistry.lookup(SOURCE_NODE, "cc->1", mockArguments(
                 new TestTypes.Polygon(),
                 new TestTypes.Polygon()
         )));
@@ -185,7 +208,7 @@ class FunctionRegistryTest {
             @ConvertWith(TestTypes.TypeConverter.class) Type t,
             @ConvertWith(TestTypes.TypeConverter.class) Type u,
             @ConvertWith(TestTypes.TypeConverter.class) Type expected
-    ) throws ParseException {
+    ) {
         functionRegistry.add(new TestFunctions.Fun_AA2A());
 
         val actual = functionRegistry.lookup(SOURCE_NODE, "aa->a", mockArguments(t, u));
@@ -205,7 +228,7 @@ class FunctionRegistryTest {
             @ConvertWith(TestTypes.TypeConverter.class) Type u,
             @ConvertWith(TestTypes.TypeConverter.class) Type tExpectedCast,
             @ConvertWith(TestTypes.TypeConverter.class) Type uExpectedCast
-    ) throws ParseException {
+    ) {
         functionRegistry.add(new TestFunctions.Fun_AA2A());
 
         val actual = functionRegistry.lookup(SOURCE_NODE, "aa->a", mockArguments(t, u));
@@ -251,13 +274,13 @@ class FunctionRegistryTest {
     @CsvSource({
             "Two,One"
     })
-    void shouldThrowParseExceptionWhenVariablesAreNotConvertible(
+    void shouldThrowIllegalArgumentExceptionWhenVariablesAreNotConvertible(
             @ConvertWith(TestTypes.TypeConverter.class) Type t,
             @ConvertWith(TestTypes.TypeConverter.class) Type u
     ) {
         functionRegistry.add(new TestFunctions.Fun_AA2A());
 
-        ParseException actual = assertThrows(ParseException.class, () -> functionRegistry.lookup(SOURCE_NODE, "aa->a", mockArguments(t, u)));
+        IllegalArgumentException actual = assertThrows(IllegalArgumentException.class, () -> functionRegistry.lookup(SOURCE_NODE, "aa->a", mockArguments(t, u)));
 
         assertCannotResolve(actual);
     }
@@ -270,7 +293,7 @@ class FunctionRegistryTest {
             @ConvertWith(TestTypes.TypeConverter.class) Type t,
             @ConvertWith(TestTypes.TypeConverter.class) Type u,
             @ConvertWith(TestTypes.TypeConverter.class) Type expected
-    ) throws ParseException {
+    ) {
         functionRegistry.add(new TestFunctions.Fun_AStar2A());
 
         val actual = functionRegistry.lookup(SOURCE_NODE, "a*->a", mockArguments(t, u));
@@ -279,16 +302,16 @@ class FunctionRegistryTest {
     }
 
     @Test
-    void shouldThrowParseExceptionEmptyVarArgsWhenNeededForReturn() {
+    void shouldThrowIllegalArgumentExceptionEmptyVarArgsWhenNeededForReturn() {
         functionRegistry.add(new TestFunctions.Fun_AStar2A());
 
-        ParseException actual = assertThrows(ParseException.class, () -> functionRegistry.lookup(SOURCE_NODE, "a*->a", mockArguments()));
+        IllegalArgumentException actual = assertThrows(IllegalArgumentException.class, () -> functionRegistry.lookup(SOURCE_NODE, "a*->a", mockArguments()));
 
         assertCannotResolve(actual);
     }
 
     @Test
-    void shouldMatchEmptyVarArgs() throws ParseException {
+    void shouldMatchEmptyVarArgs() {
         functionRegistry.add(new TestFunctions.Fun_AStar2One());
 
         val actual = functionRegistry.lookup(SOURCE_NODE, "a*->1", mockArguments());
@@ -300,13 +323,13 @@ class FunctionRegistryTest {
     @CsvSource({
             "One,Two"
     })
-    void shouldThrowParseExceptionVarArgsWhenVariablesAreNotConvertible(
+    void shouldThrowIllegalArgumentExceptionVarArgsWhenVariablesAreNotConvertible(
             @ConvertWith(TestTypes.TypeConverter.class) Type t,
             @ConvertWith(TestTypes.TypeConverter.class) Type u
     ) {
         functionRegistry.add(new TestFunctions.Fun_AStar2A());
 
-        ParseException actual = assertThrows(ParseException.class, () -> functionRegistry.lookup(SOURCE_NODE, "a*->a", mockArguments(t, u)));
+        IllegalArgumentException actual = assertThrows(IllegalArgumentException.class, () -> functionRegistry.lookup(SOURCE_NODE, "a*->a", mockArguments(t, u)));
 
         assertCannotResolve(actual);
     }
@@ -325,7 +348,7 @@ class FunctionRegistryTest {
             @ConvertWith(TestTypes.TypeConverter.class) Type e,
             @ConvertWith(TestTypes.TypeConverter.class) Type f,
             @ConvertWith(TestTypes.TypeConverter.class) Type expected
-    ) throws ParseException {
+    ) {
         functionRegistry.add(new TestFunctions.Fun_AB_Star2B());
 
         Type[] arguments = Stream.of(a, b, c, d, e, f)
@@ -343,7 +366,7 @@ class FunctionRegistryTest {
             "One,Two,One,,",
             "One,Two,One,Two,One",
     })
-    void shouldThrowParseExceptionIncompleteVarArgGroups(
+    void shouldThrowIllegalArgumentExceptionIncompleteVarArgGroups(
             @ConvertWith(TestTypes.TypeConverter.class) Type a,
             @ConvertWith(TestTypes.TypeConverter.class) Type b,
             @ConvertWith(TestTypes.TypeConverter.class) Type c,
@@ -356,7 +379,7 @@ class FunctionRegistryTest {
                 .filter(Objects::nonNull)
                 .toArray(Type[]::new);
 
-        ParseException actual = assertThrows(ParseException.class, () -> functionRegistry.lookup(SOURCE_NODE, "(ab)*->b", mockArguments(arguments)));
+        IllegalArgumentException actual = assertThrows(IllegalArgumentException.class, () -> functionRegistry.lookup(SOURCE_NODE, "(ab)*->b", mockArguments(arguments)));
 
         assertCannotResolve(actual);
     }
@@ -365,7 +388,7 @@ class FunctionRegistryTest {
     @CsvSource({
             "One,Two,Two,One",
     })
-    void shouldThrowParseExceptionIncompatibleVarArgGroups(
+    void shouldThrowIllegalArgumentExceptionIncompatibleVarArgGroups(
             @ConvertWith(TestTypes.TypeConverter.class) Type a,
             @ConvertWith(TestTypes.TypeConverter.class) Type b,
             @ConvertWith(TestTypes.TypeConverter.class) Type c,
@@ -377,7 +400,7 @@ class FunctionRegistryTest {
                 .filter(Objects::nonNull)
                 .toArray(Type[]::new);
 
-        ParseException actual = assertThrows(ParseException.class, () -> functionRegistry.lookup(SOURCE_NODE, "(ab)*->b", mockArguments(arguments)));
+        IllegalArgumentException actual = assertThrows(IllegalArgumentException.class, () -> functionRegistry.lookup(SOURCE_NODE, "(ab)*->b", mockArguments(arguments)));
 
         assertCannotResolve(actual);
     }
@@ -386,7 +409,7 @@ class FunctionRegistryTest {
     @CsvSource({
             "Color<Red>,Color<White>",
     })
-    void shouldThrowParseExceptionIncompatibleTemplateSpecializations(
+    void shouldThrowIllegalArgumentExceptionIncompatibleTemplateSpecializations(
             @ConvertWith(TestTypes.TypeConverter.class) Type a,
             @ConvertWith(TestTypes.TypeConverter.class) Type b
     ) {
@@ -396,7 +419,7 @@ class FunctionRegistryTest {
                 .filter(Objects::nonNull)
                 .toArray(Type[]::new);
 
-        ParseException actual = assertThrows(ParseException.class, () -> functionRegistry.lookup(SOURCE_NODE, "a*->1", mockArguments(arguments)));
+        IllegalArgumentException actual = assertThrows(IllegalArgumentException.class, () -> functionRegistry.lookup(SOURCE_NODE, "a*->1", mockArguments(arguments)));
 
         assertCannotResolve(actual);
     }
@@ -408,7 +431,7 @@ class FunctionRegistryTest {
     void shouldMatchWhenSameTemplateSpecializations(
             @ConvertWith(TestTypes.TypeConverter.class) Type a,
             @ConvertWith(TestTypes.TypeConverter.class) Type b
-    ) throws ParseException {
+    ) {
         functionRegistry.add(new TestFunctions.Fun_AStar2One());
 
         Type[] arguments = Stream.of(a, b)
@@ -424,7 +447,7 @@ class FunctionRegistryTest {
     @CsvSource({
             "Color<Red>,Color<Red>"
     })
-    void shouldThrowParseExceptionWhenNoReturnIsSpecifiedAndProgrammaticReturnTypeResolutionFails(
+    void shouldThrowIllegalArgumentExceptionWhenNoReturnIsSpecifiedAndProgrammaticReturnTypeResolutionFails(
             @ConvertWith(TestTypes.TypeConverter.class) Type a,
             @ConvertWith(TestTypes.TypeConverter.class) Type b
     ) {
@@ -435,7 +458,7 @@ class FunctionRegistryTest {
                 .filter(Objects::nonNull)
                 .toArray(Type[]::new);
 
-        ParseException actual = assertThrows(ParseException.class, () -> functionRegistry.lookup(SOURCE_NODE, "a*->?", mockArguments(arguments)));
+        IllegalArgumentException actual = assertThrows(IllegalArgumentException.class, () -> functionRegistry.lookup(SOURCE_NODE, "a*->?", mockArguments(arguments)));
         verify(function).resolveReturnType(Mockito.isNull(), Mockito.anyMap(), Mockito.any());
 
         assertCannotResolve(actual);
@@ -448,7 +471,7 @@ class FunctionRegistryTest {
     void shouldUseProgrammaticReturnTypeResolutionWhenNoReturnIsSpecified(
             @ConvertWith(TestTypes.TypeConverter.class) Type a,
             @ConvertWith(TestTypes.TypeConverter.class) Type b
-    ) throws ParseException {
+    ) {
         val expected = new TestTypes.Two();
         Function function = Mockito.mock(TestFunctions.Fun_AStar2Unknown.class);
         when(function.resolveReturnType(Mockito.isNull(), Mockito.anyMap(), Mockito.any()))
@@ -477,7 +500,7 @@ class FunctionRegistryTest {
             @ConvertWith(TestTypes.TypeConverter.class) Type a,
             @ConvertWith(TestTypes.TypeConverter.class) Type b,
             @ConvertWith(TestTypes.TypeConverter.class) Type expected
-    ) throws ParseException {
+    ) {
         Function function = Mockito.spy(new TestFunctions.Fun_CC2C());
         functionRegistry.add(function);
 
@@ -495,7 +518,7 @@ class FunctionRegistryTest {
     @CsvSource({
             "Color<Red>,Color<White>"
     })
-    void shouldThrowParseExceptionWhenReturnIsTemplateAndProgrammaticReturnTypeResolutionFails(
+    void shouldThrowIllegalArgumentExceptionWhenReturnIsTemplateAndProgrammaticReturnTypeResolutionFails(
             @ConvertWith(TestTypes.TypeConverter.class) Type a,
             @ConvertWith(TestTypes.TypeConverter.class) Type b
     ) {
@@ -506,7 +529,7 @@ class FunctionRegistryTest {
                 .filter(Objects::nonNull)
                 .toArray(Type[]::new);
 
-        ParseException actual = assertThrows(ParseException.class, () -> functionRegistry.lookup(SOURCE_NODE, "cc->c", mockArguments(arguments)));
+        IllegalArgumentException actual = assertThrows(IllegalArgumentException.class, () -> functionRegistry.lookup(SOURCE_NODE, "cc->c", mockArguments(arguments)));
         verify(function).resolveReturnType(Mockito.any(TestTypes.Color.class), Mockito.anyMap(), Mockito.any());
 
         assertCannotResolve(actual);
@@ -514,14 +537,14 @@ class FunctionRegistryTest {
 
     @ParameterizedTest
     @CsvSource({
-            "Polygon,One,l->1",
+            "Polygon,One,p->1",
             "Color,One,c->1"
     })
     void shouldMatchMultiPrototypes(
             @ConvertWith(TestTypes.TypeConverter.class) Type t,
             @ConvertWith(TestTypes.TypeConverter.class) Type u,
             String function
-    ) throws ParseException {
+    ) {
         functionRegistry.add(new TestFunctions.Fun_M2One());
 
         val actual = functionRegistry.lookup(SOURCE_NODE, function, mockArguments(t));
@@ -539,7 +562,7 @@ class FunctionRegistryTest {
                 .collect(toList());
     }
 
-    private void assertCannotResolve(ParseException actual) {
+    private void assertCannotResolve(IllegalArgumentException actual) {
         assertThat(actual.getMessage(), containsString("Cannot resolve function"));
     }
 
@@ -754,13 +777,39 @@ class FunctionRegistryTest {
                 ),
                 @FunctionPrototype(
                         returns = @Returns(type = TestTypes.One.class),
-                        name = "l->1",
+                        name = "p->1",
                         parameters = {
                                 @Parameter(type = TestTypes.Polygon.class)
                         }
                 )
         })
         static class Fun_M2One extends MockedFunction {
+        }
+
+        static class Fun_Invalid_NoPrototypeAnnotations extends MockedFunction {
+        }
+
+        @FunctionPrototypes({})
+        @FunctionPrototype(
+                returns = @Returns(type = TestTypes.One.class),
+                name = "invalid_varargs",
+                parameters = {
+                        @Parameter(type = TestTypes.Color.class, varArgs = true),
+                        @Parameter(type = TestTypes.Color.class)
+                }
+        )
+        static class Fun_Invalid_MultiplePrototypeAnnotations extends MockedFunction {
+        }
+
+        @FunctionPrototype(
+                returns = @Returns(type = TestTypes.One.class),
+                name = "invalid_varargs",
+                parameters = {
+                        @Parameter(type = TestTypes.Color.class, varArgs = true),
+                        @Parameter(type = TestTypes.Color.class)
+                }
+        )
+        static class Fun_Invalid_NonTailVarArgs extends MockedFunction {
         }
     }
 }
