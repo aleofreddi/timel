@@ -73,7 +73,7 @@ primaryExpression
     : constant
     | array
     | Identifier
-    | StringLiteral+
+    | StringLiteral
     | '(' expression ')'
     ;
 
