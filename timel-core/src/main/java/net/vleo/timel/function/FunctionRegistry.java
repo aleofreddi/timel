@@ -109,9 +109,7 @@ public class FunctionRegistry {
 
         List<FunctionPrototype> prototypes = functionPrototypes == null ? singletonList(functionPrototype) : Arrays.asList(functionPrototypes.value());
 
-        prototypes.stream()
-                .forEach(this::validate);
-
+        prototypes.forEach(this::validate);
         prototypes.stream()
                 .map(entry -> new Pair<FunctionPrototype, Function<?>>(entry, function))
                 .forEach(entry ->
@@ -146,8 +144,17 @@ public class FunctionRegistry {
                 .sorted(Comparator.comparing(FunctionCallMatch::getWeight))
                 .collect(toList());
 
-        if(alternatives.isEmpty())
-            throw new IllegalArgumentException("Cannot resolve function " + getSignature(function, arguments));
+        if(alternatives.isEmpty()) {
+            val candidates = functions.get(function);
+            if(candidates == null)
+                throw new IllegalArgumentException("Cannot resolve function " + getSignature(function, arguments));
+            else
+                throw new IllegalArgumentException("Cannot resolve function " + getSignature(function, arguments) + ". Available signatures: " +
+                        candidates.stream()
+                                .map(entry -> getSignature(entry.getFirst()))
+                                .collect(joining(", "))
+                );
+        }
 
         if(alternatives.size() > 1 && alternatives.get(0).getWeight() == alternatives.get(1).getWeight())
             throw new IllegalArgumentException("Ambiguous function call, matches: " +
@@ -166,7 +173,6 @@ public class FunctionRegistry {
     }
 
     private FunctionCallMatch functionMatches(FunctionPrototype functionPrototype, Function<?> function, List<AbstractSyntaxTree> arguments) throws ConfigurationException {
-        val functionClass = function.getClass();
         val metaReturns = functionPrototype.returns();
         val metaParameters = functionPrototype.parameters();
 

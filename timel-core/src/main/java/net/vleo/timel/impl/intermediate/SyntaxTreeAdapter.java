@@ -100,7 +100,7 @@ public class SyntaxTreeAdapter implements ParserTreeVisitor<AbstractSyntaxTree, 
             try {
                 return functionRegistry.lookup(functionCallNode, function, children);
             } catch(IllegalArgumentException e) {
-                throw new ParseException("Failed to lookup function " + function, e);
+                throw new ParseException("Failed to lookup function " + function + ": " + e.getMessage());
             }
         });
     }

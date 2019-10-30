@@ -130,6 +130,7 @@ class FunctionRegistryTest {
         IllegalArgumentException actual = assertThrows(IllegalArgumentException.class, () -> functionRegistry.lookup(SOURCE_NODE, "a->a", mockArguments()));
 
         assertCannotResolve(actual);
+        assertThat(actual.getMessage(), containsString("Available signatures: a->a($A)"));
     }
 
     @Test
@@ -139,6 +140,7 @@ class FunctionRegistryTest {
         IllegalArgumentException actual = assertThrows(IllegalArgumentException.class, () -> functionRegistry.lookup(SOURCE_NODE, "a->a", mockArguments(new TestTypes.Polygon(), new TestTypes.Polygon())));
 
         assertCannotResolve(actual);
+        assertThat(actual.getMessage(), containsString("Available signatures: a->a($A)"));
     }
 
     @Test
