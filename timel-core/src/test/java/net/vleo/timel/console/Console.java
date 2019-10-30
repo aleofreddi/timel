@@ -23,6 +23,7 @@ package net.vleo.timel.console;
  */
 
 import lombok.val;
+import net.vleo.timel.ParseException;
 import net.vleo.timel.conversion.StandardConversions;
 import net.vleo.timel.executor.ExecutorContext;
 import net.vleo.timel.function.FunctionRegistry;
@@ -111,7 +112,11 @@ public class Console {
                 }
 
                 System.out.println("Evaluation complete");
+            } catch(ParseException e) {
+                System.err.println(e.getMessage() + " at " + e.getSourceReference());
+                e.printStackTrace();
             } catch(Exception e) {
+                System.err.println(e.getMessage());
                 e.printStackTrace();
             }
         }
