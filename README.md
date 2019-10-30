@@ -40,7 +40,8 @@ With TimEL you can:
   * **Scale** natively integral values (like consumptions) and averages;
   * **Stream** results without the need of having all the operands in memory;
   * **Support** integer, floating point and double expressions;
-  * **Extend** with your own types and functions.
+  * **Extend** with your own types and functions;
+  * Evaluate expression **securely** - by default there is no way to access external JVM objects or methods that would expose you to a security risk.
 
 TimEL requires Java 8 and will run in any J2SE or J2EE container.  For complete project information, see [TimEL's website](https://timel.vleo.net).
 
