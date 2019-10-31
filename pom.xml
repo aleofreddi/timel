@@ -4,7 +4,7 @@
 
     <groupId>net.vleo.timel</groupId>
     <artifactId>pom</artifactId>
-    <version>0.9.3-SNAPSHOT</version>
+    <version>0.9.3</version>
     <packaging>pom</packaging>
 
     <name>TimEL pom</name>
@@ -37,7 +37,7 @@
         <connection>scm:git:https://github.com/aleofreddi/timel</connection>
         <developerConnection>scm:git:git@github.com:aleofreddi/timel</developerConnection>
         <url>https://github.com/aleofreddi/timel</url>
-        <tag>HEAD</tag>
+        <tag>release-0.9.3</tag>
     </scm>
 
     <properties>
