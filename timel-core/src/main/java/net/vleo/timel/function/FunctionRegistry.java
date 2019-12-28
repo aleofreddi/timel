@@ -152,15 +152,17 @@ public class FunctionRegistry {
                 throw new IllegalArgumentException("Cannot resolve function " + getSignature(function, arguments) + ". Available signatures: " +
                         candidates.stream()
                                 .map(entry -> getSignature(entry.getFirst()))
+                                .sorted()
                                 .collect(joining(", "))
                 );
         }
 
         if(alternatives.size() > 1 && alternatives.get(0).getWeight() == alternatives.get(1).getWeight())
-            throw new IllegalArgumentException("Ambiguous function call, matches: " +
+            throw new IllegalArgumentException("Ambiguous function call. Matched signatures: " +
                     alternatives.stream()
                             .map(alternative -> getSignature(alternative.getFunctionPrototype()))
-                            .collect(Collectors.joining("; ")));
+                            .sorted()
+                            .collect(Collectors.joining(", ")));
 
         val match = alternatives.get(0);
         return new FunctionCall(

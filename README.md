@@ -4,6 +4,10 @@
 [![Test Coverage](https://codecov.io/gh/aleofreddi/timel/branch/master/graph/badge.svg)](https://codecov.io/gh/aleofreddi/timel) 
 [![Javadocs](https://www.javadoc.io/badge/net.vleo.timel/timel-core.svg)](https://www.javadoc.io/doc/net.vleo.timel/timel-core)
 
+## TL;DR
+
+Pick a random example in the [📺 online console](https://timel.vleo.net/console) and try it yourself!
+
 ## Why?
 
 Monitoring, metering, IoT, pay-per-use billing: these are only few examples of applications that rely on time-series data! Often you want the final user to be 
@@ -28,8 +32,6 @@ scale(                                      // (3) and then downsample for the w
 If we evaluate this expression for an interval in the same day, let's say 06:00-18:00, it'll report 0.5 - that is half day. If we evaluate it for more days it 
 will count how many days are contained in the interval. The function `uniform` here returns an integral, so TimEL knows how to interpolate it properly - that 
 is handled by the interpreter so the user does not need to worry no more about time frames.
-
-**TL;DR?** Pick a random example in the [📺 online console](https://timel.vleo.net/console) and try it yourself!
 
 ## Features
 

@@ -152,7 +152,7 @@ class FunctionRegistryTest {
         IllegalArgumentException actual = assertThrows(IllegalArgumentException.class, () -> functionRegistry.lookup(SOURCE_NODE, "a->a", mockArguments(new TestTypes.Polygon())));
 
         assertThat(actual.getMessage(), containsString("Ambiguous function call"));
-        assertThat(actual.getMessage().chars().filter(c -> c == ';').count(), is(2L));
+        assertThat(actual.getMessage().chars().filter(c -> c == ',').count(), is(2L));
     }
 
     @Test
