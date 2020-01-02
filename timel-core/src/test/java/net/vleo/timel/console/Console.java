@@ -81,15 +81,12 @@ public class Console {
                 System.out.println("Parsed {\n" + new ParserTreeDumper().dump(parseTree) + "}\n");
 
                 FunctionRegistry functionRegistry = new FunctionRegistry(TYPE_SYSTEM);
-
                 functionRegistry.addAll(StandardFunctions.STANDARD_FUNCTIONS);
 
                 VariableRegistry variableRegistry = new VariableRegistry();
                 variableRegistry.setVariableFactory((variable, type) -> new TreeMapVariable<>());
 
                 // Time
-                functionRegistry.add(new EveryFunction());
-
                 val intTree = parseTree.accept(new SyntaxTreeAdapter(variableRegistry, functionRegistry));
 
                 System.out.println("Parsed {\n" + new SyntaxTreeDumper().dump(intTree) + "}\n");

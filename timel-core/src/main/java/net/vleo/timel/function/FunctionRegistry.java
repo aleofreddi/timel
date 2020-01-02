@@ -27,7 +27,6 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.val;
 import net.vleo.timel.ConfigurationException;
-import net.vleo.timel.ParseException;
 import net.vleo.timel.annotation.Constraint;
 import net.vleo.timel.annotation.FunctionPrototype;
 import net.vleo.timel.annotation.FunctionPrototypes;
@@ -37,7 +36,6 @@ import net.vleo.timel.impl.intermediate.tree.AbstractSyntaxTree;
 import net.vleo.timel.impl.intermediate.tree.Cast;
 import net.vleo.timel.impl.intermediate.tree.FunctionCall;
 import net.vleo.timel.impl.parser.tree.AbstractParseTree;
-import net.vleo.timel.tuple.Pair;
 import net.vleo.timel.type.*;
 
 import java.lang.reflect.InvocationTargetException;
@@ -88,7 +86,7 @@ public class FunctionRegistry {
 
     @Getter
     private final TypeSystem typeSystem;
-    private final Map<String, Set<Pair<FunctionPrototype, Function<?>>>> functions = new HashMap<>();
+    private final Map<String, Map<FunctionPrototype, Function<?>>> functions = new HashMap<>();
 
     /**
      * Add a function to the registry.
@@ -110,12 +108,12 @@ public class FunctionRegistry {
         List<FunctionPrototype> prototypes = functionPrototypes == null ? singletonList(functionPrototype) : Arrays.asList(functionPrototypes.value());
 
         prototypes.forEach(this::validate);
-        prototypes.stream()
-                .map(entry -> new Pair<FunctionPrototype, Function<?>>(entry, function))
-                .forEach(entry ->
-                        functions.computeIfAbsent(entry.getFirst().name(), key -> new HashSet<>())
-                                .add(entry)
-                );
+        prototypes.forEach(prototype -> {
+            val knownPrototypes = functions.computeIfAbsent(prototype.name(), key -> new HashMap<>());
+            if(knownPrototypes.containsKey(prototype))
+                throw new IllegalArgumentException("Duplicate signature " + getSignature(prototype));
+            knownPrototypes.put(prototype, function);
+        });
     }
 
     /**
@@ -137,9 +135,8 @@ public class FunctionRegistry {
      * @throws IllegalArgumentException When the lookup failed
      */
     public FunctionCall lookup(AbstractParseTree reference, String function, List<AbstractSyntaxTree> arguments) {
-        List<FunctionCallMatch> alternatives = functions.getOrDefault(function, emptySet())
-                .stream()
-                .map(registryFunction -> functionMatches(registryFunction.getFirst(), registryFunction.getSecond(), arguments))
+        List<FunctionCallMatch> alternatives = functions.getOrDefault(function, emptyMap()).entrySet().stream()
+                .map(registryFunction -> functionMatches(registryFunction.getKey(), registryFunction.getValue(), arguments))
                 .filter(Objects::nonNull)
                 .sorted(Comparator.comparing(FunctionCallMatch::getWeight))
                 .collect(toList());
@@ -150,8 +147,8 @@ public class FunctionRegistry {
                 throw new IllegalArgumentException("Cannot resolve function " + getSignature(function, arguments));
             else
                 throw new IllegalArgumentException("Cannot resolve function " + getSignature(function, arguments) + ". Available signatures: " +
-                        candidates.stream()
-                                .map(entry -> getSignature(entry.getFirst()))
+                        candidates.keySet().stream()
+                                .map(this::getSignature)
                                 .sorted()
                                 .collect(joining(", "))
                 );
