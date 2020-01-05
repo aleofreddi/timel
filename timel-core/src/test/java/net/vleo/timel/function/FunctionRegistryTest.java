@@ -38,10 +38,7 @@ import net.vleo.timel.impl.target.Evaluable;
 import net.vleo.timel.impl.upscaler.Upscaler;
 import net.vleo.timel.iterator.UpscalableIterator;
 import net.vleo.timel.time.Interval;
-import net.vleo.timel.type.TemplateType;
-import net.vleo.timel.type.Type;
-import net.vleo.timel.type.TypeSystem;
-import net.vleo.timel.type.Types;
+import net.vleo.timel.type.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -115,6 +112,15 @@ class FunctionRegistryTest {
     }
 
     @Test
+    void shouldThrowIllegalArgumentExceptionWhenAddingDuplicatePrototype() {
+        functionRegistry.add(new TestFunctions.Fun_A2A());
+
+        IllegalArgumentException actual = assertThrows(IllegalArgumentException.class, () -> functionRegistry.add(new TestFunctions.Fun_A2A()));
+
+        assertThat(actual.getMessage(), containsString("Duplicate"));
+    }
+
+    @Test
     void shouldThrowIllegalArgumentExceptionWhenUnknownName() {
         functionRegistry.add(new TestFunctions.Fun_A2A());
 
@@ -145,11 +151,9 @@ class FunctionRegistryTest {
 
     @Test
     void shouldThrowIllegalArgumentExceptionWhenMultipleMatches() {
-        functionRegistry.add(new TestFunctions.Fun_A2A());
-        functionRegistry.add(new TestFunctions.Fun_A2A());
-        functionRegistry.add(new TestFunctions.Fun_A2A());
+        functionRegistry.add(new TestFunctions.Fun_Ambiguous());
 
-        IllegalArgumentException actual = assertThrows(IllegalArgumentException.class, () -> functionRegistry.lookup(SOURCE_NODE, "a->a", mockArguments(new TestTypes.Polygon())));
+        IllegalArgumentException actual = assertThrows(IllegalArgumentException.class, () -> functionRegistry.lookup(SOURCE_NODE, "ambiguous", mockArguments(new ZeroType())));
 
         assertThat(actual.getMessage(), containsString("Ambiguous function call"));
         assertThat(actual.getMessage().chars().filter(c -> c == ',').count(), is(2L));
@@ -616,7 +620,27 @@ class FunctionRegistryTest {
         static class TriangleToPolygon extends MockedConversion {
         }
 
-        private static final Set<Conversion<?, ?>> CONVERSIONS = new HashSet<>(Arrays.asList(new SquareToRectangle(), new RectangleToPolygon(), new TriangleToPolygon()));
+        @ConversionPrototype(source = ZeroType.class, target = FloatType.class, implicit = true)
+        static class ZeroToFloat extends MockedConversion {
+        }
+
+        @ConversionPrototype(source = ZeroType.class, target = DoubleType.class, implicit = true)
+        static class ZeroToDouble extends MockedConversion {
+        }
+
+        @ConversionPrototype(source = ZeroType.class, target = IntegerType.class, implicit = true)
+        static class ZeroToInteger extends MockedConversion {
+        }
+
+        private static final Set<Conversion<?, ?>> CONVERSIONS = new HashSet<>(Arrays.asList(
+                new SquareToRectangle(),
+                new RectangleToPolygon(),
+                new TriangleToPolygon(),
+
+                new ZeroToFloat(),
+                new ZeroToDouble(),
+                new ZeroToInteger()
+        ));
 
         private static class TypeConverter implements ArgumentConverter {
             private final Pattern TEMPLATE_PATTERN = Pattern.compile("(\\w+)<(\\w+)?>");
@@ -789,6 +813,32 @@ class FunctionRegistryTest {
         }
 
         static class Fun_Invalid_NoPrototypeAnnotations extends MockedFunction {
+        }
+
+        @FunctionPrototypes({
+                @FunctionPrototype(
+                        returns = @Returns(type = TestTypes.One.class),
+                        name = "ambiguous",
+                        parameters = {
+                                @Parameter(type = IntegerType.class)
+                        }
+                ),
+                @FunctionPrototype(
+                        returns = @Returns(type = TestTypes.One.class),
+                        name = "ambiguous",
+                        parameters = {
+                                @Parameter(type = FloatType.class)
+                        }
+                ),
+                @FunctionPrototype(
+                        returns = @Returns(type = TestTypes.One.class),
+                        name = "ambiguous",
+                        parameters = {
+                                @Parameter(type = DoubleType.class)
+                        }
+                )
+        })
+        static class Fun_Ambiguous extends MockedFunction {
         }
 
         @FunctionPrototypes({})
