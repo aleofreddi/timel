@@ -13,6 +13,18 @@ Pick a random example in the [📺 online console](https://timel.vleo.net/consol
 Monitoring, metering, IoT, pay-per-use billing: these are only few examples of applications that rely on time-series data! Often you want the final user to be 
 able to manipulate and customize some results based on some time-series data - that's when TimEL comes in handy!
 
+### Keep your data: do not resample your time series
+Many time-series systems automatically upscale your value to a certain interval (let's say a value every 60 seconds): this produces a lot of duplicates and also limits granularity: what if there is a value change that lasted for less than 60 seconds? The information will be somehow lost, as it will be blended with some other value to accommodate the 60 second boundary constraint.
+
+TimEL won't force you to do that: it will operate directly using your sample timestamps, regardless of their form (aligned, misaligned, constant interval or variable one) or granularity (anything from years to milliseconds).
+
+*The granularity of your samples drives the computation, not the other way around!*
+
+### Do the right thing: gauges vs integrals (counters)
+Some time-series data come as a gauge, while some other come as a counter (integral). TimEL encodes this information directly within its *typing system*, so you do not have to worry.
+
+Let's imagine you're summing two integral (counter) values: if they're not perfectly aligned, TimEL will automatically interpolate when needed.
+
 ## What?
 
 TimEL is a Java library to compile and evaluate TimEL expressions. TimEL expressions are written in a user-friendly language that allows time-series 
